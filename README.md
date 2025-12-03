@@ -1,2 +1,6 @@
-# AUTO-LECTIO
-The goal for this project is to generate a slide show for the catholic mass on any given date.
+# Auto-Lectio :book:
+## Goals
+- Programmatically generate daily mass slide show.
+- Provide this service through a website.
+- Create a user friendly UI to customize slide show.
+- Display information of how to follow the GIRM.
