@@ -28,11 +28,13 @@ Assumes a virtualenv `venv` with dependencies installed (python-pptx, feedparser
 2) Fetch specific date:
    - `venv/bin/python fetch.py --date 12-14-25`
 
-3) Render basic:
-   - `venv/bin/python render.py --template template.pptx --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx`
+3) Render basic (auto-picks Sunday/Daily template from `templates/`):
+   - `venv/bin/python render.py --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx`
+   - Use a custom templates directory: `--template-root /templates`
+   - Or point directly to a template file/dir: `--template /templates/sunday-ord` or `--template /templates/daily-ord.pptx`
 
 4) Render with logs + timestamped filename:
-   - `venv/bin/python render.py --verbose --template template.pptx --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx --stamp`
+   - `venv/bin/python render.py --verbose --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx --stamp`
 
 The renderer prints the final output path (with timestamp when `--stamp` is used).
 
@@ -40,11 +42,14 @@ The renderer prints the final output path (with timestamp when `--stamp` is used
 See `AGENTS.md` for the full list and behavior.
 
 ## Notes
-- The canonical template is `template.pptx` (copied from `testtt.pptx`).
+- Templates live under `templates/` by default. The renderer auto-selects:
+  - `sunday-ord(.pptx)` for Sundays
+  - `daily-ord(.pptx)` for weekdays
+  You can override with `--template` (file or directory) or `--template-root`.
 - We avoid deleting slides to keep the PPTX package consistent. If a reading is missing, placeholders are blanked and slides can be left in place or hidden later.
 
 ## Troubleshooting
-- Verbose logs: run with `--verbose` to print initial placeholder slide positions (1-based), waterfall seed/sequence indices, and short text previews. This helps correlate PowerPoint slide numbers with renderer operations.
+- Verbose logs: run with `--verbose` to print the chosen template path, initial placeholder slide positions (1-based), waterfall seed/sequence indices, and short text previews. This helps correlate PowerPoint slide numbers with renderer operations.
 - No repair prompt: avoid deleting slides. The renderer blanks missing-reading placeholders instead of deleting slides to prevent duplicate slide-part names and “repair” warnings.
 - Slide order shifts: seeds are processed in descending index to minimize index shifting. Logs report final sequence indices so you can confirm where duplicates land.
 - Psalm splitting: renderer ignores global chunking for Psalms and alternates refrain/verse slides. If verses look too short, ask to enable verse-only min/merge rules.

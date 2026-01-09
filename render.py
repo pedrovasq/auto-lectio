@@ -2,13 +2,80 @@ from __future__ import annotations
 
 import argparse
 import os
-from datetime import datetime
+from datetime import datetime, date
 import json
 from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List, Tuple
 
 from pptx import Presentation
+
+
+def _is_sunday_from_meta(meta: Dict) -> bool:
+    """Detect if the mass day is Sunday using meta.date or meta.title.
+
+    - Uses ISO date in payload meta to check weekday.
+    - Falls back to checking 'Domingo' in the title if date is missing.
+    """
+    dstr = (meta or {}).get("date")
+    if dstr:
+        try:
+            d = date.fromisoformat(dstr)
+            return d.weekday() == 6  # Monday=0 .. Sunday=6
+        except Exception:
+            pass
+    title = (meta or {}).get("title") or ""
+    return "domingo" in title.lower()
+
+
+def _ensure_pptx(path: str) -> str:
+    """If a path without extension is given and '<path>.pptx' exists, use it."""
+    if os.path.isfile(path):
+        return path
+    if not os.path.splitext(path)[1]:
+        cand = path + ".pptx"
+        if os.path.isfile(cand):
+            return cand
+    return path
+
+
+def resolve_template_path(args, payload: Dict) -> str:
+    """Resolve the template file path.
+
+    Rules:
+      - If --template points to a file, use it.
+      - If --template points to a directory, pick sunday-ord/daily-ord inside it.
+      - If --template is omitted, use --template-root (default: 'templates').
+      - Accept filenames without .pptx extension.
+    """
+    meta = payload.get("meta", {})
+    is_sunday = _is_sunday_from_meta(meta)
+
+    # Explicit --template takes precedence
+    if args.template:
+        tpath = args.template
+        if os.path.isdir(tpath):
+            root = tpath
+        else:
+            # file (possibly without extension)
+            return _ensure_pptx(tpath)
+    else:
+        root = args.template_root or "templates"
+
+    # We have a directory root; choose based on sunday/daily
+    sunday_name = "sunday-ord"
+    daily_name = "daily-ord"
+    chosen = sunday_name if is_sunday else daily_name
+    cand1 = os.path.join(root, chosen)
+    cand2 = _ensure_pptx(cand1)
+    if os.path.isfile(cand2):
+        return cand2
+    # Fallbacks: try explicit .pptx variants under root
+    alt = os.path.join(root, chosen + ".pptx")
+    if os.path.isfile(alt):
+        return alt
+    # Last resort: if a non-directory --template was provided but not found, return as-is
+    return cand2
 
 
 # Simple iterator that also descends into group shapes (type 6)
@@ -258,7 +325,8 @@ def delete_slides(prs: Presentation, indices: List[int]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Render PPTX from JSON payload with waterfall duplication.")
-    parser.add_argument("--template", required=True, help="Path to template PPTX (e.g., template.pptx)")
+    parser.add_argument("--template", required=False, help="Path to template PPTX or directory (auto-pick sunday/daily)")
+    parser.add_argument("--template-root", default="templates", help="Directory containing sunday-ord/daily-ord templates")
     parser.add_argument("--json", dest="json_path", required=True, help="Path to payload JSON")
     parser.add_argument("--out", required=True, help="Path to output PPTX")
     parser.add_argument("--stamp", action="store_true", help="Append timestamp to output filename")
@@ -266,10 +334,11 @@ def main() -> None:
     args = parser.parse_args()
 
     payload = load_payload(args.json_path)
+    template_path = resolve_template_path(args, payload)
     placeholders: Dict[str, str] = payload.get("placeholders", {})
     chunks_map: Dict[str, List[str]] = payload.get("chunks", {})
 
-    prs = Presentation(args.template)
+    prs = Presentation(template_path)
 
     def log(msg: str) -> None:
         if args.verbose:
@@ -284,6 +353,7 @@ def main() -> None:
         "{GOSPEL_REF}", "{GOSPEL_TXT}",
     ]
     if args.verbose:
+        print(f"Using template: {template_path}")
         for tok in interested:
             idxs = find_seed_slide_indices(prs, tok)
             if idxs:
@@ -449,7 +519,8 @@ def main() -> None:
     out_path_str = args.out
     if args.stamp:
         base, ext = os.path.splitext(out_path_str)
-        ts = datetime.now().strftime('%Y%m%d-%H%M%S')
+        # More readable, shorter timestamp: YYYY-MM-DD_HH-MM
+        ts = datetime.now().strftime('%Y-%m-%d_%H-%M')
         out_path_str = f"{base}.{ts}{ext or '.pptx'}"
 
     # Update core properties for traceability

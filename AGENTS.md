@@ -184,8 +184,10 @@ In step (2), do it in slide index order, because inserting slides shifts indices
 ## Quick CLI
 - Fetch (today): `venv/bin/python fetch.py`
 - Fetch (specific date): `venv/bin/python fetch.py --date 12-14-25`
-- Render (basic): `venv/bin/python render.py --template template.pptx --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx`
-- Render (verbose + timestamp): `venv/bin/python render.py --verbose --template template.pptx --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx --stamp`
+- Render (auto-pick Sunday/Daily): `venv/bin/python render.py --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx`
+  - Override templates dir: `--template-root /templates`
+  - Force specific template: `--template /templates/sunday-ord` or `--template /templates/daily-ord.pptx`
+- Render (verbose + timestamp): `venv/bin/python render.py --verbose --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx --stamp`
 
 ## Testing Checklist
 - Run fetcher for today -> JSON created
