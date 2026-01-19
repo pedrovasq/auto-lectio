@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Auto-Lectio — UI</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+      h1 { font-size: 20px; margin: 0 0 16px; }
+      fieldset { border: 1px solid #ddd; padding: 12px; margin-bottom: 16px; }
+      label { display: block; margin: 6px 0 4px; font-weight: 600; }
+      input[type="text"], input[type="date"] { width: 100%; max-width: 520px; padding: 8px; }
+      .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+      button { padding: 8px 12px; cursor: pointer; }
+      #log { white-space: pre-wrap; background: #fafafa; border: 1px solid #eee; padding: 12px; min-height: 120px; }
+      .muted { color: #666; font-size: 12px; }
+      .ok { color: #0a7; }
+      .err { color: #c33; }
+      a { color: #06c; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <h1>Auto‑Lectio — Básico</h1>
+
+    <fieldset>
+      <legend>Parámetros</legend>
+      <label for="date">Fecha</label>
+      <input type="date" id="date" />
+
+      <label for="template">Plantilla PPTX (ruta)</label>
+      <input type="text" id="template" value="templates/custom/custom-sunday.pptx" />
+
+      <div class="row">
+        <label><input type="checkbox" id="stamp" checked /> Añadir timestamp</label>
+        <label><input type="checkbox" id="verbose" /> Verbose</label>
+      </div>
+      <div class="muted">Sugerencias: templates/sunday-ord.pptx, templates/daily-ord.pptx</div>
+    </fieldset>
+
+    <div class="row">
+      <button id="btn-fetch">Solo Fetch</button>
+      <button id="btn-render">Solo Render</button>
+      <button id="btn-run">Fetch + Render</button>
+    </div>
+
+    <p class="muted">Los archivos se escriben en <code>out/</code> (JSON) y <code>build/</code> (PPTX).</p>
+
+    <h3>Resultado</h3>
+    <div id="log">Listo.</div>
+
+    <script>
+      function todayISO() {
+        const d = new Date();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${d.getFullYear()}-${m}-${day}`;
+      }
+      const dateEl = document.getElementById('date');
+      dateEl.value = todayISO();
+
+      const logEl = document.getElementById('log');
+      function log(msg, cls) {
+        logEl.className = cls || '';
+        logEl.textContent = msg;
+      }
+
+      async function postJSON(url, body) {
+        const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok || data.ok === false) throw new Error(data.error || JSON.stringify(data));
+        return data;
+      }
+
+      async function doFetch() {
+        log('Fetching…');
+        const date = document.getElementById('date').value;
+        const data = await postJSON('/fetch', { date });
+        const meta = data.meta || {};
+        log(`✔ Fetch OK\nTítulo: ${meta.title || ''}\nJSON: ${data.json_path}`, 'ok');
+        return data;
+      }
+
+      async function doRender() {
+        const jsonPathGuess = `out/${document.getElementById('date').value}.es-US.json`;
+        const template = document.getElementById('template').value.trim();
+        const stamp = document.getElementById('stamp').checked;
+        const verbose = document.getElementById('verbose').checked;
+        log('Rendering…');
+        const data = await postJSON('/render', { json_path: jsonPathGuess, template, stamp, verbose });
+        const link = data.output_path ? `<a href="${data.output_path.replace(/^build\//, '/build/')}" target="_blank">Descargar PPTX</a>` : '';
+        log(`✔ Render OK\nSalida: ${data.output_path || ''}\n${link}`, 'ok');
+        return data;
+      }
+
+      async function doRun() {
+        const date = document.getElementById('date').value;
+        const template = document.getElementById('template').value.trim();
+        const stamp = document.getElementById('stamp').checked;
+        const verbose = document.getElementById('verbose').checked;
+        log('Fetch + Render…');
+        const data = await postJSON('/run', { date, template, stamp, verbose });
+        const link = data.output_path ? `<a href="${data.output_path.replace(/^build\//, '/build/')}" target="_blank">Descargar PPTX</a>` : '';
+        log(`✔ Hecho\nJSON: ${data.json_path}\nPPTX: ${data.output_path}\n${link}`, 'ok');
+        return data;
+      }
+
+      document.getElementById('btn-fetch').addEventListener('click', () => doFetch().catch(e => log(`✖ ${e.message}`, 'err')));
+      document.getElementById('btn-render').addEventListener('click', () => doRender().catch(e => log(`✖ ${e.message}`, 'err')));
+      document.getElementById('btn-run').addEventListener('click', () => doRun().catch(e => log(`✖ ${e.message}`, 'err')));
+    </script>
+  </body>
+  </html>
+

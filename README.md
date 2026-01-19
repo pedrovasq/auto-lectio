@@ -38,6 +38,34 @@ Assumes a virtualenv `venv` with dependencies installed (python-pptx, feedparser
 
 The renderer prints the final output path (with timestamp when `--stamp` is used).
 
+## Minimal Web UI
+
+Run a tiny Flask UI to fetch + render:
+
+- Local: `venv/bin/pip install flask && venv/bin/python web/app.py` then open http://127.0.0.1:5000
+- Docker: `docker compose up --build` then open http://127.0.0.1:8000
+
+The UI lives in `web/templates/index.html` and calls backend endpoints:
+
+- `POST /fetch` (build JSON)
+- `POST /render` (render PPTX)
+- `POST /run` (fetch + render)
+
+### Deploy behind Nginx (example)
+
+Reverse proxy a path on your site to the container:
+
+```
+location /lectio/ {
+    proxy_pass http://127.0.0.1:8000/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+```
+
+Then visit `https://your-domain/lectio/`.
+
 ## Placeholders
 See `AGENTS.md` for the full list and behavior.
 

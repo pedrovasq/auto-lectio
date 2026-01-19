@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 from typing import Dict, List, Optional
+import unicodedata
 from datetime import date
 from bs4 import BeautifulSoup
 
@@ -74,20 +75,26 @@ def classify(header: str) -> str:
 
 
 def extract_book_phrase(header: str) -> str:
-    """Extract the book name phrase from a section header, dropping numbering.
+    """Extract the book phrase (optionally with leading ordinal) and drop chapter/verse.
 
     Examples:
-      "Primera Lectura Sofonías 3, 1-2. 9-13" -> "Sofonías"
-      "Evangelio Mateo 21, 28-32" -> "Mateo"
+      - "Primera Lectura Sofonías 3, 1-2. 9-13" -> "Sofonías"
+      - "Evangelio Mateo 21, 28-32" -> "Mateo"
+      - "Segunda Lectura 1 Corintios 6, 13-20" -> "1 Corintios"
+      - "Segunda Lectura Primera carta a los Corintios 1, 1-3" -> "Primera carta a los Corintios"
     """
     h = header.strip()
-    # drop leading category words
+    # Drop leading category words (Primera/Segunda Lectura, Evangelio, Salmo Responsorial)
     h = re.sub(r"^(Primera Lectura|Segunda Lectura|Evangelio|Salmo Responsorial)\s+", "", h, flags=re.I)
-    # keep up to before the first digit
-    m = re.match(r"^([^\d]+)", h)
-    book = m.group(1) if m else h
-    # normalize spacing
-    return " ".join(book.split()).strip(" ,·—-\u2013\u2014")
+    # Cut off from the first occurrence of a chapter reference like " 6," or " 12:"
+    h = re.split(r"\s+\d{1,3}\s*[,.:]", h, maxsplit=1)[0]
+    # If nothing left (e.g., string starts with digits), fall back to non-digit prefix
+    if not h.strip():
+        m = re.match(r"^([^\d]+)", header)
+        if m:
+            h = m.group(1)
+    # Normalize spacing and trim punctuation
+    return " ".join(h.split()).strip(" ,·—-\u2013\u2014")
 
 
 PROPHETS = {
@@ -97,18 +104,41 @@ PROPHETS = {
 }
 
 
+def _norm_key(s: str) -> str:
+    """Return a lenient key for book-name matching.
+
+    - Lowercases, strips, removes diacritics.
+    - Normalizes common Greek-accent glitch for Isaías (ί -> í) and similar.
+    """
+    if not s:
+        return ""
+    # Fix common Greek iota with tonos showing up in some feeds
+    s = s.replace("ί", "í").replace("Ι", "I").replace("ι", "i")
+    # Unicode normalize + strip combining marks (accents)
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(ch for ch in s if not unicodedata.category(ch).startswith("M"))
+    return s.strip().lower()
+
+
+# Normalized lookup for prophets and a map to their canonical display names
+_PROPHETS_NORM = {_norm_key(b) for b in PROPHETS}
+_PROPHET_CANON = {_norm_key(b): b for b in PROPHETS}
+
+
 def first_reading_intro(header: str) -> str:
     book = extract_book_phrase(header)
-    nbook = book.lower()
-    # Prophets
-    if book in PROPHETS:
-        return f"Lectura del profeta {book}"
+    nkey = _norm_key(book)
+    # Prophets: prefer canonical display name to avoid odd glyphs
+    if nkey in _PROPHETS_NORM:
+        canon = _PROPHET_CANON.get(nkey, book)
+        # Per request: include "libro del profeta"
+        return f"Lectura del libro del profeta {canon}"
     # Hechos de los Apóstoles
-    if "hechos" in nbook:
+    if "hechos" in nkey:
         return "Lectura del libro de los Hechos de los Apóstoles"
     # Feminine article (Sabiduría)
     fem_books = {"Sabiduría"}
-    if book in fem_books or nbook.startswith("la "):
+    if book in fem_books or nkey.startswith("la "):
         return f"Lectura del libro de la {book.replace('la ', '').strip()}"
     return f"Lectura del libro de {book}"
 
@@ -157,7 +187,7 @@ def second_reading_intro(header: str) -> str:
       Revelation -> "Lectura del libro del Apocalipsis"
       James (Santiago) -> "Lectura de la carta del apóstol Santiago"
     """
-    book_raw = extract_book_phrase(header)  # e.g., "Santiago", "1 Juan", "Romanos"
+    book_raw = extract_book_phrase(header)  # e.g., "Santiago", "1 Juan", "Romanos", "Primera carta a los Corintios"
     book = book_raw.strip()
 
     # Split possible ordinal and base name: e.g., "1 Juan" -> ("1", "Juan")
@@ -183,8 +213,21 @@ def second_reading_intro(header: str) -> str:
         return t
 
     nb = norm(base)
+    # If no numeric ordinal, detect spelled ordinal words present in the phrase
+    if not ord_num:
+        whole = norm(book)
+        # Also useful for special-case checks below
+        if "primera" in whole:
+            ord_num = "1"
+        elif "segunda" in whole:
+            ord_num = "2"
+        elif "tercera" in whole:
+            ord_num = "3"
 
     # Special cases not attributed to an apostle name
+    # Acts of the Apostles appears sometimes as second reading (e.g., solemnities)
+    if "hechos" in (nb or "") or "hechos" in (norm(book) or ""):
+        return "Lectura del libro de los Hechos de los Apóstoles"
     if nb == "hebreos":
         return "Lectura de la carta a los Hebreos"
     if nb == "apocalipsis":
@@ -218,14 +261,25 @@ def second_reading_intro(header: str) -> str:
         "tito": "Tito",
         "filemon": "Filemón",
     }
-    if nb in pauline_plurals:
+    # Sometimes the phrase can include extra words (e.g., "Primera carta a los Corintios").
+    # Detect target names by presence rather than strict equality.
+    def find_key(keys: dict, text: str) -> Optional[str]:
+        for k in keys:
+            if re.search(rf"\b{k}\b", text):
+                return k
+        return None
+
+    key = find_key(pauline_plurals, nb) or find_key(pauline_plurals, norm(book))
+    if key:
         if ord_num in ("1", "2"):
-            return f"Lectura de la {ord_spanish(ord_num)} carta del apóstol san Pablo a los {pauline_plurals[nb]}"
-        return f"Lectura de la carta del apóstol san Pablo a los {pauline_plurals[nb]}"
-    if nb in pauline_singulars:
+            return f"Lectura de la {ord_spanish(ord_num)} carta del apóstol san Pablo a los {pauline_plurals[key]}"
+        return f"Lectura de la carta del apóstol san Pablo a los {pauline_plurals[key]}"
+
+    key = find_key(pauline_singulars, nb) or find_key(pauline_singulars, norm(book))
+    if key:
         if ord_num in ("1", "2"):
-            return f"Lectura de la {ord_spanish(ord_num)} carta del apóstol san Pablo a {pauline_singulars[nb]}"
-        return f"Lectura de la carta del apóstol san Pablo a {pauline_singulars[nb]}"
+            return f"Lectura de la {ord_spanish(ord_num)} carta del apóstol san Pablo a {pauline_singulars[key]}"
+        return f"Lectura de la carta del apóstol san Pablo a {pauline_singulars[key]}"
 
     # James (Santiago), Jude (Judas), etc.
     if nb == "santiago":
