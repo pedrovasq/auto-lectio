@@ -66,6 +66,12 @@ location /lectio/ {
 
 Then visit `https://your-domain/lectio/`.
 
+### Upload limits and timeouts
+- The UI allows uploading custom `.pptx` templates. Max size is set to 65 MB.
+- Cloudflare (proxied) max upload size is typically 100 MB on Free/Pro/Business; 65 MB is within that cap.
+- Cloudflare’s 100-second response timeout may apply; very slow connections could hit this. The container sets Gunicorn timeout to 180s to avoid backend timeouts.
+- If you proxy via Nginx, set `client_max_body_size 65m;` in your site config.
+
 ## Placeholders
 See `AGENTS.md` for the full list and behavior.
 

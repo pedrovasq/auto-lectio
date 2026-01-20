@@ -18,5 +18,5 @@ RUN mkdir -p out build
 EXPOSE 8000
 
 # Start with gunicorn (production WSGI server)
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "web.app:app"]
-
+# -t 180 increases worker timeout to accommodate larger uploads and rendering
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "-t", "180", "web.app:app"]

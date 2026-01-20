@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 from flask import Flask, jsonify, render_template, request, send_from_directory
+from werkzeug.utils import secure_filename
 
 # Ensure project root is importable when running as `python web/app.py`
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,6 +20,7 @@ import fetch as fetch_mod
 
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
+app.config["MAX_CONTENT_LENGTH"] = 65 * 1024 * 1024  # 65 MB upload limit
 
 
 def _default_json_path(d: date) -> Path:
@@ -118,6 +120,33 @@ def do_render():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
+@app.post("/upload")
+def upload_template():
+    try:
+        file = request.files.get("file") or request.files.get("template")
+        if not file or not getattr(file, "filename", ""):
+            return jsonify({"ok": False, "error": "No file uploaded"}), 400
+        ext = Path(file.filename).suffix.lower()
+        if ext != ".pptx":
+            return jsonify({"ok": False, "error": "Only .pptx files are allowed"}), 400
+        # Save under templates/uploads to keep paths simple for render.py
+        uploads_dir = ROOT / "templates" / "uploads"
+        uploads_dir.mkdir(parents=True, exist_ok=True)
+        safe_name = secure_filename(Path(file.filename).name)
+        # Make name unique
+        from datetime import datetime
+        import uuid
+        unique = datetime.now().strftime("%Y%m%d_%H%M%S") + "_" + uuid.uuid4().hex[:8]
+        final_name = f"{unique}_{safe_name}" if safe_name else f"{unique}.pptx"
+        dest = uploads_dir / final_name
+        file.save(str(dest))
+        # Return a server-side path suitable for --template input
+        rel_path = f"templates/uploads/{final_name}"
+        return jsonify({"ok": True, "template_path": rel_path})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
 @app.post("/run")
 def do_run():
     try:
@@ -153,7 +182,9 @@ def do_run():
 def download_build(filename: str):
     build_dir = ROOT / "build"
     build_dir.mkdir(parents=True, exist_ok=True)
-    return send_from_directory(str(build_dir), filename, as_attachment=False)
+    # If query param download=1 is present, force attachment download
+    as_attachment = str(request.args.get("download", "0")).lower() in ("1", "true", "yes", "on")
+    return send_from_directory(str(build_dir), filename, as_attachment=as_attachment)
 
 
 if __name__ == "__main__":

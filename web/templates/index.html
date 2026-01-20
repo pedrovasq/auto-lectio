@@ -27,8 +27,13 @@
       <label for="date">Fecha</label>
       <input type="date" id="date" />
 
-      <label for="template">Plantilla PPTX (ruta)</label>
+      <label for="template">Plantilla PPTX (ruta en servidor)</label>
       <input type="text" id="template" value="templates/custom/custom-sunday.pptx" />
+      <div class="row">
+        <input type="file" id="templateFile" accept=".pptx" />
+        <button id="btn-upload" type="button">Subir .pptx</button>
+      </div>
+      <div class="muted">Puede seleccionar un archivo .pptx local para subirlo; la ruta resultante se rellenará arriba.</div>
 
       <div class="row">
         <label><input type="checkbox" id="stamp" checked /> Añadir timestamp</label>
@@ -59,9 +64,13 @@
       dateEl.value = todayISO();
 
       const logEl = document.getElementById('log');
-      function log(msg, cls) {
+      function log(msg, cls, isHTML=false) {
         logEl.className = cls || '';
-        logEl.textContent = msg;
+        if (isHTML) {
+          logEl.innerHTML = msg;
+        } else {
+          logEl.textContent = msg;
+        }
       }
 
       async function postJSON(url, body) {
@@ -87,9 +96,27 @@
         const verbose = document.getElementById('verbose').checked;
         log('Rendering…');
         const data = await postJSON('/render', { json_path: jsonPathGuess, template, stamp, verbose });
-        const link = data.output_path ? `<a href="${data.output_path.replace(/^build\//, '/build/')}" target="_blank">Descargar PPTX</a>` : '';
-        log(`✔ Render OK\nSalida: ${data.output_path || ''}\n${link}`, 'ok');
+        const path = data.output_path || '';
+        const viewUrl = path ? path.replace(/^build\//, '/build/') : '';
+        const dlUrl = viewUrl ? viewUrl + (viewUrl.includes('?') ? '&' : '?') + 'download=1' : '';
+        const link = viewUrl ? `<a href="${dlUrl}">Descargar PPTX</a> · <a href="${viewUrl}" target="_blank">Ver</a>` : '';
+        const html = `✔ Render OK<br/>Salida: ${path}<br/>${link}`;
+        log(html, 'ok', true);
         return data;
+      }
+
+      async function uploadTemplate() {
+        const fileInput = document.getElementById('templateFile');
+        const f = fileInput.files && fileInput.files[0];
+        if (!f) { log('Seleccione un archivo .pptx', 'err'); return; }
+        const fd = new FormData();
+        fd.append('file', f);
+        log('Subiendo plantilla…');
+        const res = await fetch('/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok || data.ok === false) throw new Error(data.error || 'Upload failed');
+        document.getElementById('template').value = data.template_path;
+        log(`✔ Plantilla subida\n${data.template_path}`, 'ok');
       }
 
       async function doRun() {
@@ -99,15 +126,19 @@
         const verbose = document.getElementById('verbose').checked;
         log('Fetch + Render…');
         const data = await postJSON('/run', { date, template, stamp, verbose });
-        const link = data.output_path ? `<a href="${data.output_path.replace(/^build\//, '/build/')}" target="_blank">Descargar PPTX</a>` : '';
-        log(`✔ Hecho\nJSON: ${data.json_path}\nPPTX: ${data.output_path}\n${link}`, 'ok');
+        const path = data.output_path || '';
+        const viewUrl = path ? path.replace(/^build\//, '/build/') : '';
+        const dlUrl = viewUrl ? viewUrl + (viewUrl.includes('?') ? '&' : '?') + 'download=1' : '';
+        const link = viewUrl ? `<a href="${dlUrl}">Descargar PPTX</a> · <a href="${viewUrl}" target="_blank">Ver</a>` : '';
+        const html = `✔ Hecho<br/>JSON: ${data.json_path}<br/>PPTX: ${path}<br/>${link}`;
+        log(html, 'ok', true);
         return data;
       }
 
       document.getElementById('btn-fetch').addEventListener('click', () => doFetch().catch(e => log(`✖ ${e.message}`, 'err')));
       document.getElementById('btn-render').addEventListener('click', () => doRender().catch(e => log(`✖ ${e.message}`, 'err')));
       document.getElementById('btn-run').addEventListener('click', () => doRun().catch(e => log(`✖ ${e.message}`, 'err')));
+      document.getElementById('btn-upload').addEventListener('click', () => uploadTemplate().catch(e => log(`✖ ${e.message}`, 'err')));
     </script>
   </body>
   </html>
-
