@@ -331,12 +331,55 @@ def main() -> None:
     parser.add_argument("--out", required=True, help="Path to output PPTX")
     parser.add_argument("--stamp", action="store_true", help="Append timestamp to output filename")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument("--songs", required=False, help="Path to songs JSON providing hymn lyric chunks")
     args = parser.parse_args()
 
     payload = load_payload(args.json_path)
     template_path = resolve_template_path(args, payload)
     placeholders: Dict[str, str] = payload.get("placeholders", {})
     chunks_map: Dict[str, List[str]] = payload.get("chunks", {})
+
+    # Optional: load hymn lyric chunks from songs JSON
+    hymn_tokens = [
+        "{ENTRANCE_TXT}",
+        "{KYRIE_TXT}",
+        "{OFFERTORY_TXT}",
+        "{SANCTUS_TXT}",
+        "{MYSTERIUM_TXT}",
+        "{AGNUS_TXT}",
+        "{COMMUNION_TXT}",
+        "{RECESSIONAL_TXT}",
+    ]
+
+    songs_chunks: Dict[str, List[str]] = {}
+    if getattr(args, "songs", None):
+        try:
+            with open(args.songs, "r", encoding="utf-8") as sf:
+                songs_payload = json.load(sf)
+            # Primary: expect a top-level "chunks" mapping
+            if isinstance(songs_payload, dict):
+                raw_chunks = songs_payload.get("chunks")
+                if isinstance(raw_chunks, dict):
+                    for k, v in raw_chunks.items():
+                        if k in hymn_tokens and isinstance(v, list):
+                            # accept only str values; coerce others via str for safety
+                            songs_chunks[k] = [x if isinstance(x, str) else str(x) for x in v]
+                # Optional backward-compat support: single-value placeholders map
+                raw_ph = songs_payload.get("placeholders")
+                if isinstance(raw_ph, dict):
+                    for k, v in raw_ph.items():
+                        if k in hymn_tokens and isinstance(v, str):
+                            songs_chunks.setdefault(k, []).append(v)
+        except Exception as e:
+            if args.verbose:
+                print(f"Warning: failed to load songs JSON '{args.songs}': {e}")
+
+    # Merge songs chunks into chunks_map without disturbing reading chunks
+    if songs_chunks:
+        if args.verbose:
+            provided = sorted([k for k in songs_chunks.keys()])
+            print(f"Songs provided for tokens: {provided}")
+        chunks_map = {**chunks_map, **songs_chunks}
 
     prs = Presentation(template_path)
 
@@ -351,6 +394,9 @@ def main() -> None:
         "{SECOND_READING_REF}", "{SECOND_READING_TXT}",
         "{ACCLAMATION_REF}", "{ACCLAMATION_TXT}",
         "{GOSPEL_REF}", "{GOSPEL_TXT}",
+        # Hymn lyrics (chunked)
+        "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
+        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
     ]
     if args.verbose:
         print(f"Using template: {template_path}")
@@ -365,6 +411,9 @@ def main() -> None:
         "{PSALM_TXT}",
         "{SECOND_READING_TXT}",
         "{GOSPEL_TXT}",
+        # Hymn lyrics use waterfall with pre-chunked lines, preserving newlines
+        "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
+        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
     ]
 
     # Known tokens for cleanup when missing
@@ -375,6 +424,9 @@ def main() -> None:
         "{SECOND_READING_REF}", "{SECOND_READING_TXT}",
         "{ACCLAMATION_REF}", "{ACCLAMATION_TXT}",
         "{GOSPEL_REF}", "{GOSPEL_TXT}",
+        # Hymn lyrics tokens
+        "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
+        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
     }
 
     # Simple replacements: everything except the waterfall keys
@@ -384,10 +436,8 @@ def main() -> None:
         if tok not in placeholders and tok not in waterfall_keys:
             simple_mapping[tok] = ""
 
-    # For diagnostics: a superset including hymn placeholders
-    log_tokens = set(interested + [
-        "{ENTRANCE_HYMN}", "{OFFERTORY_HYMN}", "{MYSTERY_OF_FAITH}", "{COMMUNION_HYMN}", "{RECESSIONAL_HYMN}",
-    ])
+    # For diagnostics: use the same set as interested
+    log_tokens = set(interested)
 
     def tokens_in_slide(slide) -> List[str]:
         present = []
@@ -470,6 +520,12 @@ def main() -> None:
             # Always derive psalm chunks from the full text to ensure correct alternation
             raw = placeholders.get(key, "") or ""
             chunks = chunk_psalm_text(raw)
+        elif key in hymn_tokens:
+            # Use chunks exactly as provided in songs JSON; preserve newlines
+            chunks = chunks_map.get(key)
+            if not chunks:
+                raw = placeholders.get(key, "")
+                chunks = [raw] if raw is not None and str(raw).strip() else []
         else:
             chunks = chunks_map.get(key)
             if not chunks:
@@ -477,13 +533,21 @@ def main() -> None:
                 chunks = [raw] if raw is not None else [""]
 
         # Filter out empty chunks to avoid blank slides and sanitize whitespace
-        chunks = [_sanitize_text(c) for c in chunks if c and c.strip()]
-        # Enforce desired bounds for non-psalm waterfalls
-        if key != "{PSALM_TXT}":
-            chunks = enforce_chunk_bounds(chunks, min_chars=100, max_chars=140)
+        if key in hymn_tokens:
+            # Preserve line breaks in hymn chunks; only trim surrounding whitespace
+            chunks = [str(c).replace("\r\n", "\n").replace("\r", "\n").strip() for c in chunks if c and str(c).strip()]
+            # No auto-merging bounds for hymns
+        else:
+            chunks = [_sanitize_text(c) for c in chunks if c and c.strip()]
+            # Enforce desired bounds for non-psalm waterfalls
+            if key != "{PSALM_TXT}":
+                chunks = enforce_chunk_bounds(chunks, min_chars=100, max_chars=140)
         log(f"{key}: {len(chunks)} chunk(s)")
 
         if len(chunks) == 0:
+            # No content provided: blank out the token across the deck
+            for slide in prs.slides:
+                replace_tokens_in_slide(slide, {key: ""})
             continue
 
         # Duplicate slides for all chunks beyond the first

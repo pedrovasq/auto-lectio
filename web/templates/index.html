@@ -17,6 +17,13 @@
       .ok { color: #0a7; }
       .err { color: #c33; }
       a { color: #06c; text-decoration: none; }
+      .panel { border: 1px solid #eee; padding: 12px; margin-top: 16px; }
+      .ph-list { list-style: none; padding-left: 0; }
+      .ph-item { padding: 6px 0; border-bottom: 1px dotted #eee; }
+      .ph-item:last-child { border-bottom: 0; }
+      code { background: #f6f8fa; padding: 1px 4px; border-radius: 3px; }
+      .badge { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 10px; background: #eef; color: #225; margin-left: 6px; vertical-align: middle; }
+      .badge.waterfall { background: #e7f7ef; color: #0a7; }
     </style>
   </head>
   <body>
@@ -52,6 +59,13 @@
 
     <h3>Resultado</h3>
     <div id="log">Listo.</div>
+
+    <div class="panel">
+      <h3>Placeholders de la Plantilla</h3>
+      <div class="muted">Coloque estos tokens (con llaves) en cuadros de texto del PPTX. Los marcados como “waterfall” pueden generar varias diapositivas.</div>
+      <ul id="ph-list" class="ph-list"><li class="ph-item muted">Cargando…</li></ul>
+      <div id="ph-notes" class="muted" style="margin-top:8px;"></div>
+    </div>
 
     <script>
       function todayISO() {
@@ -139,6 +153,29 @@
       document.getElementById('btn-render').addEventListener('click', () => doRender().catch(e => log(`✖ ${e.message}`, 'err')));
       document.getElementById('btn-run').addEventListener('click', () => doRun().catch(e => log(`✖ ${e.message}`, 'err')));
       document.getElementById('btn-upload').addEventListener('click', () => uploadTemplate().catch(e => log(`✖ ${e.message}`, 'err')));
+
+      async function loadPlaceholders() {
+        try {
+          const res = await fetch('/placeholders');
+          const data = await res.json();
+          const list = Array.isArray(data.placeholders) ? data.placeholders : [];
+          const ul = document.getElementById('ph-list');
+          if (!list.length) { ul.innerHTML = '<li class="ph-item muted">Sin datos</li>'; return; }
+          ul.innerHTML = list.map(p => {
+            const wf = p.waterfall ? '<span class="badge waterfall">waterfall</span>' : '';
+            const cat = p.category ? `<span class="badge">${p.category}</span>` : '';
+            const desc = p.description ? ` — ${p.description}` : '';
+            return `<li class="ph-item"><code>${p.placeholder}</code> ${wf} ${cat}<span>${desc}</span></li>`;
+          }).join('');
+          const notes = Array.isArray(data.notes) ? data.notes : [];
+          document.getElementById('ph-notes').innerHTML = notes.length ? ('Notas: ' + notes.map(n => `• ${n}`).join(' &nbsp; ')) : '';
+        } catch (e) {
+          document.getElementById('ph-list').innerHTML = `<li class="ph-item err">No se pudo cargar: ${e.message}</li>`;
+        }
+      }
+
+      // Load placeholders panel on startup
+      loadPlaceholders();
     </script>
   </body>
   </html>

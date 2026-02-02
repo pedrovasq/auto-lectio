@@ -32,6 +32,7 @@ Assumes a virtualenv `venv` with dependencies installed (python-pptx, feedparser
    - `venv/bin/python render.py --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx`
    - Use a custom templates directory: `--template-root /templates`
    - Or point directly to a template file/dir: `--template /templates/sunday-ord` or `--template /templates/daily-ord.pptx`
+   - Provide hymn lyrics (chunked) via: `--songs songs/sample.es-US.json`
 
 4) Render with logs + timestamped filename:
    - `venv/bin/python render.py --verbose --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx --stamp`
@@ -75,11 +76,19 @@ Then visit `https://your-domain/lectio/`.
 ## Placeholders
 See `AGENTS.md` for the full list and behavior.
 
+### Hymn Lyrics (Songs JSON)
+- New hymn lyric placeholders (lyrics only, no titles):
+  - `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`, `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{RECESSIONAL_TXT}`.
+- Provide pre-chunked lyrics via a songs JSON file and pass it with `--songs`.
+- Example: `songs/sample.es-US.json`.
+- Rendering duplicates the seed slide per chunk (waterfall) and preserves explicit line breaks within each chunk.
+
 ## Notes
 - Templates live under `templates/` by default. The renderer auto-selects:
   - `sunday-ord(.pptx)` for Sundays
-  - `daily-ord(.pptx)` for weekdays
+ - `daily-ord(.pptx)` for weekdays
   You can override with `--template` (file or directory) or `--template-root`.
+  - Provide hymn lyrics with `--songs songs/sample.es-US.json`.
 - We avoid deleting slides to keep the PPTX package consistent. If a reading is missing, placeholders are blanked and slides can be left in place or hidden later.
 
 ## Troubleshooting

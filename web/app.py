@@ -23,6 +23,60 @@ app = Flask(__name__, template_folder="templates", static_folder="static")
 app.config["MAX_CONTENT_LENGTH"] = 65 * 1024 * 1024  # 65 MB upload limit
 
 
+# Supported template placeholders (see AGENTS.md)
+# These tokens can be placed in a custom PPTX template and will be
+# replaced by render.py. Some text placeholders support waterfall
+# expansion (slide duplication for chunked text).
+PLACEHOLDER_HELP = [
+    {
+        "placeholder": "{LITURGICAL_DAY}",
+        "description": "Título del día litúrgico (ej. Domingo III del Tiempo Ordinario)",
+        "category": "meta",
+        "waterfall": False,
+    },
+    {"placeholder": "{FIRST_READING_REF}", "description": "Referencia de la primera lectura", "category": "ref", "waterfall": False},
+    {"placeholder": "{FIRST_READING_TXT}", "description": "Texto de la primera lectura (se expande en varias diapositivas si es largo)", "category": "text", "waterfall": True},
+    {"placeholder": "{PSALM_REF}", "description": "Referencia del salmo responsorial", "category": "ref", "waterfall": False},
+    {"placeholder": "{PSALM_TXT}", "description": "Texto del salmo (alternando R. y versos; puede generar múltiples diapositivas)", "category": "text", "waterfall": True},
+    {"placeholder": "{SECOND_READING_REF}", "description": "Referencia de la segunda lectura", "category": "ref", "waterfall": False},
+    {"placeholder": "{SECOND_READING_TXT}", "description": "Texto de la segunda lectura (con posible expansión en cascada)", "category": "text", "waterfall": True},
+    {"placeholder": "{ACCLAMATION_REF}", "description": "Referencia breve de la aclamación antes del Evangelio", "category": "ref", "waterfall": False},
+    {"placeholder": "{ACCLAMATION_TXT}", "description": "Verso de la aclamación (sin 'R.'/Aleluya)", "category": "text", "waterfall": False},
+    {"placeholder": "{GOSPEL_REF}", "description": "Referencia del Evangelio", "category": "ref", "waterfall": False},
+    {"placeholder": "{GOSPEL_TXT}", "description": "Texto del Evangelio (con expansión en cascada si es largo)", "category": "text", "waterfall": True},
+    # Reservados para uso futuro (no se rellenan en esta fase)
+    {"placeholder": "{ENTRANCE_HYMN}", "description": "Himno de entrada (no utilizado por ahora)", "category": "hymn", "waterfall": False},
+    {"placeholder": "{OFFERTORY_HYMN}", "description": "Ofertorio (no utilizado por ahora)", "category": "hymn", "waterfall": False},
+    {"placeholder": "{MYSTERY_OF_FAITH}", "description": "Misterio de la Fe (no utilizado por ahora)", "category": "misc", "waterfall": False},
+    {"placeholder": "{COMMUNION_HYMN}", "description": "Comunión (no utilizado por ahora)", "category": "hymn", "waterfall": False},
+    {"placeholder": "{RECESSIONAL_HYMN}", "description": "Salida (no utilizado por ahora)", "category": "hymn", "waterfall": False},
+]
+
+
+@app.get("/placeholders")
+def placeholders_help():
+    """Return supported placeholder tokens and guidance for custom templates.
+
+    Notes for template authors:
+    - Coloque exactamente estos tokens (con llaves) en cuadros de texto.
+    - Los placeholders de texto marcados como waterfall pueden generar varias diapositivas.
+    - PowerPoint puede dividir texto en múltiples runs; el renderizador reemplaza a nivel de párrafo.
+    - Los saltos de línea se normalizan a espacios y el espacio en blanco se colapsa.
+    """
+    return jsonify(
+        {
+            "ok": True,
+            "placeholders": PLACEHOLDER_HELP,
+            "notes": [
+                "Inserte los tokens tal cual, p. ej. {FIRST_READING_TXT}.",
+                "Para lecturas largas, se usa 'waterfall' duplicando la diapositiva semilla.",
+                "El Salmo alterna R. y versos en diapositivas separadas.",
+                "Los himnos indicados no se rellenan todavía.",
+            ],
+        }
+    )
+
+
 def _default_json_path(d: date) -> Path:
     return Path("out") / f"{d.isoformat()}.es-US.json"
 
