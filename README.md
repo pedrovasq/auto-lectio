@@ -32,20 +32,69 @@ Assumes a virtualenv `venv` with dependencies installed (python-pptx, feedparser
    - `venv/bin/python render.py --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx`
    - Use a custom templates directory: `--template-root /templates`
    - Or point directly to a template file/dir: `--template /templates/sunday-ord` or `--template /templates/daily-ord.pptx`
+   - Provide hymn lyrics (chunked) via: `--songs songs/sample.es-US.json`
 
 4) Render with logs + timestamped filename:
    - `venv/bin/python render.py --verbose --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx --stamp`
 
 The renderer prints the final output path (with timestamp when `--stamp` is used).
 
+## Minimal Web UI
+
+Run a tiny Flask UI to fetch + render:
+
+- Local: `venv/bin/pip install flask && venv/bin/python web/app.py` then open http://127.0.0.1:5000
+- Docker: `docker compose up --build` then open http://127.0.0.1:8000
+
+The UI lives in `web/templates/index.html` and calls backend endpoints:
+
+- `POST /fetch` (build JSON)
+- `POST /render` (render PPTX)
+- `POST /run` (fetch + render)
+
+### Deploy behind Nginx (example)
+
+Reverse proxy a path on your site to the container:
+
+```
+location /lectio/ {
+    proxy_pass http://127.0.0.1:8000/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+```
+
+Then visit `https://your-domain/lectio/`.
+
+### Upload limits and timeouts
+- The UI allows uploading custom `.pptx` templates. Max size is set to 65 MB.
+- Cloudflare (proxied) max upload size is typically 100 MB on Free/Pro/Business; 65 MB is within that cap.
+- Cloudflare’s 100-second response timeout may apply; very slow connections could hit this. The container sets Gunicorn timeout to 180s to avoid backend timeouts.
+- If you proxy via Nginx, set `client_max_body_size 65m;` in your site config.
+
 ## Placeholders
 See `AGENTS.md` for the full list and behavior.
+
+### Hymn Lyrics (Songs JSON)
+- New hymn lyric placeholders (lyrics only, no titles):
+  - `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`, `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{RECESSIONAL_TXT}`.
+ - Optional hymn references (simple text placeholders):
+   - `{ENTRANCE_REF}`, `{OFFERTORY_REF}`, `{COMMUNION_REF}`, `{RECESSIONAL_REF}`.
+- Provide pre-chunked lyrics via a songs JSON file and pass it with `--songs`.
+- Example: `songs/sample.es-US.json`.
+- Rendering duplicates the seed slide per chunk (waterfall) and preserves explicit line breaks within each chunk.
+
+Pre-baked fixed parts
+- Ready-to-use snippets for Kyrie/Sanctus/Agnus and Mysterium (ES/LA, 3 options) live under `songs/parts/` as JSON files (e.g., `songs/parts/kyrie.es.json`, `songs/parts/mysterium.es.2.json`). These can be merged into a songs JSON by copying their `chunks` entries.
+ - The web UI auto-loads these parts based on your selections and can include song references in the `placeholders` section of the generated songs JSON.
 
 ## Notes
 - Templates live under `templates/` by default. The renderer auto-selects:
   - `sunday-ord(.pptx)` for Sundays
-  - `daily-ord(.pptx)` for weekdays
+ - `daily-ord(.pptx)` for weekdays
   You can override with `--template` (file or directory) or `--template-root`.
+  - Provide hymn lyrics with `--songs songs/sample.es-US.json`.
 - We avoid deleting slides to keep the PPTX package consistent. If a reading is missing, placeholders are blanked and slides can be left in place or hidden later.
 
 ## Troubleshooting

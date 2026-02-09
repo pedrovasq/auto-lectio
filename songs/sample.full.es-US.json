@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "name": "Ejemplo — Cantos completos (ES)",
+    "language": "es-US",
+    "source": "sample"
+  },
+  "chunks": {
+    "{ENTRANCE_TXT}": [
+      "Pueblo de reyes, asamblea santa,\nPueblo sacerdotal, pueblo de Dios.",
+      "Te alabamos, Señor, con gozo y gratitud."
+    ],
+    "{OFFERTORY_TXT}": [
+      "En tus manos, Señor, ponemos nuestra vida.",
+      "Recibe nuestras ofrendas y danos tu paz."
+    ],
+    "{COMMUNION_TXT}": [
+      "Pan de vida, cuerpo del Señor,\nCáliz de bendición, sangre de Cristo.",
+      "Nos das la vida, nos das la salvación."
+    ],
+    "{RECESSIONAL_TXT}": [
+      "Id, amigos, por el mundo, anunciando el amor.",
+      "Mensajeros de la vida, de la paz y el perdón."
+    ],
+    "{KYRIE_TXT}": [
+      "Señor, ten piedad.",
+      "Cristo, ten piedad.",
+      "Señor, ten piedad."
+    ],
+    "{SANCTUS_TXT}": [
+      "Santo, santo, santo es el Señor, Dios del universo.",
+      "Llenos están el cielo y la tierra de tu gloria.\nHosanna en el cielo."
+    ],
+    "{AGNUS_TXT}": [
+      "Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.",
+      "Cordero de Dios, que quitas el pecado del mundo, danos la paz."
+    ],
+    "{MYSTERIUM_TXT}": [
+      "Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!"
+    ]
+  }
+}
+

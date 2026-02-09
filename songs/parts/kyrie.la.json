@@ -1,0 +1,9 @@
+{
+  "meta": { "name": "Kyrie — Latin", "language": "la" },
+  "chunks": {
+    "{KYRIE_TXT}": [
+      "Kyrie, eleison.\nChriste, eleison.\nKyrie, eleison."
+    ]
+  }
+}
+

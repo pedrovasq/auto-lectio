@@ -33,3 +33,10 @@ htmlcov/
 
 # Office temp files
 ~$*.pptx
+
+# Templates (ignore binary decks, keep docs)
+templates/**/*.pptx
+templates/**/*.potx
+templates/uploads/
+!templates/README.md
+!templates/*.md

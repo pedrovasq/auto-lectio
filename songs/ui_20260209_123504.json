@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "name": "UI songs",
+    "language": "es"
+  },
+  "chunks": {
+    "{ENTRANCE_TXT}": [
+      "Vamos cantando al Señor: \nÉl es nuestra alegría.",
+      "La luz de un nuevo día\nvenció a la oscuridad,\nque brille en nuestras almas\nla luz de la verdad.",
+      "Vamos cantando al Señor: \nÉl es nuestra alegría.",
+      "La roca que nos salva\nes Cristo, nuestro Dios,\nlleguemos dando gracias\na nuestro redentor."
+    ],
+    "{OFFERTORY_TXT}": [
+      "Aquí estamos, Señor,\nunidos en la misma fe.\nAcepta, Señor, nuestros dones\ny transforma nuestras vidas.",
+      "Aquí estamos, Señor,\nunidos en la misma fe.\nRealiza con tu Espíritu\nla obra salvadora.",
+      "Estos dones de tu bondad,\nque has puesto en nuestras manos,\npor tu sacrificio,\nsantifican nuestras vidas.",
+      "Aquí estamos, Señor,\nunidos en la misma fe.\nAcepta, Señor, nuestros dones\ny transforma nuestras vidas."
+    ],
+    "{COMMUNION_TXT}": [
+      "Eres Tú, Jesús, eres Tú.\nEres Tú en un trozo de pan\ny en un poco de vino.",
+      "¡Qué alegría encontrarte, Jesús,\nen tu vino y tu pan!\n¡Oh, Señor, qué consuelo saber\nque me amas!",
+      "Eres Tú la Palabra de Dios,\nla eterna Palabra de Dios\ny has querido venir a morar\nen mi pecho.",
+      "Eres Tú, Jesús, eres Tú.\nEres Tú en un trozo de pan\ny en un poco de vino."
+    ],
+    "{RECESSIONAL_TXT}": [
+      "Que toda la tierra cante, \nsalmos al Señor.\nQue glorioso sea su nombre. (bis)",
+      "Liberó a su pueblo de toda la angustia.\nQue glorioso sea su nombre.",
+      "Ante ti la tierra se inclinará.\nQue glorioso sea su nombre.",
+      "Que toda la tierra cante, \nsalmos al Señor.\nQue glorioso sea su nombre. (bis)"
+    ],
+    "{KYRIE_TXT}": [
+      "Señor, ten piedad.\nCristo, ten piedad\nSeñor, ten piedad."
+    ],
+    "{SANCTUS_TXT}": [
+      "Santo, santo, santo es el Señor, Dios del universo.",
+      "Llenos están el cielo y la tierra de tu gloria.",
+      "¡Hosanna en el cielo!",
+      "Bendito el que viene en nombre del Señor.",
+      "¡Hosanna en el cielo!"
+    ],
+    "{AGNUS_TXT}": [
+      "Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.",
+      "Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.",
+      "Cordero de Dios, que quitas el pecado del mundo, danos la paz."
+    ],
+    "{MYSTERIUM_TXT}": [
+      "Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!"
+    ]
+  }
+}

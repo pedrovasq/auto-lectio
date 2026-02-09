@@ -41,7 +41,6 @@ We have two main scripts:
 ## Placeholders in PPTX template
 Template placeholders (exact tokens in text boxes):
 - {LITURGICAL_DAY}
-- {ENTRANCE_HYMN} (ignore for now)
 - {FIRST_READING_REF}
 - {FIRST_READING_TXT}
 - {PSALM_REF}
@@ -52,12 +51,12 @@ Template placeholders (exact tokens in text boxes):
 - {ACCLAMATION_TXT}
 - {GOSPEL_REF}
 - {GOSPEL_TXT}
-- {OFFERTORY_HYMN} (ignore for now)
-- {MYSTERY_OF_FAITH} (ignore for now)
-- {COMMUNION_HYMN} (ignore for now)
-- {RECESSIONAL_HYMN} (ignore for now)
+- Hymn lyrics (lyrics only; titles not displayed):
+  - {ENTRANCE_TXT}, {KYRIE_TXT}, {OFFERTORY_TXT}, {SANCTUS_TXT}, {MYSTERIUM_TXT}, {AGNUS_TXT}, {COMMUNION_TXT}, {RECESSIONAL_TXT}
+  - Optional hymn references to display source/identifier:
+    - {ENTRANCE_REF}, {OFFERTORY_REF}, {COMMUNION_REF}, {RECESSIONAL_REF}
 
-For now: only fill day + readings/psalm/acclamation/gospel (refs + texts).
+Hymn lyrics are provided via a separate songs JSON file; fetcher does not supply them.
 
 ## JSON Contract (expected)
 Example shape:
@@ -81,7 +80,11 @@ Example shape:
     "{ACCLAMATION_REF}": "...",
     "{ACCLAMATION_TXT}": "...",
     "{GOSPEL_REF}": "...",
-    "{GOSPEL_TXT}": "..."
+    "{GOSPEL_TXT}": "...",
+    "{ENTRANCE_REF}": "Flor y Canto #123",
+    "{OFFERTORY_REF}": "",
+    "{COMMUNION_REF}": "",
+    "{RECESSIONAL_REF}": ""
   },
   "chunks": {
     "{FIRST_READING_TXT}": ["chunk1", "chunk2", ...],
@@ -93,15 +96,28 @@ Example shape:
 
 Important: `chunks` is optional; if missing, render.py can fallback to the raw placeholder text.
 
+Songs JSON:
+- Provide hymn lyric chunks under a top-level `chunks` mapping with keys from the hymn placeholders above.
+- Example path: `songs/sample.es-US.json`.
+- Pass with `--songs` to `render.py`.
+ - You may also provide simple `placeholders` in the songs JSON (e.g., `{ENTRANCE_REF}`), which will be merged into the render placeholders.
+
+Fixed parts library:
+- Pre-baked JSON snippets live under `songs/parts/`:
+  - `kyrie.{es|la}.json`, `sanctus.{es|la}.json`, `agnus.{es|la}.json`, `mysterium.{es|la}.{1|2|3}.json`.
+  - The web UI uses these files based on your language/version selection.
+
 ## Render Plan (render.py)
 ### Inputs
 - template PPTX path (e.g., `template.pptx`)
 - payload JSON path (e.g., `out/2025-12-16.es-US.json`)
 - output PPTX path (e.g., `build/2025-12-16.es-US.pptx`)
+ - optional songs JSON path (e.g., `songs/sample.es-US.json`)
 
 ### Output
 - A PPTX where placeholders are replaced
 - Long readings are expanded into multiple slides using waterfall duplication
+ - Hymn lyric placeholders are filled from songs JSON; each chunk produces a duplicate slide, preserving line breaks
 
 ## Key Implementation Notes (python-pptx)
 ### 1) Finding placeholders reliably
@@ -148,7 +164,7 @@ Also ensure other placeholders on that slide (like `{FIRST_READING_REF}`) remain
 ### 5) Rendering order
 Recommended order:
 1) Replace all *simple* placeholders across all slides:
-   - {LITURGICAL_DAY}, all *_REF, {ACCLAMATION_TXT} if not waterfall, etc.
+   - {LITURGICAL_DAY}, all *_REF (including hymn refs), {ACCLAMATION_TXT} if not waterfall, etc.
 2) Apply waterfall expansion for:
    - {FIRST_READING_TXT}
    - {PSALM_TXT}
@@ -165,6 +181,7 @@ In step (2), do it in slide index order, because inserting slides shifts indices
 ### 7) Logging and timestamps
 - `--verbose` logs initial placeholder positions, waterfall seed/sequence indices, and short text previews per slide.
 - `--stamp` appends a `YYYYmmdd-HHMMSS` suffix to the output filename and updates core modified metadata.
+ - The renderer prints which hymn tokens and references were detected when `--verbose` is on.
 
 ## What “done” looks like for the next milestone
 - `render.py` loads a JSON payload + template PPTX.
@@ -187,6 +204,7 @@ In step (2), do it in slide index order, because inserting slides shifts indices
 - Render (auto-pick Sunday/Daily): `venv/bin/python render.py --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx`
   - Override templates dir: `--template-root /templates`
   - Force specific template: `--template /templates/sunday-ord` or `--template /templates/daily-ord.pptx`
+  - Provide hymn lyrics: `--songs songs/sample.es-US.json`
 - Render (verbose + timestamp): `venv/bin/python render.py --verbose --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx --stamp`
 
 ## Testing Checklist

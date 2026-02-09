@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Auto-Lectio — UI</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+      h1 { font-size: 20px; margin: 0 0 16px; }
+      fieldset { border: 1px solid #ddd; padding: 12px; margin-bottom: 16px; }
+      label { display: block; margin: 6px 0 4px; font-weight: 600; }
+      input[type="text"], input[type="date"] { width: 100%; max-width: 520px; padding: 8px; }
+      textarea { width: 100%; max-width: 680px; min-height: 72px; padding: 8px; }
+      .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+      button { padding: 8px 12px; cursor: pointer; }
+      #log { white-space: pre-wrap; background: #fafafa; border: 1px solid #eee; padding: 12px; min-height: 120px; }
+      .muted { color: #666; font-size: 12px; }
+      .ok { color: #0a7; }
+      .err { color: #c33; }
+      a { color: #06c; text-decoration: none; }
+      .panel { border: 1px solid #eee; padding: 12px; margin-top: 16px; }
+      .ph-list { list-style: none; padding-left: 0; }
+      .ph-item { padding: 6px 0; border-bottom: 1px dotted #eee; }
+      .ph-item:last-child { border-bottom: 0; }
+      code { background: #f6f8fa; padding: 1px 4px; border-radius: 3px; }
+      .badge { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 10px; background: #eef; color: #225; margin-left: 6px; vertical-align: middle; }
+      .badge.waterfall { background: #e7f7ef; color: #0a7; }
+    </style>
+  </head>
+  <body>
+    <h1>Auto‑Lectio — Básico</h1>
+
+    <fieldset>
+      <legend>Parámetros</legend>
+      <label for="date">Fecha</label>
+      <input type="date" id="date" />
+
+      <label for="template">Plantilla PPTX (ruta en servidor)</label>
+      <input type="text" id="template" value="templates/custom/custom-sunday.pptx" />
+      <div class="row">
+        <input type="file" id="templateFile" accept=".pptx" />
+        <button id="btn-upload" type="button">Subir .pptx</button>
+      </div>
+      <div class="muted">Puede seleccionar un archivo .pptx local para subirlo; la ruta resultante se rellenará arriba.</div>
+
+      <div class="row">
+        <label><input type="checkbox" id="stamp" checked /> Añadir timestamp</label>
+        <label><input type="checkbox" id="verbose" /> Verbose</label>
+      </div>
+      <div class="muted">Sugerencias: templates/sunday-ord.pptx, templates/daily-ord.pptx</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Cantos (opcional)</legend>
+      <div class="muted">Para Entrada/Ofertorio/Comunión/Salida pega la letra y separa estrofas con una línea en blanco. Kyrie, Santo, Cordero y Misterio usan opciones fijas.</div>
+
+      <label for="songs-entrance">Entrada — {ENTRANCE_TXT}</label>
+      <textarea id="songs-entrance" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+      <input type="text" id="songs-entrance-ref" placeholder="Referencia (opcional), p. ej. 'Flor y Canto #123'" />
+
+      <label for="songs-offertory">Ofertorio — {OFFERTORY_TXT}</label>
+      <textarea id="songs-offertory" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+      <input type="text" id="songs-offertory-ref" placeholder="Referencia (opcional)" />
+
+      <label for="songs-communion">Comunión — {COMMUNION_TXT}</label>
+      <textarea id="songs-communion" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+      <input type="text" id="songs-communion-ref" placeholder="Referencia (opcional)" />
+
+      <label for="songs-recessional">Salida — {RECESSIONAL_TXT}</label>
+      <textarea id="songs-recessional" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+      <input type="text" id="songs-recessional-ref" placeholder="Referencia (opcional)" />
+
+      <div class="row">
+        <div>
+          <strong>Kyrie</strong> — {KYRIE_TXT}
+          <label><input type="radio" name="kyrieLang" value="es" checked> Español</label>
+          <label><input type="radio" name="kyrieLang" value="la"> Latín</label>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <strong>Santo</strong> — {SANCTUS_TXT}
+          <label><input type="radio" name="sanctusLang" value="es" checked> Español</label>
+          <label><input type="radio" name="sanctusLang" value="la"> Latín</label>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <strong>Cordero</strong> — {AGNUS_TXT}
+          <label><input type="radio" name="agnusLang" value="es" checked> Español</label>
+          <label><input type="radio" name="agnusLang" value="la"> Latín</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <strong>Misterio de la Fe</strong> — {MYSTERIUM_TXT}
+          <label><input type="radio" name="mysteriumLang" value="es" checked> Español</label>
+          <label><input type="radio" name="mysteriumLang" value="la"> Latín</label>
+          &nbsp; Opción:
+          <select id="mysteriumVersion">
+            <option value="1">1) Anunciamos tu muerte</option>
+            <option value="2">2) Cada vez que comemos</option>
+            <option value="3">3) Por tu cruz y resurrección</option>
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="row">
+      <button id="btn-fetch">Solo Fetch</button>
+      <button id="btn-render">Solo Render</button>
+      <button id="btn-run">Fetch + Render</button>
+    </div>
+
+    <p class="muted">Los archivos se escriben en <code>out/</code> (JSON) y <code>build/</code> (PPTX).</p>
+
+    <h3>Resultado</h3>
+    <div id="log">Listo.</div>
+
+    <div class="panel">
+      <h3>Placeholders de la Plantilla</h3>
+      <div class="muted">Coloque estos tokens (con llaves) en cuadros de texto del PPTX. Los marcados como “waterfall” pueden generar varias diapositivas.</div>
+      <ul id="ph-list" class="ph-list"><li class="ph-item muted">Cargando…</li></ul>
+      <div id="ph-notes" class="muted" style="margin-top:8px;"></div>
+    </div>
+
+    <script>
+      function todayISO() {
+        const d = new Date();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${d.getFullYear()}-${m}-${day}`;
+      }
+      const dateEl = document.getElementById('date');
+      dateEl.value = todayISO();
+
+      const logEl = document.getElementById('log');
+      function log(msg, cls, isHTML=false) {
+        logEl.className = cls || '';
+        if (isHTML) {
+          logEl.innerHTML = msg;
+        } else {
+          logEl.textContent = msg;
+        }
+      }
+
+      async function postJSON(url, body) {
+        const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok || data.ok === false) throw new Error(data.error || JSON.stringify(data));
+        return data;
+      }
+
+      async function doFetch() {
+        log('Fetching…');
+        const date = document.getElementById('date').value;
+        const data = await postJSON('/fetch', { date });
+        const meta = data.meta || {};
+        log(`✔ Fetch OK\nTítulo: ${meta.title || ''}\nJSON: ${data.json_path}`, 'ok');
+        return data;
+      }
+
+      async function doRender() {
+        const jsonPathGuess = `out/${document.getElementById('date').value}.es-US.json`;
+        const template = document.getElementById('template').value.trim();
+        const stamp = document.getElementById('stamp').checked;
+        const verbose = document.getElementById('verbose').checked;
+        log('Rendering…');
+        const songs = buildSongsPayload();
+        const data = await postJSON('/render', { json_path: jsonPathGuess, template, stamp, verbose, songs });
+        const path = data.output_path || '';
+        const viewUrl = path ? path.replace(/^build\//, '/build/') : '';
+        const dlUrl = viewUrl ? viewUrl + (viewUrl.includes('?') ? '&' : '?') + 'download=1' : '';
+        const link = viewUrl ? `<a href="${dlUrl}">Descargar PPTX</a> · <a href="${viewUrl}" target="_blank">Ver</a>` : '';
+        const html = `✔ Render OK<br/>Salida: ${path}<br/>${link}`;
+        log(html, 'ok', true);
+        return data;
+      }
+
+      async function uploadTemplate() {
+        const fileInput = document.getElementById('templateFile');
+        const f = fileInput.files && fileInput.files[0];
+        if (!f) { log('Seleccione un archivo .pptx', 'err'); return; }
+        const fd = new FormData();
+        fd.append('file', f);
+        log('Subiendo plantilla…');
+        const res = await fetch('/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok || data.ok === false) throw new Error(data.error || 'Upload failed');
+        document.getElementById('template').value = data.template_path;
+        log(`✔ Plantilla subida\n${data.template_path}`, 'ok');
+      }
+
+      async function doRun() {
+        const date = document.getElementById('date').value;
+        const template = document.getElementById('template').value.trim();
+        const stamp = document.getElementById('stamp').checked;
+        const verbose = document.getElementById('verbose').checked;
+        log('Fetch + Render…');
+        const songs = buildSongsPayload();
+        const data = await postJSON('/run', { date, template, stamp, verbose, songs });
+        const path = data.output_path || '';
+        const viewUrl = path ? path.replace(/^build\//, '/build/') : '';
+        const dlUrl = viewUrl ? viewUrl + (viewUrl.includes('?') ? '&' : '?') + 'download=1' : '';
+        const link = viewUrl ? `<a href="${dlUrl}">Descargar PPTX</a> · <a href="${viewUrl}" target="_blank">Ver</a>` : '';
+        const html = `✔ Hecho<br/>JSON: ${data.json_path}<br/>PPTX: ${path}<br/>${link}`;
+        log(html, 'ok', true);
+        return data;
+      }
+
+      document.getElementById('btn-fetch').addEventListener('click', () => doFetch().catch(e => log(`✖ ${e.message}`, 'err')));
+      document.getElementById('btn-render').addEventListener('click', () => doRender().catch(e => log(`✖ ${e.message}`, 'err')));
+      document.getElementById('btn-run').addEventListener('click', () => doRun().catch(e => log(`✖ ${e.message}`, 'err')));
+      document.getElementById('btn-upload').addEventListener('click', () => uploadTemplate().catch(e => log(`✖ ${e.message}`, 'err')));
+
+      async function loadPlaceholders() {
+        try {
+          const res = await fetch('/placeholders');
+          const data = await res.json();
+          const list = Array.isArray(data.placeholders) ? data.placeholders : [];
+          const ul = document.getElementById('ph-list');
+          if (!list.length) { ul.innerHTML = '<li class="ph-item muted">Sin datos</li>'; return; }
+          ul.innerHTML = list.map(p => {
+            const wf = p.waterfall ? '<span class="badge waterfall">waterfall</span>' : '';
+            const cat = p.category ? `<span class="badge">${p.category}</span>` : '';
+            const desc = p.description ? ` — ${p.description}` : '';
+            return `<li class="ph-item"><code>${p.placeholder}</code> ${wf} ${cat}<span>${desc}</span></li>`;
+          }).join('');
+          const notes = Array.isArray(data.notes) ? data.notes : [];
+          document.getElementById('ph-notes').innerHTML = notes.length ? ('Notas: ' + notes.map(n => `• ${n}`).join(' &nbsp; ')) : '';
+        } catch (e) {
+          document.getElementById('ph-list').innerHTML = `<li class="ph-item err">No se pudo cargar: ${e.message}</li>`;
+        }
+      }
+
+      // Load placeholders panel on startup
+      loadPlaceholders();
+
+      function getRadio(name) {
+        const el = document.querySelector(`input[name="${name}"]:checked`);
+        return el ? el.value : '';
+      }
+      function buildSongsPayload() {
+        return {
+          entranceText: document.getElementById('songs-entrance').value.trim(),
+          entranceRef: document.getElementById('songs-entrance-ref').value.trim(),
+          offertoryText: document.getElementById('songs-offertory').value.trim(),
+          offertoryRef: document.getElementById('songs-offertory-ref').value.trim(),
+          communionText: document.getElementById('songs-communion').value.trim(),
+          communionRef: document.getElementById('songs-communion-ref').value.trim(),
+          recessionalText: document.getElementById('songs-recessional').value.trim(),
+          recessionalRef: document.getElementById('songs-recessional-ref').value.trim(),
+          kyrieLang: getRadio('kyrieLang'),
+          sanctusLang: getRadio('sanctusLang'),
+          agnusLang: getRadio('agnusLang'),
+          mysteriumLang: getRadio('mysteriumLang'),
+          mysteriumVersion: document.getElementById('mysteriumVersion').value,
+        };
+      }
+    </script>
+  </body>
+  </html>
