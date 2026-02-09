@@ -12,6 +12,8 @@ env/
 build/
 out/
 dist/
+templates/custom/
+templates/uploads/
 
 # Test and coverage
 .pytest_cache/
