@@ -1,0 +1,11 @@
+{
+  "meta": { "name": "Agnus Dei — Latin", "language": "la" },
+  "chunks": {
+    "{AGNUS_TXT}": [
+      "Agnus Dei, qui tollis peccata mundi, miserere nobis.",
+      "Agnus Dei, qui tollis peccata mundi, miserere nobis.",
+      "Agnus Dei, qui tollis peccata mundi, dona nobis pacem."
+    ]
+  }
+}
+

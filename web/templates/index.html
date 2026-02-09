@@ -10,6 +10,7 @@
       fieldset { border: 1px solid #ddd; padding: 12px; margin-bottom: 16px; }
       label { display: block; margin: 6px 0 4px; font-weight: 600; }
       input[type="text"], input[type="date"] { width: 100%; max-width: 520px; padding: 8px; }
+      textarea { width: 100%; max-width: 680px; min-height: 72px; padding: 8px; }
       .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
       button { padding: 8px 12px; cursor: pointer; }
       #log { white-space: pre-wrap; background: #fafafa; border: 1px solid #eee; padding: 12px; min-height: 120px; }
@@ -47,6 +48,63 @@
         <label><input type="checkbox" id="verbose" /> Verbose</label>
       </div>
       <div class="muted">Sugerencias: templates/sunday-ord.pptx, templates/daily-ord.pptx</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Cantos (opcional)</legend>
+      <div class="muted">Para Entrada/Ofertorio/Comunión/Salida pega la letra y separa estrofas con una línea en blanco. Kyrie, Santo, Cordero y Misterio usan opciones fijas.</div>
+
+      <label for="songs-entrance">Entrada — {ENTRANCE_TXT}</label>
+      <textarea id="songs-entrance" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+      <input type="text" id="songs-entrance-ref" placeholder="Referencia (opcional), p. ej. 'Flor y Canto #123'" />
+
+      <label for="songs-offertory">Ofertorio — {OFFERTORY_TXT}</label>
+      <textarea id="songs-offertory" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+      <input type="text" id="songs-offertory-ref" placeholder="Referencia (opcional)" />
+
+      <label for="songs-communion">Comunión — {COMMUNION_TXT}</label>
+      <textarea id="songs-communion" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+      <input type="text" id="songs-communion-ref" placeholder="Referencia (opcional)" />
+
+      <label for="songs-recessional">Salida — {RECESSIONAL_TXT}</label>
+      <textarea id="songs-recessional" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+      <input type="text" id="songs-recessional-ref" placeholder="Referencia (opcional)" />
+
+      <div class="row">
+        <div>
+          <strong>Kyrie</strong> — {KYRIE_TXT}
+          <label><input type="radio" name="kyrieLang" value="es" checked> Español</label>
+          <label><input type="radio" name="kyrieLang" value="la"> Latín</label>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <strong>Santo</strong> — {SANCTUS_TXT}
+          <label><input type="radio" name="sanctusLang" value="es" checked> Español</label>
+          <label><input type="radio" name="sanctusLang" value="la"> Latín</label>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <strong>Cordero</strong> — {AGNUS_TXT}
+          <label><input type="radio" name="agnusLang" value="es" checked> Español</label>
+          <label><input type="radio" name="agnusLang" value="la"> Latín</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <strong>Misterio de la Fe</strong> — {MYSTERIUM_TXT}
+          <label><input type="radio" name="mysteriumLang" value="es" checked> Español</label>
+          <label><input type="radio" name="mysteriumLang" value="la"> Latín</label>
+          &nbsp; Opción:
+          <select id="mysteriumVersion">
+            <option value="1">1) Anunciamos tu muerte</option>
+            <option value="2">2) Cada vez que comemos</option>
+            <option value="3">3) Por tu cruz y resurrección</option>
+          </select>
+        </div>
+      </div>
     </fieldset>
 
     <div class="row">
@@ -109,7 +167,8 @@
         const stamp = document.getElementById('stamp').checked;
         const verbose = document.getElementById('verbose').checked;
         log('Rendering…');
-        const data = await postJSON('/render', { json_path: jsonPathGuess, template, stamp, verbose });
+        const songs = buildSongsPayload();
+        const data = await postJSON('/render', { json_path: jsonPathGuess, template, stamp, verbose, songs });
         const path = data.output_path || '';
         const viewUrl = path ? path.replace(/^build\//, '/build/') : '';
         const dlUrl = viewUrl ? viewUrl + (viewUrl.includes('?') ? '&' : '?') + 'download=1' : '';
@@ -139,7 +198,8 @@
         const stamp = document.getElementById('stamp').checked;
         const verbose = document.getElementById('verbose').checked;
         log('Fetch + Render…');
-        const data = await postJSON('/run', { date, template, stamp, verbose });
+        const songs = buildSongsPayload();
+        const data = await postJSON('/run', { date, template, stamp, verbose, songs });
         const path = data.output_path || '';
         const viewUrl = path ? path.replace(/^build\//, '/build/') : '';
         const dlUrl = viewUrl ? viewUrl + (viewUrl.includes('?') ? '&' : '?') + 'download=1' : '';
@@ -176,6 +236,28 @@
 
       // Load placeholders panel on startup
       loadPlaceholders();
+
+      function getRadio(name) {
+        const el = document.querySelector(`input[name="${name}"]:checked`);
+        return el ? el.value : '';
+      }
+      function buildSongsPayload() {
+        return {
+          entranceText: document.getElementById('songs-entrance').value.trim(),
+          entranceRef: document.getElementById('songs-entrance-ref').value.trim(),
+          offertoryText: document.getElementById('songs-offertory').value.trim(),
+          offertoryRef: document.getElementById('songs-offertory-ref').value.trim(),
+          communionText: document.getElementById('songs-communion').value.trim(),
+          communionRef: document.getElementById('songs-communion-ref').value.trim(),
+          recessionalText: document.getElementById('songs-recessional').value.trim(),
+          recessionalRef: document.getElementById('songs-recessional-ref').value.trim(),
+          kyrieLang: getRadio('kyrieLang'),
+          sanctusLang: getRadio('sanctusLang'),
+          agnusLang: getRadio('agnusLang'),
+          mysteriumLang: getRadio('mysteriumLang'),
+          mysteriumVersion: document.getElementById('mysteriumVersion').value,
+        };
+      }
     </script>
   </body>
   </html>

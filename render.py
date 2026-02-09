@@ -352,6 +352,7 @@ def main() -> None:
     ]
 
     songs_chunks: Dict[str, List[str]] = {}
+    songs_placeholders: Dict[str, str] = {}
     if getattr(args, "songs", None):
         try:
             with open(args.songs, "r", encoding="utf-8") as sf:
@@ -364,12 +365,12 @@ def main() -> None:
                         if k in hymn_tokens and isinstance(v, list):
                             # accept only str values; coerce others via str for safety
                             songs_chunks[k] = [x if isinstance(x, str) else str(x) for x in v]
-                # Optional backward-compat support: single-value placeholders map
+                # Also accept simple placeholders (e.g., song references)
                 raw_ph = songs_payload.get("placeholders")
                 if isinstance(raw_ph, dict):
                     for k, v in raw_ph.items():
-                        if k in hymn_tokens and isinstance(v, str):
-                            songs_chunks.setdefault(k, []).append(v)
+                        if isinstance(v, str):
+                            songs_placeholders[k] = v
         except Exception as e:
             if args.verbose:
                 print(f"Warning: failed to load songs JSON '{args.songs}': {e}")
@@ -397,6 +398,8 @@ def main() -> None:
         # Hymn lyrics (chunked)
         "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
         "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
+        # Hymn references (simple)
+        "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{RECESSIONAL_REF}",
     ]
     if args.verbose:
         print(f"Using template: {template_path}")
@@ -427,7 +430,16 @@ def main() -> None:
         # Hymn lyrics tokens
         "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
         "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
+        # Hymn references
+        "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{RECESSIONAL_REF}",
     }
+
+    # Merge optional songs placeholders (e.g., hymn references) into base placeholders
+    if songs_placeholders:
+        # songs-provided keys should override only missing or empty base values
+        for k, v in songs_placeholders.items():
+            if not placeholders.get(k):
+                placeholders[k] = v
 
     # Simple replacements: everything except the waterfall keys
     simple_mapping = {k: _sanitize_text(v) for k, v in placeholders.items() if k not in waterfall_keys}

@@ -79,9 +79,15 @@ See `AGENTS.md` for the full list and behavior.
 ### Hymn Lyrics (Songs JSON)
 - New hymn lyric placeholders (lyrics only, no titles):
   - `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`, `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{RECESSIONAL_TXT}`.
+ - Optional hymn references (simple text placeholders):
+   - `{ENTRANCE_REF}`, `{OFFERTORY_REF}`, `{COMMUNION_REF}`, `{RECESSIONAL_REF}`.
 - Provide pre-chunked lyrics via a songs JSON file and pass it with `--songs`.
 - Example: `songs/sample.es-US.json`.
 - Rendering duplicates the seed slide per chunk (waterfall) and preserves explicit line breaks within each chunk.
+
+Pre-baked fixed parts
+- Ready-to-use snippets for Kyrie/Sanctus/Agnus and Mysterium (ES/LA, 3 options) live under `songs/parts/` as JSON files (e.g., `songs/parts/kyrie.es.json`, `songs/parts/mysterium.es.2.json`). These can be merged into a songs JSON by copying their `chunks` entries.
+ - The web UI auto-loads these parts based on your selections and can include song references in the `placeholders` section of the generated songs JSON.
 
 ## Notes
 - Templates live under `templates/` by default. The renderer auto-selects:

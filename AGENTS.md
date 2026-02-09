@@ -53,6 +53,8 @@ Template placeholders (exact tokens in text boxes):
 - {GOSPEL_TXT}
 - Hymn lyrics (lyrics only; titles not displayed):
   - {ENTRANCE_TXT}, {KYRIE_TXT}, {OFFERTORY_TXT}, {SANCTUS_TXT}, {MYSTERIUM_TXT}, {AGNUS_TXT}, {COMMUNION_TXT}, {RECESSIONAL_TXT}
+  - Optional hymn references to display source/identifier:
+    - {ENTRANCE_REF}, {OFFERTORY_REF}, {COMMUNION_REF}, {RECESSIONAL_REF}
 
 Hymn lyrics are provided via a separate songs JSON file; fetcher does not supply them.
 
@@ -78,7 +80,11 @@ Example shape:
     "{ACCLAMATION_REF}": "...",
     "{ACCLAMATION_TXT}": "...",
     "{GOSPEL_REF}": "...",
-    "{GOSPEL_TXT}": "..."
+    "{GOSPEL_TXT}": "...",
+    "{ENTRANCE_REF}": "Flor y Canto #123",
+    "{OFFERTORY_REF}": "",
+    "{COMMUNION_REF}": "",
+    "{RECESSIONAL_REF}": ""
   },
   "chunks": {
     "{FIRST_READING_TXT}": ["chunk1", "chunk2", ...],
@@ -94,6 +100,12 @@ Songs JSON:
 - Provide hymn lyric chunks under a top-level `chunks` mapping with keys from the hymn placeholders above.
 - Example path: `songs/sample.es-US.json`.
 - Pass with `--songs` to `render.py`.
+ - You may also provide simple `placeholders` in the songs JSON (e.g., `{ENTRANCE_REF}`), which will be merged into the render placeholders.
+
+Fixed parts library:
+- Pre-baked JSON snippets live under `songs/parts/`:
+  - `kyrie.{es|la}.json`, `sanctus.{es|la}.json`, `agnus.{es|la}.json`, `mysterium.{es|la}.{1|2|3}.json`.
+  - The web UI uses these files based on your language/version selection.
 
 ## Render Plan (render.py)
 ### Inputs
@@ -152,7 +164,7 @@ Also ensure other placeholders on that slide (like `{FIRST_READING_REF}`) remain
 ### 5) Rendering order
 Recommended order:
 1) Replace all *simple* placeholders across all slides:
-   - {LITURGICAL_DAY}, all *_REF, {ACCLAMATION_TXT} if not waterfall, etc.
+   - {LITURGICAL_DAY}, all *_REF (including hymn refs), {ACCLAMATION_TXT} if not waterfall, etc.
 2) Apply waterfall expansion for:
    - {FIRST_READING_TXT}
    - {PSALM_TXT}
@@ -169,6 +181,7 @@ In step (2), do it in slide index order, because inserting slides shifts indices
 ### 7) Logging and timestamps
 - `--verbose` logs initial placeholder positions, waterfall seed/sequence indices, and short text previews per slide.
 - `--stamp` appends a `YYYYmmdd-HHMMSS` suffix to the output filename and updates core modified metadata.
+ - The renderer prints which hymn tokens and references were detected when `--verbose` is on.
 
 ## What “done” looks like for the next milestone
 - `render.py` loads a JSON payload + template PPTX.
