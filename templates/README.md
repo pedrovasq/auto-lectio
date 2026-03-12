@@ -29,7 +29,24 @@ Type these tokens exactly as written into text boxes where you want content to a
 - `{GOSPEL_REF}`
 - `{GOSPEL_TXT}`
 
-Hymn placeholders exist but are currently ignored by the renderer: `{ENTRANCE_HYMN}`, `{OFFERTORY_HYMN}`, `{MYSTERY_OF_FAITH}`, `{COMMUNION_HYMN}`, `{RECESSIONAL_HYMN}`.
+Additional hymn/fixed-part placeholders are supported by the current renderer:
+
+- Lyrics / waterfall:
+  - `{ENTRANCE_TXT}`
+  - `{KYRIE_TXT}`
+  - `{OFFERTORY_TXT}`
+  - `{SANCTUS_TXT}`
+  - `{MYSTERIUM_TXT}`
+  - `{AGNUS_TXT}`
+  - `{COMMUNION_TXT}`
+  - `{RECESSIONAL_TXT}`
+- Optional references:
+  - `{ENTRANCE_REF}`
+  - `{OFFERTORY_REF}`
+  - `{COMMUNION_REF}`
+  - `{RECESSIONAL_REF}`
+
+These are filled from a songs JSON passed with `--songs`, or from the web UI which generates that JSON for you.
 
 ## Waterfall (slide duplication)
 
@@ -39,22 +56,25 @@ For long readings, the renderer duplicates a “seed” slide and replaces only 
 - Expect exactly one seed slide per body token.
 - The seed slide is filled with chunk 1. Duplicates are inserted immediately after it for chunks 2..N.
 - All other placeholders already present on the seed (e.g., the reference) remain as filled.
+- The current implementation assumes one seed slide per waterfall token and uses the first matching slide if there are multiple.
 
 Tips for reliable placeholders:
 
-- Keep each token as a single run of text (PowerPoint sometimes splits runs; paragraph-level replacement mitigates this, but single-run is safest).
+- Keep each token as a single run of text when possible. The current renderer does run-level replacement, so a token split across multiple PowerPoint runs may not be replaced.
 - Put the reading body token in its own text box.
-- Avoid placing images on the seed slide if you don’t want them duplicated; the renderer skips shapes with image relationships on duplicated slides to avoid PPTX repair prompts.
+- Avoid putting unrelated placeholders on the same seed slide as a waterfall token. The duplicate logic filters out shapes containing other known tokens.
+- Be careful with seed-slide images. The duplicate logic skips shapes with image relationships to avoid PPTX repair prompts, so those images may not appear on duplicated slides.
 
 ## Psalm Formatting
 
 - `{PSALM_TXT}` should be on a seed slide that will be duplicated for alternating refrain/verse blocks.
-- The renderer derives Psalm chunks from the full text, starting with the refrain line (`R.`).
+- The renderer derives Psalm chunks from the full text at render time, starting with the refrain line (`R.`), rather than trusting the JSON chunks blindly.
 
 ## Text Handling
 
-- Newlines are converted to spaces; repeated whitespace is collapsed.
-- Non-Psalm chunks are merged to target ~100–140 characters for better slide balance.
+- Reading/acclamation text is normalized so newlines become spaces and repeated whitespace is collapsed.
+- Hymn chunks preserve explicit line breaks from the songs JSON.
+- Non-Psalm reading chunks are merged to target ~100–140 characters for better slide balance.
 
 ## Common Layout Pattern
 
@@ -74,4 +94,3 @@ You may include interstitial slides (e.g., “Palabra de Dios”) as desired; th
 
 - Run the renderer with `--verbose` to see where tokens are detected and which slides become seeds.
 - Open the resulting PPTX and verify that long readings expand into multiple slides placed directly after their seed.
-

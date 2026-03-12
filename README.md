@@ -6,6 +6,15 @@ Generate Mass slides automatically (USCCB → JSON → PPTX)
 - Parses HTML into placeholders and chunked bodies.
 - Renders a PPTX from a template, replacing placeholders and using a “waterfall” to duplicate long readings into multiple slides.
 
+## Code map
+- `fetch.py`: RSS fetcher, HTML parser, liturgical reference formatter, chunk generator, JSON writer.
+- `render.py`: PPTX renderer, placeholder replacer, waterfall slide duplicator, hymn/song merger.
+- `web/app.py`: Flask UI and JSON API for fetch/render/upload.
+- `web/templates/index.html`: basic browser UI.
+- `songs/parts/`: fixed JSON snippets for Kyrie, Sanctus, Agnus, and Mysterium.
+- `templates/README.md`: template authoring guide.
+- `docs/CODEBASE.md`: maintenance notes and current architecture for future agents.
+
 ## Key features
 - Liturgical intros:
   - First Reading: “Lectura del profeta …”, “Lectura del libro de los Hechos…”, feminine articles (Sabiduría), etc.
@@ -52,6 +61,11 @@ The UI lives in `web/templates/index.html` and calls backend endpoints:
 - `POST /render` (render PPTX)
 - `POST /run` (fetch + render)
 
+Implementation note:
+- `/fetch` imports and calls functions from `fetch.py` directly.
+- `/render` shells out to `render.py` via `subprocess.run(...)` instead of importing renderer functions.
+- `/run` composes those two behaviors.
+
 ### Deploy behind Nginx (example)
 
 Reverse proxy a path on your site to the container:
@@ -96,6 +110,11 @@ Pre-baked fixed parts
   You can override with `--template` (file or directory) or `--template-root`.
   - Provide hymn lyrics with `--songs songs/sample.es-US.json`.
 - We avoid deleting slides to keep the PPTX package consistent. If a reading is missing, placeholders are blanked and slides can be left in place or hidden later.
+
+## Maintenance
+- The renderer currently replaces placeholders at the run level, not by rebuilding a whole paragraph. If PowerPoint splits a token across runs, replacement can fail.
+- Slide duplication in `render.py` uses private `python-pptx` internals and XML deep copies. That is the highest-risk area in the codebase.
+- `templates/README.md` documents the supported placeholder contract for template authors; keep it in sync with `web/app.py`'s `PLACEHOLDER_HELP` and `render.py`'s `waterfall_keys`.
 
 ## Troubleshooting
 - Verbose logs: run with `--verbose` to print the chosen template path, initial placeholder slide positions (1-based), waterfall seed/sequence indices, and short text previews. This helps correlate PowerPoint slide numbers with renderer operations.
