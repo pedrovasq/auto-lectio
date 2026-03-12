@@ -178,6 +178,18 @@ def find_seed_slide_indices(prs: Presentation, token: str) -> List[int]:
     return [i for i, s in enumerate(prs.slides) if slide_contains_token(s, token)]
 
 
+def get_unique_seed_slide_index(prs: Presentation, token: str) -> int | None:
+    indices = find_seed_slide_indices(prs, token)
+    if not indices:
+        return None
+    if len(indices) > 1:
+        slides_1_based = ", ".join(str(i + 1) for i in indices)
+        raise RuntimeError(
+            f"Expected exactly one seed slide for {token}, found {len(indices)}: slides {slides_1_based}"
+        )
+    return indices[0]
+
+
 def insert_slide_after(prs: Presentation, new_slide, insert_after_index: int) -> None:
     """Move the specific slide (by part rel) to position right after insert_after_index."""
     sldIdLst = prs.slides._sldIdLst
@@ -343,6 +355,7 @@ def main() -> None:
     hymn_tokens = [
         "{ENTRANCE_TXT}",
         "{KYRIE_TXT}",
+        "{GLORIA_TXT}",
         "{OFFERTORY_TXT}",
         "{SANCTUS_TXT}",
         "{MYSTERIUM_TXT}",
@@ -396,7 +409,7 @@ def main() -> None:
         "{ACCLAMATION_REF}", "{ACCLAMATION_TXT}",
         "{GOSPEL_REF}", "{GOSPEL_TXT}",
         # Hymn lyrics (chunked)
-        "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
+        "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{GLORIA_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
         "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
         # Hymn references (simple)
         "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{RECESSIONAL_REF}",
@@ -415,7 +428,7 @@ def main() -> None:
         "{SECOND_READING_TXT}",
         "{GOSPEL_TXT}",
         # Hymn lyrics use waterfall with pre-chunked lines, preserving newlines
-        "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
+        "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{GLORIA_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
         "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
     ]
 
@@ -428,7 +441,7 @@ def main() -> None:
         "{ACCLAMATION_REF}", "{ACCLAMATION_TXT}",
         "{GOSPEL_REF}", "{GOSPEL_TXT}",
         # Hymn lyrics tokens
-        "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
+        "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{GLORIA_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
         "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
         # Hymn references
         "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{RECESSIONAL_REF}",
@@ -509,16 +522,12 @@ def main() -> None:
     # Find seed indices first
     seeds: List[Tuple[str, int]] = []
     for key in waterfall_keys:
-        indices = find_seed_slide_indices(prs, key)
-        if not indices:
-            # No seed present for this key; fall back to replacing token as-is
-            val = _sanitize_text(placeholders.get(key, ""))
-            log(f"No seed for {key}; applying simple replacement across deck")
-            for slide in prs.slides:
-                replace_tokens_in_slide(slide, {key: val})
+        seed_idx = get_unique_seed_slide_index(prs, key)
+        if seed_idx is None:
+            # Missing seed is allowed. Some templates intentionally omit
+            # optional sections such as the second reading or seasonal music.
+            log(f"No seed for {key}; skipping waterfall expansion")
             continue
-        # assume exactly one seed per key; use the first if multiple
-        seed_idx = indices[0]
         seeds.append((key, seed_idx))
         log(f"Seed for {key} at slide index {seed_idx}")
 

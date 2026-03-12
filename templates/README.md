@@ -34,6 +34,7 @@ Additional hymn/fixed-part placeholders are supported by the current renderer:
 - Lyrics / waterfall:
   - `{ENTRANCE_TXT}`
   - `{KYRIE_TXT}`
+  - `{GLORIA_TXT}`
   - `{OFFERTORY_TXT}`
   - `{SANCTUS_TXT}`
   - `{MYSTERIUM_TXT}`
@@ -53,10 +54,10 @@ These are filled from a songs JSON passed with `--songs`, or from the web UI whi
 For long readings, the renderer duplicates a “seed” slide and replaces only the body token on each duplicate:
 
 - Seed tokens: `{FIRST_READING_TXT}`, `{PSALM_TXT}`, `{SECOND_READING_TXT}`, `{GOSPEL_TXT}`.
-- Expect exactly one seed slide per body token.
+- Expect exactly one seed slide per body token. If the renderer finds more than one slide containing the same waterfall token, it now fails with a template error instead of guessing.
+- Zero seed slides is allowed for optional sections. In that case the renderer skips that waterfall token entirely.
 - The seed slide is filled with chunk 1. Duplicates are inserted immediately after it for chunks 2..N.
 - All other placeholders already present on the seed (e.g., the reference) remain as filled.
-- The current implementation assumes one seed slide per waterfall token and uses the first matching slide if there are multiple.
 
 Tips for reliable placeholders:
 

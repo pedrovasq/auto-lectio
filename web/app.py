@@ -92,6 +92,7 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
     # Free-text hymns (split into stanzas)
     ft_map = [
         ("{ENTRANCE_TXT}", cfg.get("entranceText")),
+        ("{GLORIA_TXT}", cfg.get("gloriaText")),
         ("{OFFERTORY_TXT}", cfg.get("offertoryText")),
         ("{COMMUNION_TXT}", cfg.get("communionText")),
         ("{RECESSIONAL_TXT}", cfg.get("recessionalText")),
@@ -169,6 +170,7 @@ PLACEHOLDER_HELP = [
     {"placeholder": "{GOSPEL_TXT}", "description": "Texto del Evangelio (con expansión en cascada si es largo)", "category": "text", "waterfall": True},
     # Himnos (rellenados vía UI; cada trozo genera una diapositiva)
     {"placeholder": "{ENTRANCE_TXT}", "description": "Canto de entrada (estrofas: separa con línea en blanco)", "category": "hymn", "waterfall": True},
+    {"placeholder": "{GLORIA_TXT}", "description": "Gloria (opcional; estrofas o líneas separadas por línea en blanco)", "category": "hymn", "waterfall": True},
     {"placeholder": "{OFFERTORY_TXT}", "description": "Ofertorio (estrofas)", "category": "hymn", "waterfall": True},
     {"placeholder": "{COMMUNION_TXT}", "description": "Comunión (estrofas)", "category": "hymn", "waterfall": True},
     {"placeholder": "{RECESSIONAL_TXT}", "description": "Salida (estrofas)", "category": "hymn", "waterfall": True},
@@ -190,7 +192,7 @@ def placeholders_help():
     Notes for template authors:
     - Coloque exactamente estos tokens (con llaves) en cuadros de texto.
     - Los placeholders de texto marcados como waterfall pueden generar varias diapositivas.
-    - PowerPoint puede dividir texto en múltiples runs; el renderizador reemplaza a nivel de párrafo.
+    - PowerPoint puede dividir texto en múltiples runs; el renderizador funciona mejor cuando cada token está en un solo run.
     - Los saltos de línea se normalizan a espacios y el espacio en blanco se colapsa.
     """
     return jsonify(
@@ -201,7 +203,7 @@ def placeholders_help():
                 "Inserte los tokens tal cual, p. ej. {FIRST_READING_TXT}.",
                 "Para lecturas largas, se usa 'waterfall' duplicando la diapositiva semilla.",
                 "El Salmo alterna R. y versos en diapositivas separadas.",
-                "Los himnos se pueden configurar en la sección 'Cantos' de esta UI.",
+                "Los himnos y el Gloria se pueden configurar en la sección 'Cantos' de esta UI.",
             ],
         }
     )

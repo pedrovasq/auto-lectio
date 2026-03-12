@@ -52,7 +52,7 @@ Template placeholders (exact tokens in text boxes):
 - {GOSPEL_REF}
 - {GOSPEL_TXT}
 - Hymn lyrics (lyrics only; titles not displayed):
-  - {ENTRANCE_TXT}, {KYRIE_TXT}, {OFFERTORY_TXT}, {SANCTUS_TXT}, {MYSTERIUM_TXT}, {AGNUS_TXT}, {COMMUNION_TXT}, {RECESSIONAL_TXT}
+  - {ENTRANCE_TXT}, {KYRIE_TXT}, {GLORIA_TXT}, {OFFERTORY_TXT}, {SANCTUS_TXT}, {MYSTERIUM_TXT}, {AGNUS_TXT}, {COMMUNION_TXT}, {RECESSIONAL_TXT}
   - Optional hymn references to display source/identifier:
     - {ENTRANCE_REF}, {OFFERTORY_REF}, {COMMUNION_REF}, {RECESSIONAL_REF}
 

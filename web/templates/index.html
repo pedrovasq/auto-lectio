@@ -52,11 +52,14 @@
 
     <fieldset>
       <legend>Cantos (opcional)</legend>
-      <div class="muted">Para Entrada/Ofertorio/Comunión/Salida pega la letra y separa estrofas con una línea en blanco. Kyrie, Santo, Cordero y Misterio usan opciones fijas.</div>
+      <div class="muted">Para Entrada/Gloria/Ofertorio/Comunión/Salida pega la letra y separa estrofas con una línea en blanco. Kyrie, Santo, Cordero y Misterio usan opciones fijas.</div>
 
       <label for="songs-entrance">Entrada — {ENTRANCE_TXT}</label>
       <textarea id="songs-entrance" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
       <input type="text" id="songs-entrance-ref" placeholder="Referencia (opcional), p. ej. 'Flor y Canto #123'" />
+
+      <label for="songs-gloria">Gloria — {GLORIA_TXT}</label>
+      <textarea id="songs-gloria" placeholder="Gloria a Dios en el cielo...\n\nOtra estrofa o continuación..."></textarea>
 
       <label for="songs-offertory">Ofertorio — {OFFERTORY_TXT}</label>
       <textarea id="songs-offertory" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
@@ -245,6 +248,7 @@
         return {
           entranceText: document.getElementById('songs-entrance').value.trim(),
           entranceRef: document.getElementById('songs-entrance-ref').value.trim(),
+          gloriaText: document.getElementById('songs-gloria').value.trim(),
           offertoryText: document.getElementById('songs-offertory').value.trim(),
           offertoryRef: document.getElementById('songs-offertory-ref').value.trim(),
           communionText: document.getElementById('songs-communion').value.trim(),

@@ -66,7 +66,7 @@ Actual rendering order:
 
 Waterfall tokens currently include:
 - Readings: `{FIRST_READING_TXT}`, `{PSALM_TXT}`, `{SECOND_READING_TXT}`, `{GOSPEL_TXT}`
-- Hymns/fixed sung parts: `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`, `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{RECESSIONAL_TXT}`
+- Hymns/fixed sung parts: `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{GLORIA_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`, `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{RECESSIONAL_TXT}`
 
 Notable behavior:
 - Psalm chunking is regenerated from the raw psalm text at render time, even if the JSON already contains psalm chunks.
@@ -98,7 +98,7 @@ Core placeholders:
 - `{GOSPEL_REF}`, `{GOSPEL_TXT}`
 
 Hymn/fixed-part placeholders:
-- `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`
+- `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{GLORIA_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`
 - `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{RECESSIONAL_TXT}`
 - optional refs: `{ENTRANCE_REF}`, `{OFFERTORY_REF}`, `{COMMUNION_REF}`, `{RECESSIONAL_REF}`
 

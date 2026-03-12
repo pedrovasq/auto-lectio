@@ -26,6 +26,10 @@
       "Cristo, ten piedad.",
       "Señor, ten piedad."
     ],
+    "{GLORIA_TXT}": [
+      "Gloria a Dios en el cielo,\ny en la tierra paz a los hombres que ama el Señor.",
+      "Por tu inmensa gloria te alabamos, te bendecimos,\nte adoramos, te glorificamos, te damos gracias."
+    ],
     "{SANCTUS_TXT}": [
       "Santo, santo, santo es el Señor, Dios del universo.",
       "Llenos están el cielo y la tierra de tu gloria.\nHosanna en el cielo."
@@ -39,4 +43,3 @@
     ]
   }
 }
-

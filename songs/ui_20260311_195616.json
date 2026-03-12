@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "name": "UI songs",
+    "language": "es"
+  },
+  "chunks": {
+    "{ENTRANCE_TXT}": [
+      "Venimos hoy a tu mesa, Señor,\ncon alegría en el corazón.\nTu pueblo canta lleno de fe,\ngloria y alabanza a ti.",
+      "Caminamos juntos en tu luz,\nguiados por tu amor sin fin.\nTu palabra nos da vida hoy,\ny tu gracia nos sostiene.",
+      "Con esperanza te alabamos, Dios,\nporque eres fuente de paz.\nRecibe, Padre, nuestro cantar,\ny bendice a tu pueblo fiel."
+    ],
+    "{GLORIA_TXT}": [
+      "Gloria a Dios en el cielo,\ny en la tierra paz a los hombres\nque ama el Señor.\nPor tu inmensa gloria te alabamos,\nte bendecimos y te adoramos.",
+      "Señor Dios, Rey celestial,\nDios Padre todopoderoso.\nSeñor, Hijo único Jesucristo,\nCordero de Dios, Hijo del Padre.",
+      "Tú que quitas el pecado del mundo,\nten piedad de nosotros.\nPorque sólo tú eres Santo,\nsólo tú, Señor, eres Altísimo."
+    ],
+    "{OFFERTORY_TXT}": [
+      "Te ofrecemos hoy, Señor,\nel trabajo de nuestras manos,\nnuestro pan y nuestro vino,\nsignos de tu amor.",
+      "Recibe nuestra vida entera,\nnuestros gozos y dolor.\nQue tu Espíritu transforme\ntodo en ofrenda de amor.",
+      "Haz de nosotros, Padre bueno,\nun pueblo fiel a tu voz.\nQue vivamos siempre unidos\nen la paz del Señor."
+    ],
+    "{COMMUNION_TXT}": [
+      "Pan de vida, cuerpo santo,\nalimento del Señor,\nen tu mesa nos reúnes\ncomo hermanos en tu amor.",
+      "Tu presencia nos renueva,\nnos da fuerza y comunión.\nCaminamos con esperanza\nen la luz de tu perdón.",
+      "Quédate con nosotros, Cristo,\nen la noche y en el día.\nQue tu gracia nos transforme\ny nos llene de alegría."
+    ],
+    "{RECESSIONAL_TXT}": [
+      "Vayamos con alegría\na vivir el Evangelio.\nQue la paz del Señor\nnos acompañe siempre.",
+      "Con tu gracia caminamos\npor senderos de verdad.\nAnunciando tu esperanza\na los pueblos y la ciudad.",
+      "Gloria al Padre, gloria al Hijo,\ngloria al Santo Espíritu.\nQue su amor nos guíe siempre\nen la vida y la misión."
+    ],
+    "{KYRIE_TXT}": [
+      "Señor, ten piedad.\nCristo, ten piedad\nSeñor, ten piedad."
+    ],
+    "{SANCTUS_TXT}": [
+      "Santo, santo, santo es el Señor, Dios del universo.",
+      "Llenos están el cielo y la tierra de tu gloria.",
+      "¡Hosanna en el cielo!",
+      "Bendito el que viene en nombre del Señor.",
+      "¡Hosanna en el cielo!"
+    ],
+    "{AGNUS_TXT}": [
+      "Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.",
+      "Cordero de Dios, que quitas el pecado del mundo, ten piedad de nosotros.",
+      "Cordero de Dios, que quitas el pecado del mundo, danos la paz."
+    ],
+    "{MYSTERIUM_TXT}": [
+      "Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!"
+    ]
+  },
+  "placeholders": {
+    "{ENTRANCE_REF}": "Flor y Canto #412",
+    "{OFFERTORY_REF}": "Flor y Canto #233",
+    "{COMMUNION_REF}": "Flor y Canto #589",
+    "{RECESSIONAL_REF}": "Flor y Canto #701"
+  }
+}
