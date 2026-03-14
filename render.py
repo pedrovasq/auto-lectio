@@ -10,6 +10,8 @@ from typing import Dict, List, Tuple
 
 from pptx import Presentation
 
+from chunking import rebalance_chunks
+
 
 def _is_sunday_from_meta(meta: Dict) -> bool:
     """Detect if the mass day is Sunday using meta.date or meta.title.
@@ -146,32 +148,6 @@ def _sanitize_text(s: str) -> str:
     # Collapse multiple spaces/tabs
     s = " ".join(s.split())
     return s.strip()
-
-
-def enforce_chunk_bounds(chunks: List[str], min_chars: int = 100, max_chars: int = 140) -> List[str]:
-    """Merge adjacent short chunks when possible to keep within [min,max].
-
-    - Only merges with the immediate next chunk if combined length <= max.
-    - Leaves chunks as-is when merging would exceed max.
-    - Operates on already-sanitized chunks (no newlines).
-    """
-    out: List[str] = []
-    i = 0
-    n = len(chunks)
-    while i < n:
-        cur = chunks[i]
-        # If current is short and there is a next, try to merge
-        if len(cur) < min_chars and i + 1 < n:
-            nxt = chunks[i + 1]
-            # Prefer to merge if it keeps us within max
-            if len(cur) + 1 + len(nxt) <= max_chars:
-                cur = (cur + " " + nxt).strip()
-                i += 2
-                out.append(cur)
-                continue
-        out.append(cur)
-        i += 1
-    return out
 
 
 def find_seed_slide_indices(prs: Presentation, token: str) -> List[int]:
@@ -560,9 +536,8 @@ def main() -> None:
             # No auto-merging bounds for hymns
         else:
             chunks = [_sanitize_text(c) for c in chunks if c and c.strip()]
-            # Enforce desired bounds for non-psalm waterfalls
             if key != "{PSALM_TXT}":
-                chunks = enforce_chunk_bounds(chunks, min_chars=100, max_chars=140)
+                chunks = rebalance_chunks(chunks)
         log(f"{key}: {len(chunks)} chunk(s)")
 
         if len(chunks) == 0:

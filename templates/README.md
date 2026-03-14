@@ -75,7 +75,7 @@ Tips for reliable placeholders:
 
 - Reading/acclamation text is normalized so newlines become spaces and repeated whitespace is collapsed.
 - Hymn chunks preserve explicit line breaks from the songs JSON.
-- Non-Psalm reading chunks are merged to target ~100–140 characters for better slide balance.
+- Non-Psalm reading chunks are balanced with the shared `chunking.py` rules, which prefer fuller slides and avoid tiny remainder chunks when possible.
 
 ## Common Layout Pattern
 

@@ -26,20 +26,36 @@ Primary responsibilities:
 - HTML cleanup and section extraction
 - liturgical phrasing for reading references
 - acclamation cleanup
-- sentence/clause/word chunking
+- balanced reading chunking
 - JSON payload creation
 
 Important functions:
 - `pick_item(entries, target_mmddyy)`: date match by substring in the RSS item link
 - `parse_sections(desc_html)`: extracts `(header, body)` pairs
 - `to_placeholders(item_title, sections)`: maps parsed sections to the template contract
-- `chunkify(text, max_chars=140, min_chars=100)`: sentence-first chunking for long text
+- `chunkify(...)`: wrapper around the shared balanced chunker in `chunking.py`
 - `make_chunks(placeholders)`: only chunks the reading body tokens
 
 Notable behavior:
 - First and second reading references are normalized into spoken Mass phrasing, not copied verbatim from the feed.
 - `{ACCLAMATION_TXT}` removes `R.` and `Aleluya` lines.
 - `build_payload(...)` normalizes whitespace in both placeholders and chunks.
+
+### `chunking.py`
+
+Primary responsibilities:
+- shared reading chunking rules used by both fetch and render
+- sentence/clause/word unitization
+- chunk-sequence balancing with scoring
+
+Important functions:
+- `chunk_text(...)`: builds balanced reading chunks from raw text
+- `rebalance_chunks(...)`: rebalances existing reading chunks, useful for older payloads
+
+Notable behavior:
+- Uses a wider soft/hard size band than the older 100-140 character pass.
+- Penalizes very short orphan chunks and weak clause endings.
+- Will split long sentences at clause boundaries even when they are still below the hard ceiling, so neighboring short lines can be absorbed.
 
 ### `render.py`
 
@@ -71,6 +87,7 @@ Waterfall tokens currently include:
 Notable behavior:
 - Psalm chunking is regenerated from the raw psalm text at render time, even if the JSON already contains psalm chunks.
 - Hymn chunks preserve newlines; reading chunks are flattened to spaces.
+- Non-Psalm reading chunks are rebalanced with the shared chunker so older payloads also benefit.
 - Missing content is blanked out. The current code avoids deleting slides.
 
 ### `web/app.py`

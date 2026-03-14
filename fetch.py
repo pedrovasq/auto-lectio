@@ -11,6 +11,8 @@ import unicodedata
 from datetime import date
 from bs4 import BeautifulSoup
 
+from chunking import chunk_text
+
 FEED_URL = "https://bible.usccb.org/lecturas.rss"
 
 
@@ -329,117 +331,12 @@ def normalize_text(s: str) -> str:
     return out.strip()
 
 
-def split_sentences(text: str) -> List[str]:
-    """
-    Simple sentence splitter that works decently for Spanish.
-    Avoids splitting on common abbreviations like 'Sr.', 'Sra.', 'p.ej.' etc.
-    You can improve this later if needed.
-    """
-    text = text.strip()
-    if not text:
-        return []
-
-    # protect a few abbreviations (add more as you discover them)
-    protected = {
-        "Sr.": "Sr<dot>",
-        "Sra.": "Sra<dot>",
-        "Dr.": "Dr<dot>",
-        "Dra.": "Dra<dot>",
-        "p.ej.": "pej<dot>",
-        "etc.": "etc<dot>",
-    }
-    for k, v in protected.items():
-        text = text.replace(k, v)
-
-    # split on punctuation followed by whitespace + a likely next sentence start
-    parts = re.split(r"(?<=[.!?…])\s+(?=[\"“¿¡A-ZÁÉÍÓÚÜÑ])", text)
-
-    # restore protected dots
-    restored: List[str] = []
-    for p in parts:
-        for k, v in protected.items():
-            p = p.replace(v, k)
-        p = p.strip()
-        if p:
-            restored.append(p)
-    return restored
-
-
 def chunkify(
     text: str,
-    max_chars: int = 140,
-    min_chars: int = 100,
+    max_chars: int = 210,
+    min_chars: int = 90,
 ) -> List[str]:
-    """
-    Chunk text preferring sentences, then commas/clauses.
-
-    1) Pack full sentences up to max_chars.
-    2) If a sentence is too long, split on commas/semicolons/colons and pack.
-    3) As a last resort, hard-wrap by words.
-    """
-    text = normalize_text(text)
-    if not text:
-        return []
-
-    sentences = split_sentences(text)
-    chunks: List[str] = []
-
-    def push(buf: List[str]):
-        if not buf:
-            return
-        s = " ".join(buf).strip()
-        if s:
-            chunks.append(s)
-        buf.clear()
-
-    buf: List[str] = []
-
-    for sent in sentences:
-        candidate = (" ".join(buf + [sent])).strip()
-        if len(candidate) <= max_chars:
-            buf.append(sent)
-            continue
-
-        # flush current buffer
-        push(buf)
-
-        if len(sent) <= max_chars:
-            buf.append(sent)
-            continue
-
-        # Split long sentence by clauses (commas/semicolons/colons)
-        clauses = [c.strip() for c in re.split(r"(?<=[,;:])\s+", sent) if c.strip()]
-        clause_buf: List[str] = []
-        for cl in clauses:
-            cand2 = (" ".join(clause_buf + [cl])).strip()
-            if len(cand2) <= max_chars:
-                clause_buf.append(cl)
-            else:
-                # flush clause buffer
-                push(clause_buf)
-                # hard-wrap this clause by words
-                words = cl.split()
-                wbuf: List[str] = []
-                for w in words:
-                    candw = (" ".join(wbuf + [w])).strip()
-                    if len(candw) <= max_chars:
-                        wbuf.append(w)
-                    else:
-                        push(wbuf)
-                        wbuf = [w]
-                push(wbuf)
-        push(clause_buf)
-
-    push(buf)
-
-    # Final pass: avoid tiny trailing chunk by merging if possible
-    if len(chunks) >= 2 and len(chunks[-1]) < min_chars:
-        merged = (chunks[-2] + " " + chunks[-1]).strip()
-        if len(merged) <= max_chars:
-            chunks[-2] = merged
-            chunks.pop()
-
-    return chunks
+    return chunk_text(text, min_chars=min_chars, hard_max_chars=max_chars)
 
 
 def build_payload(
@@ -490,7 +387,7 @@ def make_chunks(placeholders: Dict[str, str]) -> Dict[str, List[str]]:
     for k in keys_to_chunk:
         txt = placeholders.get(k, "")
         if txt.strip():
-            out[k] = chunkify(txt, max_chars=140, min_chars=100)
+            out[k] = chunkify(txt)
     return out
 
 

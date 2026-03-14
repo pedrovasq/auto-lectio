@@ -8,6 +8,7 @@ Generate Mass slides automatically (USCCB → JSON → PPTX)
 
 ## Code map
 - `fetch.py`: RSS fetcher, HTML parser, liturgical reference formatter, chunk generator, JSON writer.
+- `chunking.py`: shared balanced reading chunker used by fetch and render.
 - `render.py`: PPTX renderer, placeholder replacer, waterfall slide duplicator, hymn/song merger.
 - `web/app.py`: Flask UI and JSON API for fetch/render/upload.
 - `web/templates/index.html`: basic browser UI.
@@ -24,7 +25,7 @@ Generate Mass slides automatically (USCCB → JSON → PPTX)
 - Waterfall duplication: duplicates the seed slide and changes only the body text; preserves formatting; inserts immediately after the seed.
 - Psalm handling: alternates R. (refrain) and verse blocks as separate slides.
 - Text normalization: removes manual newlines, collapses whitespace so PowerPoint wraps naturally.
-- Chunk sizing: targets ~100–140 chars for non-Psalm waterfalls (merges short chunks when possible).
+- Chunk sizing: uses a balanced sentence/clause chunker for non-Psalm readings, with a wider soft target to reduce tiny orphan slides.
 - No slide deletions (avoids repair prompts); blanks placeholders if a reading is absent.
 - Verbose logging and timestamped outputs for traceability.
 
@@ -121,7 +122,7 @@ Pre-baked fixed parts
 - No repair prompt: avoid deleting slides. The renderer blanks missing-reading placeholders instead of deleting slides to prevent duplicate slide-part names and “repair” warnings.
 - Slide order shifts: seeds are processed in descending index to minimize index shifting. Logs report final sequence indices so you can confirm where duplicates land.
 - Psalm splitting: renderer ignores global chunking for Psalms and alternates refrain/verse slides. If verses look too short, ask to enable verse-only min/merge rules.
-- Short slides (<100 chars): non-Psalm waterfalls enforce ~100–140 characters by merging adjacent chunks when it fits. If you want stricter packing, request multi-sentence repacking.
+- Short slides: non-Psalm readings now use a shared balancing pass in `chunking.py` that prefers fuller slides and avoids tiny remainders when possible.
 - Newlines/spacing: renderer removes manual newlines and collapses whitespace so PowerPoint manages wrapping. If you need explicit breaks for a template, we can whitelist sections.
 - Seeds not found: logs will say “No seed for {TOKEN}”; the renderer falls back to simple replacement across the deck. Verify the exact placeholder token text in the template matches what `fetch.py` emits.
 - Moved placeholders: if a future placeholder appears in a duplicated slide, confirm the seed slide only contains the target token. Use `--verbose` snapshots to list tokens present on each slide.

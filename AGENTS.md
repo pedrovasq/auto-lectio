@@ -34,7 +34,7 @@ We have two main scripts:
   - expands long bodies with a “waterfall” by duplicating the seed slide and changing only the body text
   - handles Psalm specially (alternating R. and verse slides)
   - sanitizes text (newlines → spaces; collapse whitespace)
-  - enforces chunk length (non-Psalm) to ~100–140 chars by merging short chunks
+  - rebalances non-Psalm reading chunks with a shared scoring-based chunker to avoid tiny orphan slides
   - supports verbose logging and timestamped output filenames
   - avoids slide deletion (to prevent repair prompts); blanks placeholders when a reading is absent
 
@@ -176,7 +176,7 @@ In step (2), do it in slide index order, because inserting slides shifts indices
 
 ### 6) Text normalization
 - Renderer strips newlines and collapses whitespace so text wraps naturally inside text boxes.
-- Non-Psalm waterfalls enforce ~100–140 characters per chunk; Psalm uses R./verse alternation.
+- Non-Psalm readings use a shared balanced chunker with a wider soft target so the slideshow has fewer abrupt slide changes; Psalm uses R./verse alternation.
 
 ### 7) Logging and timestamps
 - `--verbose` logs initial placeholder positions, waterfall seed/sequence indices, and short text previews per slide.

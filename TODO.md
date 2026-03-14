@@ -9,10 +9,11 @@
   - `second_reading_intro`
   - `normalize_acclamation_text`
   - `chunkify`
+  - `chunking.chunk_text`
+  - `chunking.rebalance_chunks`
 
 - Add unit tests for pure render logic in `render.py`:
   - `chunk_psalm_text`
-  - `enforce_chunk_bounds`
   - `resolve_template_path`
   - duplicate-seed validation for waterfall tokens
   - zero-seed behavior for optional waterfall tokens
