@@ -2,8 +2,7 @@
   "meta": { "name": "Sanctus — Español", "language": "es" },
   "chunks": {
     "{SANCTUS_TXT}": [
-      "Santo, santo, santo es el Señor, Dios del universo.",
-      "Llenos están el cielo y la tierra de tu gloria.",
+      "Santo, santo, santo es el Señor, Dios del universo.\nLlenos están el cielo y la tierra de tu gloria.",
       "¡Hosanna en el cielo!",
       "Bendito el que viene en nombre del Señor.",
       "¡Hosanna en el cielo!"

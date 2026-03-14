@@ -2,7 +2,7 @@
   "meta": { "name": "Mysterium — Latin (1)", "language": "la" },
   "chunks": {
     "{MYSTERIUM_TXT}": [
-      "Mortem tuam annuntiamus, Domine, et tuam resurrectionem confitemur, donec venias."
+      "Mortem tuam annuntiamus, Domine,\net tuam resurrectionem confitemur,\ndonec venias."
     ]
   }
 }

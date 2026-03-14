@@ -6,6 +6,7 @@ import subprocess
 from datetime import date
 from pathlib import Path
 from typing import Any, Dict
+from zipfile import ZipFile
 
 from flask import Flask, jsonify, render_template, request, send_from_directory
 import json
@@ -22,6 +23,12 @@ import fetch as fetch_mod
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 app.config["MAX_CONTENT_LENGTH"] = 65 * 1024 * 1024  # 65 MB upload limit
+
+TEMPLATE_DIR_SPECS = [
+    ("library", ROOT / "templates" / "library", "Library"),
+    ("custom", ROOT / "templates" / "custom", "Custom"),
+    ("uploads", ROOT / "templates" / "uploads", "Uploads"),
+]
 
 
 # ---- Songs helpers: build JSON from UI config (reads parts from songs/parts) ----
@@ -41,6 +48,10 @@ def _part_path(kind: str, lang: str | None = None, version: str | None = None) -
         if not lang or not version:
             return Path("")
         return base / f"mysterium.{lang}.{version}.json"
+    if kind == "gloria":
+        if not lang:
+            return Path("")
+        return base / f"gloria.{lang}.json"
     # kyrie, sanctus, agnus
     if not lang:
         return Path("")
@@ -80,6 +91,7 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
 
     cfg shape (expected keys):
       - entranceText, offertoryText, communionText, recessionalText: multiline strings (blank line separates chunks)
+      - gloriaEnabled: boolean-like flag to include fixed Gloria text
       - kyrieLang, sanctusLang, agnusLang: 'es' or 'la'
       - mysteriumLang: 'es' or 'la'; mysteriumVersion: '1'|'2'|'3'
     Reads fixed parts from songs/parts/*.json
@@ -92,7 +104,6 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
     # Free-text hymns (split into stanzas)
     ft_map = [
         ("{ENTRANCE_TXT}", cfg.get("entranceText")),
-        ("{GLORIA_TXT}", cfg.get("gloriaText")),
         ("{OFFERTORY_TXT}", cfg.get("offertoryText")),
         ("{COMMUNION_TXT}", cfg.get("communionText")),
         ("{RECESSIONAL_TXT}", cfg.get("recessionalText")),
@@ -116,6 +127,7 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
 
     # Fixed parts from songs/parts
     k_lang = (cfg.get("kyrieLang") or "").lower()[:2]
+    g_lang = (cfg.get("gloriaLang") or "es").lower()[:2]
     s_lang = (cfg.get("sanctusLang") or "").lower()[:2]
     a_lang = (cfg.get("agnusLang") or "").lower()[:2]
     m_lang = (cfg.get("mysteriumLang") or "").lower()[:2]
@@ -123,6 +135,8 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
 
     if k_lang in ("es", "la"):
         _merge_chunks(chunks, _load_chunks_from_file(_part_path("kyrie", k_lang)))
+    if str(cfg.get("gloriaEnabled", "")).lower() in ("1", "true", "yes", "on") and g_lang in ("es",):
+        _merge_chunks(chunks, _load_chunks_from_file(_part_path("gloria", g_lang)))
     if s_lang in ("es", "la"):
         _merge_chunks(chunks, _load_chunks_from_file(_part_path("sanctus", s_lang)))
     if a_lang in ("es", "la"):
@@ -145,6 +159,136 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
     out_path = songs_dir / f"ui_{ts}.json"
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     return str(out_path)
+
+
+def _list_templates() -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+
+    for key, base_dir, label in TEMPLATE_DIR_SPECS:
+        if not base_dir.exists() or not base_dir.is_dir():
+            continue
+
+        files = [p for p in base_dir.rglob("*.pptx") if p.is_file()]
+        if key == "uploads":
+            files.sort(key=lambda p: (p.stat().st_mtime, p.name.lower()), reverse=True)
+        else:
+            files.sort(key=lambda p: str(p.relative_to(base_dir)).lower())
+
+        for path in files:
+            stat = path.stat()
+            rel_path = path.relative_to(ROOT).as_posix()
+            rel_label = path.relative_to(base_dir).as_posix()
+            entries.append(
+                {
+                    "id": rel_path,
+                    "path": rel_path,
+                    "name": path.stem,
+                    "filename": path.name,
+                    "group": key,
+                    "group_label": label,
+                    "label": rel_label,
+                    "modified_ts": stat.st_mtime,
+                }
+            )
+
+    return entries
+
+
+def _build_fetch_preview(payload: Dict[str, Any]) -> Dict[str, Any]:
+    placeholders = payload.get("placeholders") or {}
+    chunks = payload.get("chunks") or {}
+
+    preview_sections = [
+        ("first_reading", "{FIRST_READING_REF}", "{FIRST_READING_TXT}", "Primera lectura"),
+        ("psalm", "{PSALM_REF}", "{PSALM_TXT}", "Salmo"),
+        ("second_reading", "{SECOND_READING_REF}", "{SECOND_READING_TXT}", "Segunda lectura"),
+        ("acclamation", "{ACCLAMATION_REF}", "{ACCLAMATION_TXT}", "Aclamación"),
+        ("gospel", "{GOSPEL_REF}", "{GOSPEL_TXT}", "Evangelio"),
+    ]
+
+    sections = []
+    for key, ref_key, body_key, label in preview_sections:
+        body_text = str(placeholders.get(body_key) or "").strip()
+        chunk_list = chunks.get(body_key) if isinstance(chunks.get(body_key), list) else []
+        sections.append(
+            {
+                "key": key,
+                "label": label,
+                "ref": str(placeholders.get(ref_key) or "").strip(),
+                "has_body": bool(body_text),
+                "chunk_count": len(chunk_list),
+            }
+        )
+
+    return {
+        "meta": payload.get("meta") or {},
+        "sections": sections,
+    }
+
+
+def _known_placeholder_tokens() -> list[str]:
+    return [item["placeholder"] for item in PLACEHOLDER_HELP]
+
+
+def _inspect_template(template_path: str) -> Dict[str, Any]:
+    allowed = {item["path"]: item for item in _list_templates()}
+    selected = allowed.get(template_path)
+    if not selected:
+        raise ValueError("Template not found in approved template list")
+
+    path = ROOT / template_path
+    if not path.exists() or not path.is_file():
+        raise ValueError("Template file does not exist")
+
+    tokens = _known_placeholder_tokens()
+    waterfall_tokens = {item["placeholder"] for item in PLACEHOLDER_HELP if item.get("waterfall")}
+    slide_matches: dict[str, int] = {token: 0 for token in tokens}
+    total_slides = 0
+
+    with ZipFile(path, "r") as zf:
+        slide_names = sorted(
+            [name for name in zf.namelist() if name.startswith("ppt/slides/slide") and name.endswith(".xml")],
+            key=lambda name: int(Path(name).stem.replace("slide", "")),
+        )
+        total_slides = len(slide_names)
+        for slide_name in slide_names:
+            content = zf.read(slide_name).decode("utf-8", errors="ignore")
+            for token in tokens:
+                if token in content:
+                    slide_matches[token] += 1
+
+    present = []
+    missing = []
+    for item in PLACEHOLDER_HELP:
+        token = item["placeholder"]
+        entry = {
+            "placeholder": token,
+            "description": item["description"],
+            "category": item["category"],
+            "waterfall": item["waterfall"],
+            "slide_count": slide_matches[token],
+        }
+        if slide_matches[token] > 0:
+            present.append(entry)
+        else:
+            missing.append(entry)
+
+    waterfall_seeds = [
+        {
+            "placeholder": item["placeholder"],
+            "slide_count": slide_matches[item["placeholder"]],
+        }
+        for item in PLACEHOLDER_HELP
+        if item["placeholder"] in waterfall_tokens
+    ]
+
+    return {
+        "template": selected,
+        "slide_count": total_slides,
+        "present": present,
+        "missing": missing,
+        "waterfall_seeds": waterfall_seeds,
+    }
 
 
 # Supported template placeholders (see AGENTS.md)
@@ -170,7 +314,7 @@ PLACEHOLDER_HELP = [
     {"placeholder": "{GOSPEL_TXT}", "description": "Texto del Evangelio (con expansión en cascada si es largo)", "category": "text", "waterfall": True},
     # Himnos (rellenados vía UI; cada trozo genera una diapositiva)
     {"placeholder": "{ENTRANCE_TXT}", "description": "Canto de entrada (estrofas: separa con línea en blanco)", "category": "hymn", "waterfall": True},
-    {"placeholder": "{GLORIA_TXT}", "description": "Gloria (opcional; estrofas o líneas separadas por línea en blanco)", "category": "hymn", "waterfall": True},
+    {"placeholder": "{GLORIA_TXT}", "description": "Gloria fijo (se incluye u omite desde la UI)", "category": "hymn", "waterfall": True},
     {"placeholder": "{OFFERTORY_TXT}", "description": "Ofertorio (estrofas)", "category": "hymn", "waterfall": True},
     {"placeholder": "{COMMUNION_TXT}", "description": "Comunión (estrofas)", "category": "hymn", "waterfall": True},
     {"placeholder": "{RECESSIONAL_TXT}", "description": "Salida (estrofas)", "category": "hymn", "waterfall": True},
@@ -207,6 +351,23 @@ def placeholders_help():
             ],
         }
     )
+
+
+@app.get("/templates")
+def list_templates():
+    templates = _list_templates()
+    return jsonify({"ok": True, "templates": templates})
+
+
+@app.get("/templates/inspect")
+def inspect_template():
+    template_path = (request.args.get("path") or "").strip()
+    if not template_path:
+        return jsonify({"ok": False, "error": "path is required"}), 400
+    try:
+        return jsonify({"ok": True, "inspection": _inspect_template(template_path)})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
 
 
 def _default_json_path(d: date) -> Path:
@@ -259,6 +420,7 @@ def do_fetch():
                 "ok": True,
                 "json_path": str(out_path),
                 "meta": payload.get("meta", {}),
+                "preview": _build_fetch_preview(payload),
                 "placeholders_count": len(payload.get("placeholders", {})),
                 "chunks_keys": list((payload.get("chunks") or {}).keys()),
             }
@@ -333,7 +495,7 @@ def upload_template():
         file.save(str(dest))
         # Return a server-side path suitable for --template input
         rel_path = f"templates/uploads/{final_name}"
-        return jsonify({"ok": True, "template_path": rel_path})
+        return jsonify({"ok": True, "template_path": rel_path, "templates": _list_templates()})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
 

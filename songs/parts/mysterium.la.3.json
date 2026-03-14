@@ -2,7 +2,7 @@
   "meta": { "name": "Mysterium — Latin (3)", "language": "la" },
   "chunks": {
     "{MYSTERIUM_TXT}": [
-      "Per crucem tuam et resurrectionem tuam liberasti nos, Domine."
+      "Per crucem tuam et resurrectionem\ntuam liberasti nos, Domine."
     ]
   }
 }

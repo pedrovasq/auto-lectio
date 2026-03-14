@@ -2,8 +2,7 @@
   "meta": { "name": "Sanctus — Latin", "language": "la" },
   "chunks": {
     "{SANCTUS_TXT}": [
-      "Sanctus, Sanctus, Sanctus Dominus Deus Sabaoth.",
-      "Pleni sunt caeli et terra gloria tua.",
+      "Sanctus, Sanctus, Sanctus Dominus Deus Sabaoth.\nPleni sunt caeli et terra gloria tua.",
       "Hosanna in excelsis.",
       "Benedictus qui venit in nomine Domini.",
       "Hosanna in excelsis."

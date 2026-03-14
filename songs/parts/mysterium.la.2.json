@@ -2,7 +2,7 @@
   "meta": { "name": "Mysterium — Latin (2)", "language": "la" },
   "chunks": {
     "{MYSTERIUM_TXT}": [
-      "Quotiescumque manducamus panem hunc et calicem bibimus, mortem tuam annuntiamus, Domine, donec venias."
+      "Quotiescumque manducamus panem\nhunc et calicem bibimus,\nmortem tuam annuntiamus,\nDomine, donec venias."
     ]
   }
 }

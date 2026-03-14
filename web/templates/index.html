@@ -5,127 +5,475 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Auto-Lectio — UI</title>
     <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
-      h1 { font-size: 20px; margin: 0 0 16px; }
-      fieldset { border: 1px solid #ddd; padding: 12px; margin-bottom: 16px; }
-      label { display: block; margin: 6px 0 4px; font-weight: 600; }
-      input[type="text"], input[type="date"] { width: 100%; max-width: 520px; padding: 8px; }
-      textarea { width: 100%; max-width: 680px; min-height: 72px; padding: 8px; }
+      :root {
+        --bg: #f4efe6;
+        --surface: #fffdf8;
+        --surface-strong: #fffaf0;
+        --line: #ded4c4;
+        --line-soft: #ece3d4;
+        --text: #2d241d;
+        --muted: #6f6255;
+        --accent: #7c3421;
+        --accent-soft: #f3dfd7;
+        --ok: #1f7a57;
+        --err: #b2402e;
+        --shadow: 0 10px 30px rgba(88, 62, 37, 0.08);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        background:
+          radial-gradient(circle at top, rgba(255,255,255,0.9), transparent 36%),
+          linear-gradient(180deg, #efe4d2 0%, var(--bg) 55%, #f8f3eb 100%);
+        color: var(--text);
+      }
+      .shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 28px 18px 40px;
+      }
+      .hero {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 18px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: linear-gradient(135deg, rgba(255,253,248,0.96), rgba(252,244,230,0.92));
+        box-shadow: var(--shadow);
+      }
+      .eyebrow {
+        margin: 0;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(30px, 5vw, 48px);
+        line-height: 0.95;
+        font-weight: 600;
+      }
+      .hero-copy {
+        max-width: 720px;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      .hero-stats {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .stat-chip {
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.72);
+        font-size: 13px;
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+        gap: 14px;
+        align-items: start;
+      }
+      .stack {
+        display: grid;
+        gap: 14px;
+      }
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+      .card-header {
+        padding: 16px 18px 12px;
+        border-bottom: 1px solid var(--line-soft);
+        background: linear-gradient(180deg, rgba(255,250,240,0.95), rgba(255,253,248,0.85));
+      }
+      .card-title {
+        margin: 0;
+        font-size: 20px;
+      }
+      .card-subtitle {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .card-body {
+        padding: 16px 18px 18px;
+      }
+      .section-grid {
+        display: grid;
+        gap: 14px;
+      }
+      .two-up {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .setup-grid {
+        display: grid;
+        grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+        gap: 14px;
+      }
+      .song-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .song-card {
+        border: 1px solid var(--line-soft);
+        border-radius: 6px;
+        padding: 12px;
+        background: var(--surface-strong);
+      }
+      .song-title {
+        margin: 0 0 8px;
+        font-size: 15px;
+      }
+      .fixed-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .fixed-card {
+        border: 1px solid var(--line-soft);
+        border-radius: 6px;
+        padding: 12px;
+        background: #fff;
+      }
+      .fixed-card strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+      label { display: block; margin: 6px 0 4px; font-weight: 600; font-size: 13px; }
+      input[type="text"], input[type="date"], select {
+        width: 100%;
+        max-width: none;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: #fff;
+        color: var(--text);
+      }
+      textarea {
+        width: 100%;
+        max-width: none;
+        min-height: 92px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: #fff;
+        color: var(--text);
+        resize: vertical;
+      }
       .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-      button { padding: 8px 12px; cursor: pointer; }
-      #log { white-space: pre-wrap; background: #fafafa; border: 1px solid #eee; padding: 12px; min-height: 120px; }
-      .muted { color: #666; font-size: 12px; }
-      .ok { color: #0a7; }
-      .err { color: #c33; }
-      a { color: #06c; text-decoration: none; }
-      .panel { border: 1px solid #eee; padding: 12px; margin-top: 16px; }
-      .ph-list { list-style: none; padding-left: 0; }
-      .ph-item { padding: 6px 0; border-bottom: 1px dotted #eee; }
+      .control {
+        display: grid;
+        gap: 6px;
+      }
+      .check-row {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .check-row label,
+      .radio-row label {
+        margin: 0;
+        font-weight: 500;
+      }
+      .inline-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      .radio-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      button {
+        padding: 9px 13px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--text);
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fffaf7;
+      }
+      button.secondary {
+        background: var(--surface-strong);
+      }
+      #log {
+        white-space: pre-wrap;
+        background: #fff;
+        border: 1px solid var(--line-soft);
+        border-radius: 4px;
+        padding: 14px;
+        min-height: 120px;
+      }
+      .muted { color: var(--muted); font-size: 12px; }
+      .ok { color: var(--ok); }
+      .err { color: var(--err); }
+      a { color: var(--accent); text-decoration: none; }
+      .panel { border: 1px solid var(--line); padding: 12px; margin-top: 16px; border-radius: 6px; background: var(--surface); }
+      .ph-list { list-style: none; padding-left: 0; margin: 10px 0 0; }
+      .ph-item { padding: 8px 0; border-bottom: 1px dotted var(--line-soft); break-inside: avoid; }
       .ph-item:last-child { border-bottom: 0; }
-      code { background: #f6f8fa; padding: 1px 4px; border-radius: 3px; }
-      .badge { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 10px; background: #eef; color: #225; margin-left: 6px; vertical-align: middle; }
-      .badge.waterfall { background: #e7f7ef; color: #0a7; }
+      code { background: #f7efe4; padding: 1px 5px; border-radius: 3px; }
+      .badge { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 4px; background: #efe4d8; color: #5b4233; margin-left: 6px; vertical-align: middle; }
+      .badge.waterfall { background: #dff2e9; color: var(--ok); }
+      .status-grid { display: grid; gap: 4px; }
+      .result-block { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line-soft); }
+      .result-block:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+      .result-label { font-weight: 600; }
+      .result-pre { white-space: pre-wrap; background: #fff; border: 1px solid var(--line-soft); border-radius: 4px; padding: 8px; margin: 6px 0 0; }
+      .preview-grid { display: grid; gap: 8px; }
+      .preview-card { border: 1px solid var(--line-soft); padding: 12px; background: #fcfcfc; border-radius: 6px; }
+      .preview-title { font-weight: 600; margin-bottom: 4px; }
+      .preview-list { list-style: none; padding-left: 0; margin: 8px 0 0; }
+      .preview-list li { padding: 6px 0; border-bottom: 1px dotted var(--line-soft); }
+      .preview-list li:last-child { border-bottom: 0; }
+      button:disabled { cursor: not-allowed; opacity: 0.55; }
+      .inspect-grid {
+        display: grid;
+        gap: 10px;
+      }
+      .inspect-box {
+        border: 1px solid var(--line-soft);
+        border-radius: 6px;
+        padding: 12px;
+        background: #fff;
+      }
+      .inspect-box h3 {
+        margin: 0 0 8px;
+        font-size: 15px;
+      }
+      .placeholder-grid {
+        column-count: 2;
+        column-gap: 22px;
+      }
+      @media (max-width: 940px) {
+        .workspace,
+        .setup-grid,
+        .two-up,
+        .song-grid,
+        .fixed-grid {
+          grid-template-columns: 1fr;
+        }
+        .placeholder-grid {
+          column-count: 1;
+        }
+      }
     </style>
   </head>
   <body>
-    <h1>Auto‑Lectio — Básico</h1>
+    <div class="shell">
+      <section class="hero">
+        <p class="eyebrow">USCCB → JSON → PPTX</p>
+        <h1>Auto‑Lectio</h1>
+        <div class="hero-copy">
+          Preparar la presentación de la Misa debería sentirse como un flujo claro: elegir la fecha, escoger la plantilla, revisar el payload y generar el PPTX sin adivinar rutas internas.
+        </div>
+        <div class="hero-stats">
+          <div class="stat-chip">1. Elegir fecha</div>
+          <div class="stat-chip">2. Elegir plantilla</div>
+          <div class="stat-chip">3. Revisar preview</div>
+          <div class="stat-chip">4. Generar PPTX</div>
+        </div>
+      </section>
 
-    <fieldset>
-      <legend>Parámetros</legend>
-      <label for="date">Fecha</label>
-      <input type="date" id="date" />
+      <div class="workspace">
+        <div class="stack">
+          <section class="card">
+            <div class="card-header">
+              <h2 class="card-title">Configuración</h2>
+              <p class="card-subtitle">Defina la fecha litúrgica, elija la plantilla y controle cómo se escribe la salida.</p>
+            </div>
+            <div class="card-body section-grid">
+              <div class="setup-grid">
+                <div class="control">
+                  <label for="date">Fecha</label>
+                  <input type="date" id="date" />
+                </div>
+                <div class="control">
+                  <label for="templateSelect">Plantilla PPTX</label>
+                  <div class="inline-actions">
+                    <select id="templateSelect">
+                      <option value="">Cargando plantillas...</option>
+                    </select>
+                    <button id="btn-refresh-templates" class="secondary" type="button">Actualizar lista</button>
+                  </div>
+                  <div id="template-meta" class="muted">Cargando opciones de plantilla...</div>
+                </div>
+              </div>
 
-      <label for="template">Plantilla PPTX (ruta en servidor)</label>
-      <input type="text" id="template" value="templates/custom/custom-sunday.pptx" />
-      <div class="row">
-        <input type="file" id="templateFile" accept=".pptx" />
-        <button id="btn-upload" type="button">Subir .pptx</button>
-      </div>
-      <div class="muted">Puede seleccionar un archivo .pptx local para subirlo; la ruta resultante se rellenará arriba.</div>
+              <div class="two-up">
+                <div class="control">
+                  <label for="templateFile">Subir nueva plantilla</label>
+                  <div class="inline-actions">
+                    <input type="file" id="templateFile" accept=".pptx" />
+                    <button id="btn-upload" class="secondary" type="button">Subir .pptx</button>
+                  </div>
+                  <div class="muted">Las plantillas subidas permanecen disponibles para reutilizarlas en sesiones futuras.</div>
+                </div>
+                <div class="control">
+                  <label>Opciones de salida</label>
+                  <div class="check-row">
+                    <label><input type="checkbox" id="stamp" checked /> Añadir timestamp</label>
+                    <label><input type="checkbox" id="verbose" /> Verbose</label>
+                  </div>
+                  <div class="muted">Los archivos se escriben en <code>out/</code> (JSON) y <code>build/</code> (PPTX).</div>
+                  <div id="json-state" class="muted">JSON actual: ninguno.</div>
+                </div>
+              </div>
+            </div>
+          </section>
 
-      <div class="row">
-        <label><input type="checkbox" id="stamp" checked /> Añadir timestamp</label>
-        <label><input type="checkbox" id="verbose" /> Verbose</label>
-      </div>
-      <div class="muted">Sugerencias: templates/sunday-ord.pptx, templates/daily-ord.pptx</div>
-    </fieldset>
+          <section class="card">
+            <div class="card-header">
+              <h2 class="card-title">Cantos</h2>
+              <p class="card-subtitle">Pegue textos libres por estrofas y seleccione las partes fijas que deben entrar al deck.</p>
+            </div>
+            <div class="card-body section-grid">
+              <div class="song-grid">
+                <div class="song-card">
+                  <h3 class="song-title">Entrada <code>{ENTRANCE_TXT}</code></h3>
+                  <textarea id="songs-entrance" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+                  <input type="text" id="songs-entrance-ref" placeholder="Referencia opcional, p. ej. Flor y Canto #123" />
+                </div>
+                <div class="song-card">
+                  <h3 class="song-title">Ofertorio <code>{OFFERTORY_TXT}</code></h3>
+                  <textarea id="songs-offertory" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+                  <input type="text" id="songs-offertory-ref" placeholder="Referencia opcional" />
+                </div>
+                <div class="song-card">
+                  <h3 class="song-title">Comunión <code>{COMMUNION_TXT}</code></h3>
+                  <textarea id="songs-communion" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+                  <input type="text" id="songs-communion-ref" placeholder="Referencia opcional" />
+                </div>
+                <div class="song-card">
+                  <h3 class="song-title">Salida <code>{RECESSIONAL_TXT}</code></h3>
+                  <textarea id="songs-recessional" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+                  <input type="text" id="songs-recessional-ref" placeholder="Referencia opcional" />
+                </div>
+              </div>
 
-    <fieldset>
-      <legend>Cantos (opcional)</legend>
-      <div class="muted">Para Entrada/Gloria/Ofertorio/Comunión/Salida pega la letra y separa estrofas con una línea en blanco. Kyrie, Santo, Cordero y Misterio usan opciones fijas.</div>
+              <div class="fixed-grid">
+                <div class="fixed-card">
+                  <strong>Kyrie <code>{KYRIE_TXT}</code></strong>
+                  <div class="radio-row">
+                    <label><input type="radio" name="kyrieLang" value="es" checked> Español</label>
+                    <label><input type="radio" name="kyrieLang" value="la"> Latín</label>
+                  </div>
+                </div>
+                <div class="fixed-card">
+                  <strong>Gloria <code>{GLORIA_TXT}</code></strong>
+                  <div class="radio-row">
+                    <label><input type="checkbox" id="gloriaEnabled" /> Incluir</label>
+                  </div>
+                  <div class="muted">Actívelo cuando la celebración lleve Gloria.</div>
+                </div>
+                <div class="fixed-card">
+                  <strong>Santo <code>{SANCTUS_TXT}</code></strong>
+                  <div class="radio-row">
+                    <label><input type="radio" name="sanctusLang" value="es" checked> Español</label>
+                    <label><input type="radio" name="sanctusLang" value="la"> Latín</label>
+                  </div>
+                </div>
+                <div class="fixed-card">
+                  <strong>Cordero <code>{AGNUS_TXT}</code></strong>
+                  <div class="radio-row">
+                    <label><input type="radio" name="agnusLang" value="es" checked> Español</label>
+                    <label><input type="radio" name="agnusLang" value="la"> Latín</label>
+                  </div>
+                </div>
+                <div class="fixed-card">
+                  <strong>Misterio de la Fe <code>{MYSTERIUM_TXT}</code></strong>
+                  <div class="radio-row" style="margin-bottom:8px;">
+                    <label><input type="radio" name="mysteriumLang" value="es" checked> Español</label>
+                    <label><input type="radio" name="mysteriumLang" value="la"> Latín</label>
+                  </div>
+                  <label for="mysteriumVersion">Opción</label>
+                  <select id="mysteriumVersion">
+                    <option value="1">1) Anunciamos tu muerte</option>
+                    <option value="2">2) Cada vez que comemos</option>
+                    <option value="3">3) Por tu cruz y resurrección</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </section>
 
-      <label for="songs-entrance">Entrada — {ENTRANCE_TXT}</label>
-      <textarea id="songs-entrance" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
-      <input type="text" id="songs-entrance-ref" placeholder="Referencia (opcional), p. ej. 'Flor y Canto #123'" />
+          <section class="card">
+            <div class="card-header">
+              <h2 class="card-title">Acciones</h2>
+              <p class="card-subtitle">Use fetch para cargar el payload, render para generar desde un payload ya cargado, o ejecute el flujo completo de una vez.</p>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <button id="btn-fetch" class="secondary">Solo Fetch</button>
+                <button id="btn-render">Solo Render</button>
+                <button id="btn-run" class="primary">Fetch + Render</button>
+              </div>
+            </div>
+          </section>
+        </div>
 
-      <label for="songs-gloria">Gloria — {GLORIA_TXT}</label>
-      <textarea id="songs-gloria" placeholder="Gloria a Dios en el cielo...\n\nOtra estrofa o continuación..."></textarea>
+        <div class="stack">
+          <section class="card">
+            <div class="card-header">
+              <h2 class="card-title">Preview</h2>
+              <p class="card-subtitle">Revise el payload cargado y el estado actual de los cantos antes de generar la presentación.</p>
+            </div>
+            <div class="card-body">
+              <div id="payload-preview" class="muted">Todavía no hay payload cargado.</div>
+            </div>
+          </section>
 
-      <label for="songs-offertory">Ofertorio — {OFFERTORY_TXT}</label>
-      <textarea id="songs-offertory" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
-      <input type="text" id="songs-offertory-ref" placeholder="Referencia (opcional)" />
+          <section class="card">
+            <div class="card-header">
+              <h2 class="card-title">Resultado</h2>
+              <p class="card-subtitle">Aquí aparecen los mensajes de fetch, render, errores del backend y enlaces de descarga.</p>
+            </div>
+            <div class="card-body">
+              <div id="log">Listo.</div>
+            </div>
+          </section>
 
-      <label for="songs-communion">Comunión — {COMMUNION_TXT}</label>
-      <textarea id="songs-communion" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
-      <input type="text" id="songs-communion-ref" placeholder="Referencia (opcional)" />
+          <section class="card">
+            <div class="card-header">
+              <h2 class="card-title">Inspección de Plantilla</h2>
+              <p class="card-subtitle">Revise qué placeholders soportados existen en la plantilla seleccionada y si los seeds waterfall están bien formados.</p>
+            </div>
+            <div class="card-body">
+              <div id="template-inspection" class="muted">Seleccione una plantilla para ver su inspección.</div>
+            </div>
+          </section>
 
-      <label for="songs-recessional">Salida — {RECESSIONAL_TXT}</label>
-      <textarea id="songs-recessional" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
-      <input type="text" id="songs-recessional-ref" placeholder="Referencia (opcional)" />
-
-      <div class="row">
-        <div>
-          <strong>Kyrie</strong> — {KYRIE_TXT}
-          <label><input type="radio" name="kyrieLang" value="es" checked> Español</label>
-          <label><input type="radio" name="kyrieLang" value="la"> Latín</label>
         </div>
       </div>
-      <div class="row">
-        <div>
-          <strong>Santo</strong> — {SANCTUS_TXT}
-          <label><input type="radio" name="sanctusLang" value="es" checked> Español</label>
-          <label><input type="radio" name="sanctusLang" value="la"> Latín</label>
+
+      <section class="card" style="margin-top:18px;">
+        <div class="card-header">
+          <h2 class="card-title">Placeholders de la Plantilla</h2>
+          <p class="card-subtitle">Inserte estos tokens exactamente como aparecen en cuadros de texto del PPTX.</p>
         </div>
-      </div>
-      <div class="row">
-        <div>
-          <strong>Cordero</strong> — {AGNUS_TXT}
-          <label><input type="radio" name="agnusLang" value="es" checked> Español</label>
-          <label><input type="radio" name="agnusLang" value="la"> Latín</label>
+        <div class="card-body">
+          <ul id="ph-list" class="ph-list placeholder-grid"><li class="ph-item muted">Cargando…</li></ul>
+          <div id="ph-notes" class="muted" style="margin-top:8px;"></div>
         </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <strong>Misterio de la Fe</strong> — {MYSTERIUM_TXT}
-          <label><input type="radio" name="mysteriumLang" value="es" checked> Español</label>
-          <label><input type="radio" name="mysteriumLang" value="la"> Latín</label>
-          &nbsp; Opción:
-          <select id="mysteriumVersion">
-            <option value="1">1) Anunciamos tu muerte</option>
-            <option value="2">2) Cada vez que comemos</option>
-            <option value="3">3) Por tu cruz y resurrección</option>
-          </select>
-        </div>
-      </div>
-    </fieldset>
-
-    <div class="row">
-      <button id="btn-fetch">Solo Fetch</button>
-      <button id="btn-render">Solo Render</button>
-      <button id="btn-run">Fetch + Render</button>
-    </div>
-
-    <p class="muted">Los archivos se escriben en <code>out/</code> (JSON) y <code>build/</code> (PPTX).</p>
-
-    <h3>Resultado</h3>
-    <div id="log">Listo.</div>
-
-    <div class="panel">
-      <h3>Placeholders de la Plantilla</h3>
-      <div class="muted">Coloque estos tokens (con llaves) en cuadros de texto del PPTX. Los marcados como “waterfall” pueden generar varias diapositivas.</div>
-      <ul id="ph-list" class="ph-list"><li class="ph-item muted">Cargando…</li></ul>
-      <div id="ph-notes" class="muted" style="margin-top:8px;"></div>
+      </section>
     </div>
 
     <script>
@@ -137,6 +485,10 @@
       }
       const dateEl = document.getElementById('date');
       dateEl.value = todayISO();
+      let templateList = [];
+      let currentJsonPath = '';
+      let currentPreview = null;
+      let currentInspection = null;
 
       const logEl = document.getElementById('log');
       function log(msg, cls, isHTML=false) {
@@ -148,10 +500,210 @@
         }
       }
 
+      function escapeHTML(value) {
+        return String(value || '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      }
+
+      function setCurrentJsonPath(path) {
+        currentJsonPath = path || '';
+        document.getElementById('json-state').textContent = currentJsonPath
+          ? `JSON actual: ${currentJsonPath}`
+          : 'JSON actual: ninguno.';
+        updateActionState();
+      }
+
+      function updateActionState() {
+        const hasPayload = Boolean(currentJsonPath);
+        const renderBtn = document.getElementById('btn-render');
+        renderBtn.disabled = !hasPayload;
+        renderBtn.title = hasPayload ? '' : 'Primero cargue un payload con Solo Fetch o Fetch + Render.';
+      }
+
+      function renderTemplateInspection() {
+        const el = document.getElementById('template-inspection');
+        if (!currentInspection) {
+          el.innerHTML = '<div class="muted">Seleccione una plantilla para ver su inspección.</div>';
+          return;
+        }
+
+        const inspection = currentInspection;
+        const present = Array.isArray(inspection.present) ? inspection.present : [];
+        const missing = Array.isArray(inspection.missing) ? inspection.missing : [];
+        const seeds = Array.isArray(inspection.waterfall_seeds) ? inspection.waterfall_seeds : [];
+
+        const seedItems = seeds.map(item => {
+          const label = item.slide_count === 1 ? 'OK' : (item.slide_count === 0 ? 'Falta seed' : 'Múltiples seeds');
+          return `<li>
+            <div><code>${escapeHTML(item.placeholder)}</code></div>
+            <div class="muted">slides: ${escapeHTML(String(item.slide_count))} • ${escapeHTML(label)}</div>
+          </li>`;
+        }).join('');
+
+        const presentItems = present.length
+          ? present.map(item => `<li><code>${escapeHTML(item.placeholder)}</code> <span class="muted">• slides: ${escapeHTML(String(item.slide_count))}</span></li>`).join('')
+          : '<li class="muted">No se detectaron placeholders soportados.</li>';
+
+        const missingItems = missing.length
+          ? missing.slice(0, 10).map(item => `<li><code>${escapeHTML(item.placeholder)}</code></li>`).join('')
+          : '<li class="muted">No faltan placeholders del set soportado.</li>';
+        const missingExtra = missing.length > 10 ? `<div class="muted">y ${escapeHTML(String(missing.length - 10))} más...</div>` : '';
+
+        el.innerHTML = `
+          <div class="inspect-grid">
+            <div class="inspect-box">
+              <h3>Resumen</h3>
+              <div><span class="result-label">Plantilla:</span> ${escapeHTML((inspection.template || {}).path || '')}</div>
+              <div><span class="result-label">Slides:</span> ${escapeHTML(String(inspection.slide_count || 0))}</div>
+              <div><span class="result-label">Placeholders presentes:</span> ${escapeHTML(String(present.length))}</div>
+              <div><span class="result-label">Placeholders ausentes:</span> ${escapeHTML(String(missing.length))}</div>
+            </div>
+            <div class="inspect-box">
+              <h3>Waterfall Seeds</h3>
+              <ul class="preview-list">${seedItems}</ul>
+            </div>
+            <div class="inspect-box">
+              <h3>Presentes</h3>
+              <ul class="preview-list">${presentItems}</ul>
+            </div>
+            <div class="inspect-box">
+              <h3>Ausentes</h3>
+              <ul class="preview-list">${missingItems}</ul>
+              ${missingExtra}
+            </div>
+          </div>`;
+      }
+
+      function summarizeSongState() {
+        const songs = buildSongsPayload();
+        const freeText = [
+          ['Entrada', songs.entranceText],
+          ['Ofertorio', songs.offertoryText],
+          ['Comunión', songs.communionText],
+          ['Salida', songs.recessionalText],
+        ].filter(([, value]) => value);
+
+        const fixed = [
+          `Kyrie (${songs.kyrieLang || '-'})`,
+          `Gloria (${songs.gloriaEnabled ? 'incluido' : 'omitido'})`,
+          `Santo (${songs.sanctusLang || '-'})`,
+          `Cordero (${songs.agnusLang || '-'})`,
+          `Misterio (${songs.mysteriumLang || '-'}, opción ${songs.mysteriumVersion || '-'})`,
+        ];
+
+        return {
+          freeText,
+          fixed,
+        };
+      }
+
+      function renderPreview() {
+        const el = document.getElementById('payload-preview');
+        const preview = currentPreview;
+        const songState = summarizeSongState();
+
+        if (!preview) {
+          const fixedSongs = songState.fixed.map(item => `<li>${escapeHTML(item)}</li>`).join('');
+          const freeSongs = songState.freeText.length
+            ? songState.freeText.map(([label]) => `<li>${escapeHTML(label)}</li>`).join('')
+            : '<li class="muted">Ninguno</li>';
+          el.innerHTML = `
+            <div class="preview-grid">
+              <div class="preview-card">
+                <div class="preview-title">Payload</div>
+                <div class="muted">Todavía no hay payload cargado.</div>
+              </div>
+              <div class="preview-card">
+                <div class="preview-title">Cantos</div>
+                <div class="muted">Textos libres</div>
+                <ul class="preview-list">${freeSongs}</ul>
+                <div class="muted">Partes fijas</div>
+                <ul class="preview-list">${fixedSongs}</ul>
+              </div>
+            </div>`;
+          return;
+        }
+
+        const meta = preview.meta || {};
+        const sections = Array.isArray(preview.sections) ? preview.sections : [];
+        const sectionItems = sections.map(section => {
+          const presence = section.has_body ? 'Sí' : 'No';
+          const chunks = section.chunk_count || 0;
+          const ref = section.ref || 'Sin referencia';
+          return `<li>
+            <div><span class="result-label">${escapeHTML(section.label)}:</span> ${escapeHTML(ref)}</div>
+            <div class="muted">Texto: ${escapeHTML(presence)} • Chunks: ${escapeHTML(String(chunks))}</div>
+          </li>`;
+        }).join('');
+
+        const sourceLink = meta.link ? `<a href="${escapeHTML(meta.link)}" target="_blank">${escapeHTML(meta.link)}</a>` : '<span class="muted">Sin enlace</span>';
+        const freeSongs = songState.freeText.length
+          ? songState.freeText.map(([label, value]) => {
+              const stanzaCount = value.split(/\n\s*\n/).filter(Boolean).length;
+              return `<li>${escapeHTML(label)} <span class="muted">• estrofas: ${escapeHTML(String(stanzaCount))}</span></li>`;
+            }).join('')
+          : '<li class="muted">Ninguno</li>';
+        const fixedSongs = songState.fixed.map(item => `<li>${escapeHTML(item)}</li>`).join('');
+
+        el.innerHTML = `
+          <div class="preview-grid">
+            <div class="preview-card">
+              <div class="preview-title">${escapeHTML(meta.title || 'Sin título')}</div>
+              <div><span class="result-label">Fecha:</span> ${escapeHTML(meta.date || '')}</div>
+              <div><span class="result-label">Origen:</span> ${escapeHTML(meta.source || '')}</div>
+              <div><span class="result-label">Link:</span> ${sourceLink}</div>
+              <ul class="preview-list">${sectionItems}</ul>
+            </div>
+            <div class="preview-card">
+              <div class="preview-title">Cantos</div>
+              <div class="muted">Textos libres</div>
+              <ul class="preview-list">${freeSongs}</ul>
+              <div class="muted">Partes fijas</div>
+              <ul class="preview-list">${fixedSongs}</ul>
+            </div>
+          </div>`;
+      }
+
+      function buildLinksHTML(path) {
+        if (!path) return '';
+        const viewUrl = path.replace(/^build\//, '/build/');
+        const dlUrl = viewUrl + (viewUrl.includes('?') ? '&' : '?') + 'download=1';
+        return `<a href="${escapeHTML(dlUrl)}">Descargar PPTX</a> · <a href="${escapeHTML(viewUrl)}" target="_blank">Ver</a>`;
+      }
+
+      function renderSuccess(title, items, linksHTML='') {
+        const blocks = items
+          .filter(item => item && item.value)
+          .map(item => `<div><span class="result-label">${escapeHTML(item.label)}:</span> ${escapeHTML(item.value)}</div>`)
+          .join('');
+        const linksBlock = linksHTML ? `<div class="result-block">${linksHTML}</div>` : '';
+        log(`<div class="status-grid"><div><strong>${escapeHTML(title)}</strong></div><div class="result-block">${blocks}</div>${linksBlock}</div>`, 'ok', true);
+      }
+
+      function renderError(title, err, details={}) {
+        const message = escapeHTML(err && err.message ? err.message : err || 'Error desconocido');
+        const parts = [`<div><strong>${escapeHTML(title)}</strong></div>`, `<div class="result-block">${message}</div>`];
+        if (details.stderr) {
+          parts.push(`<div class="result-block"><div class="result-label">stderr</div><div class="result-pre">${escapeHTML(details.stderr)}</div></div>`);
+        }
+        if (details.stdout) {
+          parts.push(`<div class="result-block"><div class="result-label">stdout</div><div class="result-pre">${escapeHTML(details.stdout)}</div></div>`);
+        }
+        log(`<div class="status-grid">${parts.join('')}</div>`, 'err', true);
+      }
+
       async function postJSON(url, body) {
         const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         const data = await res.json();
-        if (!res.ok || data.ok === false) throw new Error(data.error || JSON.stringify(data));
+        if (!res.ok || data.ok === false) {
+          const error = new Error(data.error || JSON.stringify(data));
+          error.data = data;
+          throw error;
+        }
         return data;
       }
 
@@ -160,24 +712,34 @@
         const date = document.getElementById('date').value;
         const data = await postJSON('/fetch', { date });
         const meta = data.meta || {};
-        log(`✔ Fetch OK\nTítulo: ${meta.title || ''}\nJSON: ${data.json_path}`, 'ok');
+        setCurrentJsonPath(data.json_path || '');
+        currentPreview = data.preview || null;
+        renderPreview();
+        renderSuccess('Fetch OK', [
+          { label: 'Título', value: meta.title || '' },
+          { label: 'JSON', value: data.json_path || '' },
+        ]);
         return data;
       }
 
       async function doRender() {
-        const jsonPathGuess = `out/${document.getElementById('date').value}.es-US.json`;
-        const template = document.getElementById('template').value.trim();
+        if (!currentJsonPath) {
+          throw new Error('No hay un payload cargado. Use Solo Fetch o Fetch + Render primero.');
+        }
+        const jsonPath = currentJsonPath;
+        const template = getSelectedTemplate();
         const stamp = document.getElementById('stamp').checked;
         const verbose = document.getElementById('verbose').checked;
         log('Rendering…');
         const songs = buildSongsPayload();
-        const data = await postJSON('/render', { json_path: jsonPathGuess, template, stamp, verbose, songs });
+        const data = await postJSON('/render', { json_path: jsonPath, template, stamp, verbose, songs });
         const path = data.output_path || '';
-        const viewUrl = path ? path.replace(/^build\//, '/build/') : '';
-        const dlUrl = viewUrl ? viewUrl + (viewUrl.includes('?') ? '&' : '?') + 'download=1' : '';
-        const link = viewUrl ? `<a href="${dlUrl}">Descargar PPTX</a> · <a href="${viewUrl}" target="_blank">Ver</a>` : '';
-        const html = `✔ Render OK<br/>Salida: ${path}<br/>${link}`;
-        log(html, 'ok', true);
+        renderSuccess('Render OK', [
+          { label: 'JSON', value: jsonPath },
+          { label: 'Plantilla', value: template },
+          { label: 'Salida', value: path },
+          { label: 'Songs', value: data.songs_path || '' },
+        ], buildLinksHTML(path));
         return data;
       }
 
@@ -191,31 +753,64 @@
         const res = await fetch('/upload', { method: 'POST', body: fd });
         const data = await res.json();
         if (!res.ok || data.ok === false) throw new Error(data.error || 'Upload failed');
-        document.getElementById('template').value = data.template_path;
-        log(`✔ Plantilla subida\n${data.template_path}`, 'ok');
+        await loadTemplates(data.template_path, data.templates || null);
+        renderSuccess('Plantilla subida', [
+          { label: 'Plantilla', value: data.template_path || '' },
+        ]);
       }
 
       async function doRun() {
         const date = document.getElementById('date').value;
-        const template = document.getElementById('template').value.trim();
+        const template = getSelectedTemplate();
         const stamp = document.getElementById('stamp').checked;
         const verbose = document.getElementById('verbose').checked;
         log('Fetch + Render…');
         const songs = buildSongsPayload();
         const data = await postJSON('/run', { date, template, stamp, verbose, songs });
+        setCurrentJsonPath(data.json_path || '');
+        if (!currentPreview || (currentPreview.meta || {}).date !== date) {
+          currentPreview = {
+            meta: {
+              title: '',
+              date,
+              source: 'usccb_rss',
+            },
+            sections: [],
+          };
+        }
+        renderPreview();
         const path = data.output_path || '';
-        const viewUrl = path ? path.replace(/^build\//, '/build/') : '';
-        const dlUrl = viewUrl ? viewUrl + (viewUrl.includes('?') ? '&' : '?') + 'download=1' : '';
-        const link = viewUrl ? `<a href="${dlUrl}">Descargar PPTX</a> · <a href="${viewUrl}" target="_blank">Ver</a>` : '';
-        const html = `✔ Hecho<br/>JSON: ${data.json_path}<br/>PPTX: ${path}<br/>${link}`;
-        log(html, 'ok', true);
+        renderSuccess('Hecho', [
+          { label: 'JSON', value: data.json_path || '' },
+          { label: 'Plantilla', value: template },
+          { label: 'PPTX', value: path },
+          { label: 'Songs', value: data.songs_path || '' },
+        ], buildLinksHTML(path));
         return data;
       }
 
-      document.getElementById('btn-fetch').addEventListener('click', () => doFetch().catch(e => log(`✖ ${e.message}`, 'err')));
-      document.getElementById('btn-render').addEventListener('click', () => doRender().catch(e => log(`✖ ${e.message}`, 'err')));
-      document.getElementById('btn-run').addEventListener('click', () => doRun().catch(e => log(`✖ ${e.message}`, 'err')));
-      document.getElementById('btn-upload').addEventListener('click', () => uploadTemplate().catch(e => log(`✖ ${e.message}`, 'err')));
+      document.getElementById('btn-fetch').addEventListener('click', () => doFetch().catch(e => renderError('Fetch falló', e, e.data || {})));
+      document.getElementById('btn-render').addEventListener('click', () => doRender().catch(e => renderError('Render falló', e, e.data || {})));
+      document.getElementById('btn-run').addEventListener('click', () => doRun().catch(e => renderError('Ejecución falló', e, e.data || {})));
+      document.getElementById('btn-upload').addEventListener('click', () => uploadTemplate().catch(e => renderError('Subida falló', e, e.data || {})));
+      document.getElementById('btn-refresh-templates').addEventListener('click', () => loadTemplates(getSelectedTemplate()).catch(e => renderError('Carga de plantillas falló', e, e.data || {})));
+      [
+        'songs-entrance',
+        'songs-entrance-ref',
+        'songs-offertory',
+        'songs-offertory-ref',
+        'songs-communion',
+        'songs-communion-ref',
+        'songs-recessional',
+        'songs-recessional-ref',
+        'mysteriumVersion',
+      ].forEach(id => {
+        document.getElementById(id).addEventListener('input', renderPreview);
+      });
+      document.getElementById('gloriaEnabled').addEventListener('change', renderPreview);
+      ['kyrieLang', 'sanctusLang', 'agnusLang', 'mysteriumLang'].forEach(name => {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(el => el.addEventListener('change', renderPreview));
+      });
 
       async function loadPlaceholders() {
         try {
@@ -237,8 +832,104 @@
         }
       }
 
-      // Load placeholders panel on startup
+      function getSelectedTemplate() {
+        return document.getElementById('templateSelect').value;
+      }
+
+      function formatDateTime(ts) {
+        if (!ts) return '';
+        const d = new Date(ts * 1000);
+        if (Number.isNaN(d.getTime())) return '';
+        return d.toLocaleString();
+      }
+
+      function updateTemplateMeta() {
+        const select = document.getElementById('templateSelect');
+        const meta = document.getElementById('template-meta');
+        const selected = templateList.find(t => t.path === select.value);
+        if (!selected) {
+          meta.textContent = templateList.length ? 'Seleccione una plantilla.' : 'No hay plantillas disponibles.';
+          return;
+        }
+        const parts = [
+          `${selected.group_label}: ${selected.label}`,
+          selected.path,
+        ];
+        const modified = formatDateTime(selected.modified_ts);
+        if (modified) parts.push(`Actualizada: ${modified}`);
+        meta.textContent = parts.join(' • ');
+      }
+
+      async function loadTemplates(selectedPath = '', providedTemplates = null) {
+        const select = document.getElementById('templateSelect');
+        const data = providedTemplates ? { templates: providedTemplates } : await (async () => {
+          const res = await fetch('/templates');
+          return res.json();
+        })();
+        const templates = Array.isArray(data.templates) ? data.templates : [];
+        templateList = templates;
+
+        if (!templates.length) {
+          select.innerHTML = '<option value="">No hay plantillas disponibles</option>';
+          updateTemplateMeta();
+          return;
+        }
+
+        const groups = new Map();
+        for (const tpl of templates) {
+          if (!groups.has(tpl.group_label)) groups.set(tpl.group_label, []);
+          groups.get(tpl.group_label).push(tpl);
+        }
+
+        select.innerHTML = '';
+        for (const [groupLabel, items] of groups.entries()) {
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = groupLabel;
+          for (const tpl of items) {
+            const option = document.createElement('option');
+            option.value = tpl.path;
+            option.textContent = tpl.label;
+            optgroup.appendChild(option);
+          }
+          select.appendChild(optgroup);
+        }
+
+        const fallback = templates[0].path;
+        select.value = templates.some(t => t.path === selectedPath) ? selectedPath : fallback;
+        updateTemplateMeta();
+        await loadTemplateInspection();
+      }
+
+      async function loadTemplateInspection() {
+        const templatePath = getSelectedTemplate();
+        if (!templatePath) {
+          currentInspection = null;
+          renderTemplateInspection();
+          return;
+        }
+        const res = await fetch(`/templates/inspect?path=${encodeURIComponent(templatePath)}`);
+        const data = await res.json();
+        if (!res.ok || data.ok === false) {
+          throw new Error(data.error || 'No se pudo inspeccionar la plantilla');
+        }
+        currentInspection = data.inspection || null;
+        renderTemplateInspection();
+      }
+
+      document.getElementById('templateSelect').addEventListener('change', () => {
+        updateTemplateMeta();
+        loadTemplateInspection().catch(e => renderError('Inspección de plantilla falló', e));
+      });
+
+      // Load placeholders panel and template options on startup
       loadPlaceholders();
+      loadTemplates().catch(e => {
+        document.getElementById('templateSelect').innerHTML = '<option value="">No se pudo cargar</option>';
+        document.getElementById('template-meta').textContent = e.message;
+      });
+      setCurrentJsonPath('');
+      renderPreview();
+      renderTemplateInspection();
 
       function getRadio(name) {
         const el = document.querySelector(`input[name="${name}"]:checked`);
@@ -248,7 +939,8 @@
         return {
           entranceText: document.getElementById('songs-entrance').value.trim(),
           entranceRef: document.getElementById('songs-entrance-ref').value.trim(),
-          gloriaText: document.getElementById('songs-gloria').value.trim(),
+          gloriaEnabled: document.getElementById('gloriaEnabled').checked,
+          gloriaLang: 'es',
           offertoryText: document.getElementById('songs-offertory').value.trim(),
           offertoryRef: document.getElementById('songs-offertory-ref').value.trim(),
           communionText: document.getElementById('songs-communion').value.trim(),
