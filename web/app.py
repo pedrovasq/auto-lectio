@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import os
+import re
 import sys
 import subprocess
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict
 from zipfile import ZipFile
@@ -194,6 +195,63 @@ def _list_templates() -> list[dict[str, Any]]:
     return entries
 
 
+def _extract_feed_date(entry: Any) -> date | None:
+    link = str(getattr(entry, "link", "") or "")
+    for pattern in (r"/(\d{6})\.cfm\b", r"\b(\d{6})\.cfm\b", r"\b(\d{6})\b"):
+        match = re.search(pattern, link)
+        if match:
+            try:
+                return datetime.strptime(match.group(1), "%m%d%y").date()
+            except ValueError:
+                return None
+    return None
+
+
+def _list_feed_dates() -> dict[str, Any]:
+    parsed = fetch_mod.feedparser.parse(fetch_mod.FEED_URL)
+    entries = getattr(parsed, "entries", []) or []
+    options: list[dict[str, str]] = []
+    seen: set[str] = set()
+
+    for entry in entries:
+        entry_date = _extract_feed_date(entry)
+        if not entry_date:
+            continue
+        iso = entry_date.isoformat()
+        if iso in seen:
+            continue
+        seen.add(iso)
+        title = str(getattr(entry, "title", "") or "").strip()
+        link = str(getattr(entry, "link", "") or "").strip()
+        options.append(
+            {
+                "date": iso,
+                "label": f"{iso} — {title}" if title else iso,
+                "title": title,
+                "link": link,
+            }
+        )
+
+    options.sort(key=lambda item: item["date"], reverse=True)
+
+    today_obj = date.today()
+    selected = ""
+    if options:
+        if any(item["date"] == today_obj.isoformat() for item in options):
+            selected = today_obj.isoformat()
+        else:
+            selected = min(
+                options,
+                key=lambda item: abs(date.fromisoformat(item["date"]) - today_obj),
+            )["date"]
+
+    return {
+        "options": options,
+        "selected": selected,
+        "count": len(options),
+    }
+
+
 def _build_fetch_preview(payload: Dict[str, Any]) -> Dict[str, Any]:
     placeholders = payload.get("placeholders") or {}
     chunks = payload.get("chunks") or {}
@@ -357,6 +415,14 @@ def placeholders_help():
 def list_templates():
     templates = _list_templates()
     return jsonify({"ok": True, "templates": templates})
+
+
+@app.get("/feed/dates")
+def list_feed_dates():
+    try:
+        return jsonify({"ok": True, **_list_feed_dates()})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
 
 
 @app.get("/templates/inspect")

@@ -120,7 +120,7 @@
       }
       .setup-grid {
         display: grid;
-        grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+        grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
         gap: 14px;
       }
       .song-grid {
@@ -191,6 +191,8 @@
         font-weight: 500;
       }
       .inline-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      .inline-actions.grow > *:first-child { flex: 1 1 240px; }
+      .setup-meta { min-height: 16px; }
       .radio-row {
         display: flex;
         gap: 12px;
@@ -303,18 +305,24 @@
             <div class="card-body section-grid">
               <div class="setup-grid">
                 <div class="control">
-                  <label for="date">Fecha</label>
-                  <input type="date" id="date" />
+                  <label for="date">Fecha disponible</label>
+                  <div class="inline-actions grow">
+                    <select id="date">
+                      <option value="">Cargando fechas...</option>
+                    </select>
+                    <button id="btn-refresh-dates" class="secondary" type="button">Actualizar fechas</button>
+                  </div>
+                  <div id="date-meta" class="muted setup-meta">Leyendo el feed RSS…</div>
                 </div>
                 <div class="control">
                   <label for="templateSelect">Plantilla PPTX</label>
-                  <div class="inline-actions">
+                  <div class="inline-actions grow">
                     <select id="templateSelect">
                       <option value="">Cargando plantillas...</option>
                     </select>
                     <button id="btn-refresh-templates" class="secondary" type="button">Actualizar lista</button>
                   </div>
-                  <div id="template-meta" class="muted">Cargando opciones de plantilla...</div>
+                  <div id="template-meta" class="muted setup-meta">Cargando opciones de plantilla...</div>
                 </div>
               </div>
 
@@ -477,14 +485,8 @@
     </div>
 
     <script>
-      function todayISO() {
-        const d = new Date();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${d.getFullYear()}-${m}-${day}`;
-      }
       const dateEl = document.getElementById('date');
-      dateEl.value = todayISO();
+      let feedDateList = [];
       let templateList = [];
       let currentJsonPath = '';
       let currentPreview = null;
@@ -519,9 +521,16 @@
 
       function updateActionState() {
         const hasPayload = Boolean(currentJsonPath);
+        const hasDate = Boolean(dateEl.value);
         const renderBtn = document.getElementById('btn-render');
+        const fetchBtn = document.getElementById('btn-fetch');
+        const runBtn = document.getElementById('btn-run');
         renderBtn.disabled = !hasPayload;
         renderBtn.title = hasPayload ? '' : 'Primero cargue un payload con Solo Fetch o Fetch + Render.';
+        fetchBtn.disabled = !hasDate;
+        fetchBtn.title = hasDate ? '' : 'No hay una fecha válida disponible en el feed RSS.';
+        runBtn.disabled = !hasDate;
+        runBtn.title = hasDate ? '' : 'No hay una fecha válida disponible en el feed RSS.';
       }
 
       function renderTemplateInspection() {
@@ -836,6 +845,22 @@
         return document.getElementById('templateSelect').value;
       }
 
+      function updateDateMeta() {
+        const meta = document.getElementById('date-meta');
+        const selected = feedDateList.find(item => item.date === dateEl.value);
+        if (!feedDateList.length) {
+          meta.textContent = 'No se pudieron cargar fechas del feed RSS.';
+          return;
+        }
+        if (!selected) {
+          meta.textContent = `${feedDateList.length} fechas disponibles en el feed RSS.`;
+          return;
+        }
+        const parts = [`${feedDateList.length} fechas en RSS`];
+        if (selected.title) parts.push(selected.title);
+        meta.textContent = parts.join(' • ');
+      }
+
       function formatDateTime(ts) {
         if (!ts) return '';
         const d = new Date(ts * 1000);
@@ -900,6 +925,38 @@
         await loadTemplateInspection();
       }
 
+      async function loadFeedDates(selectedDate = '') {
+        const meta = document.getElementById('date-meta');
+        meta.textContent = 'Leyendo el feed RSS…';
+        const res = await fetch('/feed/dates');
+        const data = await res.json();
+        if (!res.ok || data.ok === false) {
+          throw new Error(data.error || 'No se pudieron cargar fechas del feed');
+        }
+
+        feedDateList = Array.isArray(data.options) ? data.options : [];
+        dateEl.innerHTML = '';
+
+        if (!feedDateList.length) {
+          dateEl.innerHTML = '<option value="">No hay fechas disponibles</option>';
+          updateDateMeta();
+          updateActionState();
+          return;
+        }
+
+        for (const item of feedDateList) {
+          const option = document.createElement('option');
+          option.value = item.date;
+          option.textContent = item.label || item.date;
+          dateEl.appendChild(option);
+        }
+
+        const fallback = data.selected || feedDateList[0].date;
+        dateEl.value = feedDateList.some(item => item.date === selectedDate) ? selectedDate : fallback;
+        updateDateMeta();
+        updateActionState();
+      }
+
       async function loadTemplateInspection() {
         const templatePath = getSelectedTemplate();
         if (!templatePath) {
@@ -920,9 +977,20 @@
         updateTemplateMeta();
         loadTemplateInspection().catch(e => renderError('Inspección de plantilla falló', e));
       });
+      document.getElementById('btn-refresh-dates').addEventListener('click', () => loadFeedDates(dateEl.value).catch(e => renderError('Carga de fechas falló', e)));
+      dateEl.addEventListener('change', () => {
+        updateDateMeta();
+        updateActionState();
+      });
 
       // Load placeholders panel and template options on startup
       loadPlaceholders();
+      loadFeedDates().catch(e => {
+        feedDateList = [];
+        dateEl.innerHTML = '<option value="">No se pudo cargar</option>';
+        document.getElementById('date-meta').textContent = e.message;
+        updateActionState();
+      });
       loadTemplates().catch(e => {
         document.getElementById('templateSelect').innerHTML = '<option value="">No se pudo cargar</option>';
         document.getElementById('template-meta').textContent = e.message;
