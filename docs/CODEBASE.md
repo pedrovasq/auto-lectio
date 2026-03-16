@@ -116,8 +116,8 @@ Core placeholders:
 
 Hymn/fixed-part placeholders:
 - `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{GLORIA_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`
-- `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{RECESSIONAL_TXT}`
-- optional refs: `{ENTRANCE_REF}`, `{OFFERTORY_REF}`, `{COMMUNION_REF}`, `{RECESSIONAL_REF}`
+- `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{COMMUNION2_TXT}`, `{RECESSIONAL_TXT}`
+- optional refs: `{ENTRANCE_REF}`, `{OFFERTORY_REF}`, `{COMMUNION_REF}`, `{COMMUNION2_REF}`, `{RECESSIONAL_REF}`
 
 For custom templates, the safest assumption is still one seed slide per waterfall token.
 

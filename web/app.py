@@ -91,7 +91,7 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
     """Given a UI 'songs' config dict, write a songs JSON file and return its path.
 
     cfg shape (expected keys):
-      - entranceText, offertoryText, communionText, recessionalText: multiline strings (blank line separates chunks)
+      - entranceText, offertoryText, communionText, communion2Text, recessionalText: multiline strings (blank line separates chunks)
       - gloriaEnabled: boolean-like flag to include fixed Gloria text
       - kyrieLang, sanctusLang, agnusLang: 'es' or 'la'
       - mysteriumLang: 'es' or 'la'; mysteriumVersion: '1'|'2'|'3'
@@ -107,6 +107,7 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
         ("{ENTRANCE_TXT}", cfg.get("entranceText")),
         ("{OFFERTORY_TXT}", cfg.get("offertoryText")),
         ("{COMMUNION_TXT}", cfg.get("communionText")),
+        ("{COMMUNION2_TXT}", cfg.get("communion2Text")),
         ("{RECESSIONAL_TXT}", cfg.get("recessionalText")),
     ]
     for key, text in ft_map:
@@ -120,6 +121,7 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
         ("{ENTRANCE_REF}", cfg.get("entranceRef")),
         ("{OFFERTORY_REF}", cfg.get("offertoryRef")),
         ("{COMMUNION_REF}", cfg.get("communionRef")),
+        ("{COMMUNION2_REF}", cfg.get("communion2Ref")),
         ("{RECESSIONAL_REF}", cfg.get("recessionalRef")),
     ]
     for key, ref in ref_map:
@@ -252,6 +254,49 @@ def _list_feed_dates() -> dict[str, Any]:
     }
 
 
+def _list_payloads() -> list[dict[str, Any]]:
+    out_dir = ROOT / "out"
+    if not out_dir.exists() or not out_dir.is_dir():
+        return []
+
+    entries: list[dict[str, Any]] = []
+    for path in sorted(out_dir.rglob("*.json"), key=lambda p: (p.stat().st_mtime, p.name.lower()), reverse=True):
+        if not path.is_file():
+            continue
+        rel_path = path.relative_to(ROOT).as_posix()
+        stat = path.stat()
+        entries.append(
+            {
+                "id": rel_path,
+                "path": rel_path,
+                "name": path.stem,
+                "label": path.relative_to(out_dir).as_posix(),
+                "modified_ts": stat.st_mtime,
+            }
+        )
+    return entries
+
+
+def _load_payload_file(payload_path: str) -> dict[str, Any]:
+    allowed = {item["path"]: item for item in _list_payloads()}
+    selected = allowed.get(payload_path)
+    if not selected:
+        raise ValueError("Payload not found in approved payload list")
+
+    path = ROOT / payload_path
+    if not path.exists() or not path.is_file():
+        raise ValueError("Payload file does not exist")
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError("Payload JSON must be an object")
+
+    return {
+        "payload": payload,
+        "selected": selected,
+    }
+
+
 def _build_fetch_preview(payload: Dict[str, Any]) -> Dict[str, Any]:
     placeholders = payload.get("placeholders") or {}
     chunks = payload.get("chunks") or {}
@@ -375,10 +420,12 @@ PLACEHOLDER_HELP = [
     {"placeholder": "{GLORIA_TXT}", "description": "Gloria fijo (se incluye u omite desde la UI)", "category": "hymn", "waterfall": True},
     {"placeholder": "{OFFERTORY_TXT}", "description": "Ofertorio (estrofas)", "category": "hymn", "waterfall": True},
     {"placeholder": "{COMMUNION_TXT}", "description": "Comunión (estrofas)", "category": "hymn", "waterfall": True},
+    {"placeholder": "{COMMUNION2_TXT}", "description": "Segunda comunión (estrofas)", "category": "hymn", "waterfall": True},
     {"placeholder": "{RECESSIONAL_TXT}", "description": "Salida (estrofas)", "category": "hymn", "waterfall": True},
     {"placeholder": "{ENTRANCE_REF}", "description": "Referencia/identificador del canto de entrada (opcional)", "category": "hymn", "waterfall": False},
     {"placeholder": "{OFFERTORY_REF}", "description": "Referencia del ofertorio (opcional)", "category": "hymn", "waterfall": False},
     {"placeholder": "{COMMUNION_REF}", "description": "Referencia de comunión (opcional)", "category": "hymn", "waterfall": False},
+    {"placeholder": "{COMMUNION2_REF}", "description": "Referencia de la segunda comunión (opcional)", "category": "hymn", "waterfall": False},
     {"placeholder": "{RECESSIONAL_REF}", "description": "Referencia de salida (opcional)", "category": "hymn", "waterfall": False},
     {"placeholder": "{KYRIE_TXT}", "description": "Kyrie (Español o Latín)", "category": "hymn", "waterfall": True},
     {"placeholder": "{SANCTUS_TXT}", "description": "Santo (Español o Latín)", "category": "hymn", "waterfall": True},
@@ -423,6 +470,34 @@ def list_feed_dates():
         return jsonify({"ok": True, **_list_feed_dates()})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.get("/payloads")
+def list_payloads():
+    return jsonify({"ok": True, "payloads": _list_payloads()})
+
+
+@app.get("/payloads/load")
+def load_payload():
+    payload_path = (request.args.get("path") or "").strip()
+    if not payload_path:
+        return jsonify({"ok": False, "error": "path is required"}), 400
+    try:
+        loaded = _load_payload_file(payload_path)
+        payload = loaded["payload"]
+        return jsonify(
+            {
+                "ok": True,
+                "json_path": payload_path,
+                "meta": payload.get("meta", {}),
+                "preview": _build_fetch_preview(payload),
+                "payload_file": loaded["selected"],
+                "placeholders_count": len(payload.get("placeholders", {})),
+                "chunks_keys": list((payload.get("chunks") or {}).keys()),
+            }
+        )
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
 
 
 @app.get("/templates/inspect")

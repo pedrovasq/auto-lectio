@@ -52,9 +52,9 @@ Template placeholders (exact tokens in text boxes):
 - {GOSPEL_REF}
 - {GOSPEL_TXT}
 - Hymn lyrics (lyrics only; titles not displayed):
-  - {ENTRANCE_TXT}, {KYRIE_TXT}, {GLORIA_TXT}, {OFFERTORY_TXT}, {SANCTUS_TXT}, {MYSTERIUM_TXT}, {AGNUS_TXT}, {COMMUNION_TXT}, {RECESSIONAL_TXT}
+  - {ENTRANCE_TXT}, {KYRIE_TXT}, {GLORIA_TXT}, {OFFERTORY_TXT}, {SANCTUS_TXT}, {MYSTERIUM_TXT}, {AGNUS_TXT}, {COMMUNION_TXT}, {COMMUNION2_TXT}, {RECESSIONAL_TXT}
   - Optional hymn references to display source/identifier:
-    - {ENTRANCE_REF}, {OFFERTORY_REF}, {COMMUNION_REF}, {RECESSIONAL_REF}
+    - {ENTRANCE_REF}, {OFFERTORY_REF}, {COMMUNION_REF}, {COMMUNION2_REF}, {RECESSIONAL_REF}
 
 Hymn lyrics are provided via a separate songs JSON file; fetcher does not supply them.
 
@@ -84,6 +84,7 @@ Example shape:
     "{ENTRANCE_REF}": "Flor y Canto #123",
     "{OFFERTORY_REF}": "",
     "{COMMUNION_REF}": "",
+    "{COMMUNION2_REF}": "",
     "{RECESSIONAL_REF}": ""
   },
   "chunks": {

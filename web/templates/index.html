@@ -328,6 +328,17 @@
 
               <div class="two-up">
                 <div class="control">
+                  <label for="payloadSelect">Payload JSON</label>
+                  <div class="inline-actions grow">
+                    <select id="payloadSelect">
+                      <option value="">Cargando payloads...</option>
+                    </select>
+                    <button id="btn-refresh-payloads" class="secondary" type="button">Actualizar lista</button>
+                    <button id="btn-load-payload" class="secondary" type="button">Cargar payload</button>
+                  </div>
+                  <div id="payload-meta" class="muted setup-meta">Leyendo payloads locales…</div>
+                </div>
+                <div class="control">
                   <label for="templateFile">Subir nueva plantilla</label>
                   <div class="inline-actions">
                     <input type="file" id="templateFile" accept=".pptx" />
@@ -335,7 +346,7 @@
                   </div>
                   <div class="muted">Las plantillas subidas permanecen disponibles para reutilizarlas en sesiones futuras.</div>
                 </div>
-                <div class="control">
+                <div class="control" style="grid-column: 1 / -1;">
                   <label>Opciones de salida</label>
                   <div class="check-row">
                     <label><input type="checkbox" id="stamp" checked /> Añadir timestamp</label>
@@ -343,6 +354,7 @@
                   </div>
                   <div class="muted">Los archivos se escriben en <code>out/</code> (JSON) y <code>build/</code> (PPTX).</div>
                   <div id="json-state" class="muted">JSON actual: ninguno.</div>
+                  <div id="payload-source-state" class="muted">Origen del payload: ninguno.</div>
                 </div>
               </div>
             </div>
@@ -369,6 +381,11 @@
                   <h3 class="song-title">Comunión <code>{COMMUNION_TXT}</code></h3>
                   <textarea id="songs-communion" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
                   <input type="text" id="songs-communion-ref" placeholder="Referencia opcional" />
+                </div>
+                <div class="song-card">
+                  <h3 class="song-title">Comunión 2 <code>{COMMUNION2_TXT}</code></h3>
+                  <textarea id="songs-communion2" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+                  <input type="text" id="songs-communion2-ref" placeholder="Referencia opcional" />
                 </div>
                 <div class="song-card">
                   <h3 class="song-title">Salida <code>{RECESSIONAL_TXT}</code></h3>
@@ -488,9 +505,11 @@
       const dateEl = document.getElementById('date');
       let feedDateList = [];
       let templateList = [];
+      let payloadList = [];
       let currentJsonPath = '';
       let currentPreview = null;
       let currentInspection = null;
+      let currentPayloadSource = '';
 
       const logEl = document.getElementById('log');
       function log(msg, cls, isHTML=false) {
@@ -511,12 +530,24 @@
           .replaceAll("'", '&#39;');
       }
 
-      function setCurrentJsonPath(path) {
+      function setCurrentJsonPath(path, source = '') {
         currentJsonPath = path || '';
+        currentPayloadSource = source || '';
         document.getElementById('json-state').textContent = currentJsonPath
           ? `JSON actual: ${currentJsonPath}`
           : 'JSON actual: ninguno.';
+        document.getElementById('payload-source-state').textContent = currentPayloadSource
+          ? `Origen del payload: ${currentPayloadSource}.`
+          : 'Origen del payload: ninguno.';
         updateActionState();
+      }
+
+      function syncPayloadSelect(path) {
+        const select = document.getElementById('payloadSelect');
+        if (!select) return;
+        if (payloadList.some(item => item.path === path)) {
+          select.value = path;
+        }
       }
 
       function updateActionState() {
@@ -593,6 +624,7 @@
           ['Entrada', songs.entranceText],
           ['Ofertorio', songs.offertoryText],
           ['Comunión', songs.communionText],
+          ['Comunión 2', songs.communion2Text],
           ['Salida', songs.recessionalText],
         ].filter(([, value]) => value);
 
@@ -657,11 +689,13 @@
             }).join('')
           : '<li class="muted">Ninguno</li>';
         const fixedSongs = songState.fixed.map(item => `<li>${escapeHTML(item)}</li>`).join('');
+        const payloadOrigin = currentPayloadSource ? `<div><span class="result-label">Carga:</span> ${escapeHTML(currentPayloadSource)}</div>` : '';
 
         el.innerHTML = `
           <div class="preview-grid">
             <div class="preview-card">
               <div class="preview-title">${escapeHTML(meta.title || 'Sin título')}</div>
+              ${payloadOrigin}
               <div><span class="result-label">Fecha:</span> ${escapeHTML(meta.date || '')}</div>
               <div><span class="result-label">Origen:</span> ${escapeHTML(meta.source || '')}</div>
               <div><span class="result-label">Link:</span> ${sourceLink}</div>
@@ -669,6 +703,7 @@
             </div>
             <div class="preview-card">
               <div class="preview-title">Cantos</div>
+              <div class="muted">El render usará el payload actual junto con los cantos visibles en esta UI.</div>
               <div class="muted">Textos libres</div>
               <ul class="preview-list">${freeSongs}</ul>
               <div class="muted">Partes fijas</div>
@@ -721,13 +756,15 @@
         const date = document.getElementById('date').value;
         const data = await postJSON('/fetch', { date });
         const meta = data.meta || {};
-        setCurrentJsonPath(data.json_path || '');
+        setCurrentJsonPath(data.json_path || '', 'fetch RSS');
+        syncPayloadSelect(data.json_path || '');
         currentPreview = data.preview || null;
         renderPreview();
         renderSuccess('Fetch OK', [
           { label: 'Título', value: meta.title || '' },
           { label: 'JSON', value: data.json_path || '' },
         ]);
+        loadPayloads(data.json_path || '').catch(() => {});
         return data;
       }
 
@@ -768,6 +805,32 @@
         ]);
       }
 
+      async function loadSelectedPayload() {
+        const payloadPath = document.getElementById('payloadSelect').value;
+        if (!payloadPath) {
+          throw new Error('Seleccione un payload JSON.');
+        }
+        log('Cargando payload…');
+        const res = await fetch(`/payloads/load?path=${encodeURIComponent(payloadPath)}`);
+        const data = await res.json();
+        if (!res.ok || data.ok === false) {
+          throw new Error(data.error || 'No se pudo cargar el payload');
+        }
+        setCurrentJsonPath(data.json_path || '', 'archivo JSON local');
+        currentPreview = data.preview || null;
+        const payloadDate = ((data.meta || {}).date || '').trim();
+        if (payloadDate && feedDateList.some(item => item.date === payloadDate)) {
+          dateEl.value = payloadDate;
+          updateDateMeta();
+        }
+        renderPreview();
+        renderSuccess('Payload cargado', [
+          { label: 'JSON', value: data.json_path || '' },
+          { label: 'Título', value: (data.meta || {}).title || '' },
+        ]);
+        return data;
+      }
+
       async function doRun() {
         const date = document.getElementById('date').value;
         const template = getSelectedTemplate();
@@ -776,7 +839,7 @@
         log('Fetch + Render…');
         const songs = buildSongsPayload();
         const data = await postJSON('/run', { date, template, stamp, verbose, songs });
-        setCurrentJsonPath(data.json_path || '');
+        setCurrentJsonPath(data.json_path || '', 'fetch RSS');
         if (!currentPreview || (currentPreview.meta || {}).date !== date) {
           currentPreview = {
             meta: {
@@ -803,6 +866,8 @@
       document.getElementById('btn-run').addEventListener('click', () => doRun().catch(e => renderError('Ejecución falló', e, e.data || {})));
       document.getElementById('btn-upload').addEventListener('click', () => uploadTemplate().catch(e => renderError('Subida falló', e, e.data || {})));
       document.getElementById('btn-refresh-templates').addEventListener('click', () => loadTemplates(getSelectedTemplate()).catch(e => renderError('Carga de plantillas falló', e, e.data || {})));
+      document.getElementById('btn-load-payload').addEventListener('click', () => loadSelectedPayload().catch(e => renderError('Carga de payload falló', e, e.data || {})));
+      document.getElementById('btn-refresh-payloads').addEventListener('click', () => loadPayloads(document.getElementById('payloadSelect').value || currentJsonPath).catch(e => renderError('Carga de payloads falló', e, e.data || {})));
       [
         'songs-entrance',
         'songs-entrance-ref',
@@ -810,6 +875,8 @@
         'songs-offertory-ref',
         'songs-communion',
         'songs-communion-ref',
+        'songs-communion2',
+        'songs-communion2-ref',
         'songs-recessional',
         'songs-recessional-ref',
         'mysteriumVersion',
@@ -858,6 +925,20 @@
         }
         const parts = [`${feedDateList.length} fechas en RSS`];
         if (selected.title) parts.push(selected.title);
+        meta.textContent = parts.join(' • ');
+      }
+
+      function updatePayloadMeta() {
+        const select = document.getElementById('payloadSelect');
+        const meta = document.getElementById('payload-meta');
+        const selected = payloadList.find(item => item.path === select.value);
+        if (!selected) {
+          meta.textContent = payloadList.length ? 'Seleccione un payload JSON.' : 'No hay payloads JSON disponibles.';
+          return;
+        }
+        const parts = [selected.label, selected.path];
+        const modified = formatDateTime(selected.modified_ts);
+        if (modified) parts.push(`Actualizado: ${modified}`);
         meta.textContent = parts.join(' • ');
       }
 
@@ -925,6 +1006,35 @@
         await loadTemplateInspection();
       }
 
+      async function loadPayloads(selectedPath = '') {
+        const select = document.getElementById('payloadSelect');
+        const res = await fetch('/payloads');
+        const data = await res.json();
+        if (!res.ok || data.ok === false) {
+          throw new Error(data.error || 'No se pudieron cargar payloads');
+        }
+
+        payloadList = Array.isArray(data.payloads) ? data.payloads : [];
+        select.innerHTML = '';
+
+        if (!payloadList.length) {
+          select.innerHTML = '<option value="">No hay payloads JSON</option>';
+          updatePayloadMeta();
+          return;
+        }
+
+        for (const item of payloadList) {
+          const option = document.createElement('option');
+          option.value = item.path;
+          option.textContent = item.label;
+          select.appendChild(option);
+        }
+
+        const fallback = payloadList[0].path;
+        select.value = payloadList.some(item => item.path === selectedPath) ? selectedPath : fallback;
+        updatePayloadMeta();
+      }
+
       async function loadFeedDates(selectedDate = '') {
         const meta = document.getElementById('date-meta');
         meta.textContent = 'Leyendo el feed RSS…';
@@ -977,6 +1087,7 @@
         updateTemplateMeta();
         loadTemplateInspection().catch(e => renderError('Inspección de plantilla falló', e));
       });
+      document.getElementById('payloadSelect').addEventListener('change', updatePayloadMeta);
       document.getElementById('btn-refresh-dates').addEventListener('click', () => loadFeedDates(dateEl.value).catch(e => renderError('Carga de fechas falló', e)));
       dateEl.addEventListener('change', () => {
         updateDateMeta();
@@ -995,7 +1106,11 @@
         document.getElementById('templateSelect').innerHTML = '<option value="">No se pudo cargar</option>';
         document.getElementById('template-meta').textContent = e.message;
       });
-      setCurrentJsonPath('');
+      loadPayloads().catch(e => {
+        document.getElementById('payloadSelect').innerHTML = '<option value="">No se pudo cargar</option>';
+        document.getElementById('payload-meta').textContent = e.message;
+      });
+      setCurrentJsonPath('', '');
       renderPreview();
       renderTemplateInspection();
 
@@ -1013,6 +1128,8 @@
           offertoryRef: document.getElementById('songs-offertory-ref').value.trim(),
           communionText: document.getElementById('songs-communion').value.trim(),
           communionRef: document.getElementById('songs-communion-ref').value.trim(),
+          communion2Text: document.getElementById('songs-communion2').value.trim(),
+          communion2Ref: document.getElementById('songs-communion2-ref').value.trim(),
           recessionalText: document.getElementById('songs-recessional').value.trim(),
           recessionalRef: document.getElementById('songs-recessional-ref').value.trim(),
           kyrieLang: getRadio('kyrieLang'),

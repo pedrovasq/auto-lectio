@@ -40,11 +40,13 @@ Additional hymn/fixed-part placeholders are supported by the current renderer:
   - `{MYSTERIUM_TXT}`
   - `{AGNUS_TXT}`
   - `{COMMUNION_TXT}`
+  - `{COMMUNION2_TXT}`
   - `{RECESSIONAL_TXT}`
 - Optional references:
   - `{ENTRANCE_REF}`
   - `{OFFERTORY_REF}`
   - `{COMMUNION_REF}`
+  - `{COMMUNION2_REF}`
   - `{RECESSIONAL_REF}`
 
 These are filled from a songs JSON passed with `--songs`, or from the web UI which generates that JSON for you.

@@ -337,6 +337,7 @@ def main() -> None:
         "{MYSTERIUM_TXT}",
         "{AGNUS_TXT}",
         "{COMMUNION_TXT}",
+        "{COMMUNION2_TXT}",
         "{RECESSIONAL_TXT}",
     ]
 
@@ -386,9 +387,9 @@ def main() -> None:
         "{GOSPEL_REF}", "{GOSPEL_TXT}",
         # Hymn lyrics (chunked)
         "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{GLORIA_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
-        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
+        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{COMMUNION2_TXT}", "{RECESSIONAL_TXT}",
         # Hymn references (simple)
-        "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{RECESSIONAL_REF}",
+        "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{COMMUNION2_REF}", "{RECESSIONAL_REF}",
     ]
     if args.verbose:
         print(f"Using template: {template_path}")
@@ -405,7 +406,7 @@ def main() -> None:
         "{GOSPEL_TXT}",
         # Hymn lyrics use waterfall with pre-chunked lines, preserving newlines
         "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{GLORIA_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
-        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
+        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{COMMUNION2_TXT}", "{RECESSIONAL_TXT}",
     ]
 
     # Known tokens for cleanup when missing
@@ -418,9 +419,9 @@ def main() -> None:
         "{GOSPEL_REF}", "{GOSPEL_TXT}",
         # Hymn lyrics tokens
         "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{GLORIA_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
-        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{RECESSIONAL_TXT}",
+        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{COMMUNION2_TXT}", "{RECESSIONAL_TXT}",
         # Hymn references
-        "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{RECESSIONAL_REF}",
+        "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{COMMUNION2_REF}", "{RECESSIONAL_REF}",
     }
 
     # Merge optional songs placeholders (e.g., hymn references) into base placeholders
