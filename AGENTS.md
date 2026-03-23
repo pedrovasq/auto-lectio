@@ -23,7 +23,7 @@ We have two main scripts:
     - First Reading: “Lectura del profeta …” for prophets, “Lectura del libro de los Hechos…”, feminine articles (Sabiduría), etc.
     - Second Reading: “Lectura de la (primera/segunda) carta del apóstol san Pablo a los …”, “Lectura de la carta a los Hebreos”, “Lectura del libro del Apocalipsis”, “Lectura de la (primera/…) carta del apóstol san Juan/Pedro”, “Lectura de la carta del apóstol Santiago/Judas”, etc.
     - Gospel ref simplified to just the book name.
-    - Acclamation: keeps only the verse (strips “R.”/Aleluya) and attempts a short reference when possible.
+    - Acclamation: keeps the verse as the placeholder text, attempts a short reference when possible, and emits waterfall chunks for response / verse / response.
   - produces a JSON payload with:
     - `meta`
     - `placeholders` (strings)

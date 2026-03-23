@@ -14,6 +14,10 @@ from bs4 import BeautifulSoup
 from chunking import chunk_text
 
 FEED_URL = "https://bible.usccb.org/lecturas.rss"
+ACCLAMATION_RESPONSES = {
+    "ordinary": "Aleluya, Aleluya, Aleluya",
+    "lent": "Alabanza a ti, oh Cristo, Rey de eterna gloria.",
+}
 
 
 def mmddyy(d: date) -> str:
@@ -163,6 +167,19 @@ def normalize_acclamation_text(body: str) -> str:
     return "\n".join(kept).strip()
 
 
+def normalize_acclamation_mode(mode: str | None) -> str:
+    if not mode:
+        return "ordinary"
+    value = str(mode).strip().lower()
+    if value not in ACCLAMATION_RESPONSES:
+        raise ValueError(f"Unsupported acclamation mode: {mode}")
+    return value
+
+
+def acclamation_response_for_mode(mode: str | None) -> str:
+    return ACCLAMATION_RESPONSES[normalize_acclamation_mode(mode)]
+
+
 def extract_bible_ref_from_text(text: str) -> Optional[str]:
     """Try to extract a scripture reference like 'Lucas 21:21' or 'Is 61, 1-2'.
 
@@ -292,8 +309,13 @@ def second_reading_intro(header: str) -> str:
     # Fallback: generic "Lectura de la carta de {Book}"
     return f"Lectura de la carta de {base}"
 
-def to_placeholders(item_title: str, sections: list[tuple[str, str]]) -> dict[str, str]:
+def to_placeholders(
+    item_title: str,
+    sections: list[tuple[str, str]],
+    acclamation_mode: str = "ordinary",
+) -> dict[str, str]:
     ph = {"{LITURGICAL_DAY}": item_title}
+    normalize_acclamation_mode(acclamation_mode)
 
     for header, body in sections:
         kind = classify(header)
@@ -391,6 +413,20 @@ def make_chunks(placeholders: Dict[str, str]) -> Dict[str, List[str]]:
     return out
 
 
+def add_acclamation_chunks(
+    placeholders: Dict[str, str],
+    chunks: Dict[str, List[str]],
+    acclamation_mode: str = "ordinary",
+) -> Dict[str, List[str]]:
+    verse = (placeholders.get("{ACCLAMATION_TXT}") or "").strip()
+    if not verse:
+        return chunks
+    response = acclamation_response_for_mode(acclamation_mode)
+    updated = dict(chunks)
+    updated["{ACCLAMATION_TXT}"] = [response, verse, response]
+    return updated
+
+
 def parse_date_arg(s: str) -> date:
     """Parse a date string. Supports:
     - YYYY-MM-DD (ISO)
@@ -411,6 +447,12 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Fetch USCCB RSS item and build JSON payload.")
     ap.add_argument("--date", dest="date_str", help="Target date (YYYY-MM-DD or MM-DD-YY)")
     ap.add_argument("--out", dest="out_path", help="Output JSON path (default: out/YYYY-MM-DD.es-US.json)")
+    ap.add_argument(
+        "--acclamation-mode",
+        choices=sorted(ACCLAMATION_RESPONSES.keys()),
+        default="ordinary",
+        help="Response used before and after the Gospel acclamation verse",
+    )
     args = ap.parse_args()
 
     target_date = parse_date_arg(args.date_str) if args.date_str else date.today()
@@ -429,10 +471,11 @@ def main() -> None:
     sections = parse_sections(cleaned)
 
     # placeholders for your pptx replacements
-    placeholders = to_placeholders(item.title, sections)
+    placeholders = to_placeholders(item.title, sections, acclamation_mode=args.acclamation_mode)
 
     # chunk only the long text fields
     chunks = make_chunks(placeholders)
+    chunks = add_acclamation_chunks(placeholders, chunks, acclamation_mode=args.acclamation_mode)
 
     payload = build_payload(
         d=target_date,
@@ -450,6 +493,7 @@ def main() -> None:
 
     print(f"wrote: {out_path}")
     print(f"title: {item.title}")
+    print(f"acclamation_mode: {args.acclamation_mode}")
     print(f"sections: {len(sections)}")
     for k, v in chunks.items():
         print(f"{k}: {len(v)} chunks")

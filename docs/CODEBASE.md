@@ -38,7 +38,7 @@ Important functions:
 
 Notable behavior:
 - First and second reading references are normalized into spoken Mass phrasing, not copied verbatim from the feed.
-- `{ACCLAMATION_TXT}` removes `R.` and `Aleluya` lines.
+- `{ACCLAMATION_TXT}` keeps the verse in `placeholders`; the fetcher also emits a 3-part chunk sequence for waterfall rendering: response, verse, response.
 - `build_payload(...)` normalizes whitespace in both placeholders and chunks.
 
 ### `chunking.py`
@@ -81,7 +81,7 @@ Actual rendering order:
 6. Replace the seed token with chunk 1 and duplicate the seed for chunks 2..N.
 
 Waterfall tokens currently include:
-- Readings: `{FIRST_READING_TXT}`, `{PSALM_TXT}`, `{SECOND_READING_TXT}`, `{GOSPEL_TXT}`
+- Readings: `{FIRST_READING_TXT}`, `{PSALM_TXT}`, `{SECOND_READING_TXT}`, `{ACCLAMATION_TXT}`, `{GOSPEL_TXT}`
 - Hymns/fixed sung parts: `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{GLORIA_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`, `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{RECESSIONAL_TXT}`
 
 Notable behavior:

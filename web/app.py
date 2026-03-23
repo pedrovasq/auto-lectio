@@ -329,6 +329,13 @@ def _build_fetch_preview(payload: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _get_acclamation_mode(data: Dict[str, Any] | Any) -> str:
+    raw = ""
+    if data is not None:
+        raw = data.get("acclamation_mode") or data.get("acclamationMode") or ""
+    return fetch_mod.normalize_acclamation_mode(raw or "ordinary")
+
+
 def _known_placeholder_tokens() -> list[str]:
     return [item["placeholder"] for item in PLACEHOLDER_HELP]
 
@@ -412,7 +419,7 @@ PLACEHOLDER_HELP = [
     {"placeholder": "{SECOND_READING_REF}", "description": "Referencia de la segunda lectura", "category": "ref", "waterfall": False},
     {"placeholder": "{SECOND_READING_TXT}", "description": "Texto de la segunda lectura (con posible expansión en cascada)", "category": "text", "waterfall": True},
     {"placeholder": "{ACCLAMATION_REF}", "description": "Referencia breve de la aclamación antes del Evangelio", "category": "ref", "waterfall": False},
-    {"placeholder": "{ACCLAMATION_TXT}", "description": "Verso de la aclamación (sin 'R.'/Aleluya)", "category": "text", "waterfall": False},
+    {"placeholder": "{ACCLAMATION_TXT}", "description": "Aclamación antes del Evangelio en cascada: respuesta, verso, respuesta", "category": "text", "waterfall": True},
     {"placeholder": "{GOSPEL_REF}", "description": "Referencia del Evangelio", "category": "ref", "waterfall": False},
     {"placeholder": "{GOSPEL_TXT}", "description": "Texto del Evangelio (con expansión en cascada si es largo)", "category": "text", "waterfall": True},
     # Himnos (rellenados vía UI; cada trozo genera una diapositiva)
@@ -452,6 +459,7 @@ def placeholders_help():
                 "Inserte los tokens tal cual, p. ej. {FIRST_READING_TXT}.",
                 "Para lecturas largas, se usa 'waterfall' duplicando la diapositiva semilla.",
                 "El Salmo alterna R. y versos en diapositivas separadas.",
+                "La aclamación antes del Evangelio usa waterfall: respuesta, verso, respuesta.",
                 "Los himnos y el Gloria se pueden configurar en la sección 'Cantos' de esta UI.",
             ],
         }
@@ -527,7 +535,9 @@ def index():
 @app.post("/fetch")
 def do_fetch():
     try:
-        date_str = (request.json or {}).get("date") or request.form.get("date") or ""
+        req_data = request.json or request.form
+        date_str = req_data.get("date") or ""
+        acclamation_mode = _get_acclamation_mode(req_data)
         target_date = fetch_mod.parse_date_arg(date_str) if date_str else date.today()
 
         parsed = fetch_mod.feedparser.parse(fetch_mod.FEED_URL)
@@ -540,8 +550,9 @@ def do_fetch():
         cleaned = fetch_mod.strip_footer(item.description)
         sections = fetch_mod.parse_sections(cleaned)
 
-        placeholders = fetch_mod.to_placeholders(item.title, sections)
+        placeholders = fetch_mod.to_placeholders(item.title, sections, acclamation_mode=acclamation_mode)
         chunks = fetch_mod.make_chunks(placeholders)
+        chunks = fetch_mod.add_acclamation_chunks(placeholders, chunks, acclamation_mode=acclamation_mode)
 
         payload = fetch_mod.build_payload(
             d=target_date,
@@ -562,6 +573,7 @@ def do_fetch():
                 "json_path": str(out_path),
                 "meta": payload.get("meta", {}),
                 "preview": _build_fetch_preview(payload),
+                "acclamation_mode": acclamation_mode,
                 "placeholders_count": len(payload.get("placeholders", {})),
                 "chunks_keys": list((payload.get("chunks") or {}).keys()),
             }
@@ -647,6 +659,7 @@ def do_run():
         data = request.json or request.form
         date_str = data.get("date")
         template = data.get("template")
+        acclamation_mode = _get_acclamation_mode(data)
         stamp = str(data.get("stamp", "true")).lower() in ("1", "true", "yes", "on")
         verbose = str(data.get("verbose", "true")).lower() in ("1", "true", "yes", "on")
         songs_cfg = data.get("songs") if isinstance(data, dict) else None
@@ -669,7 +682,7 @@ def do_run():
         # 2) Render
         r_res = _run_render(json_path, None, template, verbose, stamp, songs_path)
         code = 200 if r_res["ok"] else 500
-        return jsonify({"ok": r_res["ok"], "json_path": json_path, "output_path": r_res.get("output_path"), "stdout": r_res.get("stdout"), "stderr": r_res.get("stderr"), "songs_path": songs_path}), code
+        return jsonify({"ok": r_res["ok"], "json_path": json_path, "output_path": r_res.get("output_path"), "stdout": r_res.get("stdout"), "stderr": r_res.get("stderr"), "songs_path": songs_path, "acclamation_mode": acclamation_mode}), code
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
 

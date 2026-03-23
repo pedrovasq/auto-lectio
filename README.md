@@ -21,7 +21,7 @@ Generate Mass slides automatically (USCCB → JSON → PPTX)
   - First Reading: “Lectura del profeta …”, “Lectura del libro de los Hechos…”, feminine articles (Sabiduría), etc.
   - Second Reading: Paul’s letters with ordinals, Hebrews, Revelation, 1–3 John, 1–2 Peter, Santiago/Judas, etc.
   - Gospel reference simplified to book name.
-  - Acclamation keeps only the verse (strips “R.”/Aleluya) and extracts a short reference when present.
+  - Acclamation keeps the verse in the payload, extracts a short reference when present, and renders as a waterfall sequence: response, verse, response.
 - Waterfall duplication: duplicates the seed slide and changes only the body text; preserves formatting; inserts immediately after the seed.
 - Psalm handling: alternates R. (refrain) and verse blocks as separate slides.
 - Text normalization: removes manual newlines, collapses whitespace so PowerPoint wraps naturally.

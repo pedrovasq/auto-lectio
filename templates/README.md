@@ -76,6 +76,7 @@ Tips for reliable placeholders:
 ## Text Handling
 
 - Reading/acclamation text is normalized so newlines become spaces and repeated whitespace is collapsed.
+- `{ACCLAMATION_TXT}` now renders as a waterfall sequence using three chunks: response, verse, response.
 - Hymn chunks preserve explicit line breaks from the songs JSON.
 - Non-Psalm reading chunks are balanced with the shared `chunking.py` rules, which prefer fuller slides and avoid tiny remainder chunks when possible.
 
@@ -88,7 +89,7 @@ A simple, effective order in the template:
 - First Reading body seed: a slide with `{FIRST_READING_TXT}`
 - Psalm: `{PSALM_REF}` then `{PSALM_TXT}` seed
 - Second Reading: `{SECOND_READING_REF}` then `{SECOND_READING_TXT}` seed
-- Acclamation: `{ACCLAMATION_REF}` and `{ACCLAMATION_TXT}`
+- Acclamation: `{ACCLAMATION_REF}` and an `{ACCLAMATION_TXT}` seed slide
 - Gospel: `{GOSPEL_REF}` then `{GOSPEL_TXT}` seed
 
 You may include interstitial slides (e.g., “Palabra de Dios”) as desired; the renderer won’t delete slides.

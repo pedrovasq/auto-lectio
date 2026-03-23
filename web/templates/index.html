@@ -356,6 +356,14 @@
                   <div id="json-state" class="muted">JSON actual: ninguno.</div>
                   <div id="payload-source-state" class="muted">Origen del payload: ninguno.</div>
                 </div>
+                <div class="control" style="grid-column: 1 / -1;">
+                  <label>Aclamación antes del Evangelio</label>
+                  <div class="radio-row">
+                    <label><input type="radio" name="acclamationMode" value="ordinary" checked> Ordinaria</label>
+                    <label><input type="radio" name="acclamationMode" value="lent"> Cuaresma</label>
+                  </div>
+                  <div class="muted">La selección controla la secuencia waterfall de la aclamación: respuesta, verso, respuesta.</div>
+                </div>
               </div>
             </div>
           </section>
@@ -550,18 +558,33 @@
         }
       }
 
+      function getAcclamationMode() {
+        const el = document.querySelector('input[name="acclamationMode"]:checked');
+        return el ? el.value : '';
+      }
+
+      function acclamationModeLabel(mode) {
+        return mode === 'lent' ? 'Cuaresma' : (mode === 'ordinary' ? 'Ordinaria' : 'Sin elegir');
+      }
+
       function updateActionState() {
         const hasPayload = Boolean(currentJsonPath);
         const hasDate = Boolean(dateEl.value);
+        const acclamationMode = getAcclamationMode();
+        const hasAcclamationMode = Boolean(acclamationMode);
         const renderBtn = document.getElementById('btn-render');
         const fetchBtn = document.getElementById('btn-fetch');
         const runBtn = document.getElementById('btn-run');
         renderBtn.disabled = !hasPayload;
         renderBtn.title = hasPayload ? '' : 'Primero cargue un payload con Solo Fetch o Fetch + Render.';
-        fetchBtn.disabled = !hasDate;
-        fetchBtn.title = hasDate ? '' : 'No hay una fecha válida disponible en el feed RSS.';
-        runBtn.disabled = !hasDate;
-        runBtn.title = hasDate ? '' : 'No hay una fecha válida disponible en el feed RSS.';
+        fetchBtn.disabled = !hasDate || !hasAcclamationMode;
+        fetchBtn.title = !hasDate
+          ? 'No hay una fecha válida disponible en el feed RSS.'
+          : (hasAcclamationMode ? '' : 'Seleccione la aclamación ordinaria o de Cuaresma.');
+        runBtn.disabled = !hasDate || !hasAcclamationMode;
+        runBtn.title = !hasDate
+          ? 'No hay una fecha válida disponible en el feed RSS.'
+          : (hasAcclamationMode ? '' : 'Seleccione la aclamación ordinaria o de Cuaresma.');
       }
 
       function renderTemplateInspection() {
@@ -629,6 +652,7 @@
         ].filter(([, value]) => value);
 
         const fixed = [
+          `Aclamación (${acclamationModeLabel(getAcclamationMode())})`,
           `Kyrie (${songs.kyrieLang || '-'})`,
           `Gloria (${songs.gloriaEnabled ? 'incluido' : 'omitido'})`,
           `Santo (${songs.sanctusLang || '-'})`,
@@ -754,7 +778,8 @@
       async function doFetch() {
         log('Fetching…');
         const date = document.getElementById('date').value;
-        const data = await postJSON('/fetch', { date });
+        const acclamationMode = getAcclamationMode();
+        const data = await postJSON('/fetch', { date, acclamation_mode: acclamationMode });
         const meta = data.meta || {};
         setCurrentJsonPath(data.json_path || '', 'fetch RSS');
         syncPayloadSelect(data.json_path || '');
@@ -834,11 +859,12 @@
       async function doRun() {
         const date = document.getElementById('date').value;
         const template = getSelectedTemplate();
+        const acclamationMode = getAcclamationMode();
         const stamp = document.getElementById('stamp').checked;
         const verbose = document.getElementById('verbose').checked;
         log('Fetch + Render…');
         const songs = buildSongsPayload();
-        const data = await postJSON('/run', { date, template, stamp, verbose, songs });
+        const data = await postJSON('/run', { date, template, acclamation_mode: acclamationMode, stamp, verbose, songs });
         setCurrentJsonPath(data.json_path || '', 'fetch RSS');
         if (!currentPreview || (currentPreview.meta || {}).date !== date) {
           currentPreview = {
@@ -886,6 +912,12 @@
       document.getElementById('gloriaEnabled').addEventListener('change', renderPreview);
       ['kyrieLang', 'sanctusLang', 'agnusLang', 'mysteriumLang'].forEach(name => {
         document.querySelectorAll(`input[name="${name}"]`).forEach(el => el.addEventListener('change', renderPreview));
+      });
+      document.querySelectorAll('input[name="acclamationMode"]').forEach(el => {
+        el.addEventListener('change', () => {
+          renderPreview();
+          updateActionState();
+        });
       });
 
       async function loadPlaceholders() {

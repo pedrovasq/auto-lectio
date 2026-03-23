@@ -340,6 +340,9 @@ def main() -> None:
         "{COMMUNION2_TXT}",
         "{RECESSIONAL_TXT}",
     ]
+    exact_chunk_tokens = {
+        "{ACCLAMATION_TXT}",
+    }
 
     songs_chunks: Dict[str, List[str]] = {}
     songs_placeholders: Dict[str, str] = {}
@@ -403,6 +406,7 @@ def main() -> None:
         "{FIRST_READING_TXT}",
         "{PSALM_TXT}",
         "{SECOND_READING_TXT}",
+        "{ACCLAMATION_TXT}",
         "{GOSPEL_TXT}",
         # Hymn lyrics use waterfall with pre-chunked lines, preserving newlines
         "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{GLORIA_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
@@ -537,7 +541,7 @@ def main() -> None:
             # No auto-merging bounds for hymns
         else:
             chunks = [_sanitize_text(c) for c in chunks if c and c.strip()]
-            if key != "{PSALM_TXT}":
+            if key != "{PSALM_TXT}" and key not in exact_chunk_tokens:
                 chunks = rebalance_chunks(chunks)
         log(f"{key}: {len(chunks)} chunk(s)")
 
