@@ -15,7 +15,7 @@ This file is for future maintainers and agents. It describes the code as impleme
 7. It expands waterfall tokens by duplicating a seed slide and replacing only the body token per duplicate.
 8. The output PPTX is written to `build/`.
 
-The web UI in `web/app.py` is a thin wrapper around that process.
+The web UI in `web/app.py` is a thin wrapper around that process, now split between public informational pages and the existing operator workflow.
 
 ## File responsibilities
 
@@ -93,14 +93,25 @@ Notable behavior:
 ### `web/app.py`
 
 Primary responsibilities:
-- serve the minimal UI
+- serve the public site pages and the advanced operator UI
 - expose `/fetch`, `/render`, `/run`, `/upload`, `/placeholders`
 - synthesize a songs JSON from UI form data
+
+Current page routes:
+- `/`: Spanish landing page (`web/templates/home.html`)
+- `/docs`: Spanish documentation page (`web/templates/docs.html`)
+- `/guided`: placeholder page for the future guided workflow (`web/templates/guided.html`)
+- `/advanced`: current operator UI (`web/templates/advanced.html`)
 
 Architecture note:
 - `/fetch` imports `fetch.py` functions directly.
 - `/render` does not import `render.py`; it shells out to the CLI with `subprocess.run(...)`.
 - `/run` fetches first, then renders.
+
+Template/layout note:
+- `web/templates/base.html` provides the shared shell for the public pages.
+- `web/static/site.css` holds the shared styling for the public pages.
+- The advanced page is still a standalone template with its own embedded styles and behavior.
 
 This means renderer changes must be tested through the CLI path, even when the UI is the user-facing entry point.
 

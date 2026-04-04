@@ -529,7 +529,22 @@ def _default_build_path(d: date) -> Path:
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("home.html")
+
+
+@app.route("/docs")
+def docs():
+    return render_template("docs.html")
+
+
+@app.route("/guided")
+def guided():
+    return render_template("guided.html")
+
+
+@app.route("/advanced")
+def advanced():
+    return render_template("advanced.html")
 
 
 @app.post("/fetch")

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}AutoLectio | Inicio{% endblock %}
+
+{% block content %}
+  <section class="hero-band">
+    <div class="site-shell">
+      <div class="hero-paper">
+        <div class="hero-kicker-row">
+          <p class="eyebrow">Liturgia, plantillas y automatización</p>
+          <p class="hero-note">USCCB → JSON → PPTX</p>
+        </div>
+        <div class="hero-editorial">
+          <div class="hero-main">
+            <h1>Preparar la presentación de la Misa no tiene que ser complicado.</h1>
+            <p class="lead">
+              AutoLectio ayuda a organizar las lecturas del día en una plantilla para que la
+              preparación sea más rápida y más clara.
+            </p>
+            <div class="hero-actions">
+              <a class="button primary" href="#modos">Elegir modo de uso</a>
+              <a class="button ghost" href="{{ url_for('docs') }}">Ver documentación</a>
+            </div>
+          </div>
+        </div>
+        <div class="hero-strip">
+          <span>Obtiene lecturas</span>
+          <span>Estructura el contenido</span>
+          <span>Expande textos largos</span>
+          <span>Respeta tu plantilla</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="site-shell section-grid two-col">
+      <article class="content-card">
+        <p class="section-label">Problema</p>
+        <h2>Preparar la presentación a mano puede tomar más tiempo del necesario.</h2>
+        <p>
+          Cuando cada semana hay que copiar lecturas, dividir textos largos y acomodar todo en la
+          plantilla, es fácil perder tiempo o dejar detalles por revisar al final.
+        </p>
+      </article>
+      <article class="content-card accent-card">
+        <p class="section-label">Solución</p>
+        <h2>AutoLectio ayuda a preparar ese contenido con más orden.</h2>
+        <p>
+          La herramienta toma las lecturas del día, las organiza para presentación y las coloca
+          en una plantilla para que el equipo pueda concentrarse en revisar y ajustar lo necesario.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section tone-soft">
+    <div class="site-shell">
+      <div class="section-heading">
+        <p class="section-label">Cómo funciona</p>
+        <h2>Un apoyo sencillo para preparar la presentación.</h2>
+      </div>
+      <div class="steps-grid">
+        <article class="step-card">
+          <span class="step-number">01</span>
+          <h3>Selecciona la fecha</h3>
+          <p>AutoLectio busca las lecturas correspondientes al día que necesitas preparar.</p>
+        </article>
+        <article class="step-card">
+          <span class="step-number">02</span>
+          <h3>Organiza el contenido</h3>
+          <p>El texto se acomoda para que sea más fácil usarlo dentro de las diapositivas.</p>
+        </article>
+        <article class="step-card">
+          <span class="step-number">03</span>
+          <h3>Aplica la plantilla</h3>
+          <p>La plantilla se llena con el contenido y las lecturas largas se reparten en más diapositivas.</p>
+        </article>
+        <article class="step-card">
+          <span class="step-number">04</span>
+          <h3>Descarga el resultado</h3>
+          <p>Al final tienes una presentación lista para revisar y usar en la celebración.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="modos">
+    <div class="site-shell">
+      <div class="section-heading">
+        <p class="section-label">Modo de trabajo</p>
+        <h2>Elige la experiencia que mejor se adapta a tu equipo.</h2>
+      </div>
+      <div class="mode-grid">
+        <article class="mode-card">
+          <p class="mode-tag">Recomendado</p>
+          <h3>Modo guiado</h3>
+          <p>
+            Recomendado para la mayoría de los usuarios.
+          </p>
+          <a class="button primary" href="{{ url_for('guided') }}">Abrir modo guiado</a>
+        </article>
+        <article class="mode-card">
+          <p class="mode-tag">Más opciones</p>
+          <h3>Modo avanzado</h3>
+          <p>
+            Pensado para quienes ya conocen mejor la herramienta.
+          </p>
+          <a class="button secondary" href="{{ url_for('advanced') }}">Abrir modo avanzado</a>
+        </article>
+      </div>
+    </div>
+  </section>
+{% endblock %}

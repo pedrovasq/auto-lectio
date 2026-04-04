@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}AutoLectio | Documentación{% endblock %}
+
+{% block content %}
+  <section class="section docs-hero">
+    <div class="site-shell narrow">
+      <p class="eyebrow">Documentación</p>
+      <h1 class="page-title">Cómo funciona AutoLectio y cómo preparar tus plantillas.</h1>
+      <p class="lead">
+        Esta guía resume el flujo del sistema, la estructura de placeholders y los criterios
+        básicos para construir plantillas reutilizables en PowerPoint.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="site-shell narrow docs-stack">
+      <article class="doc-card">
+        <h2>Resumen del flujo</h2>
+        <ol class="doc-list">
+          <li>El sistema obtiene las lecturas del día desde la fuente configurada.</li>
+          <li>El contenido HTML se transforma a una estructura más limpia y consistente.</li>
+          <li>Las lecturas se convierten en placeholders y bloques de texto listos para renderizar.</li>
+          <li>La plantilla PPTX se llena con esos valores y se expanden las lecturas largas.</li>
+        </ol>
+      </article>
+
+      <article class="doc-card">
+        <h2>Qué contiene una plantilla</h2>
+        <p>
+          Una plantilla usa placeholders de texto como <code>{FIRST_READING_TXT}</code> o
+          <code>{GOSPEL_REF}</code>. AutoLectio busca esos tokens en las diapositivas y los
+          reemplaza con el contenido correspondiente.
+        </p>
+        <p>
+          Para lecturas largas, la plantilla debe incluir una diapositiva semilla para cada
+          bloque principal. A partir de esa semilla, el renderer crea las diapositivas
+          adicionales necesarias.
+        </p>
+      </article>
+
+      <article class="doc-card">
+        <h2>Placeholders principales</h2>
+        <ul class="feature-list">
+          <li><code>{LITURGICAL_DAY}</code> para el título o contexto litúrgico.</li>
+          <li><code>{FIRST_READING_REF}</code> y <code>{FIRST_READING_TXT}</code>.</li>
+          <li><code>{PSALM_REF}</code> y <code>{PSALM_TXT}</code>.</li>
+          <li><code>{SECOND_READING_REF}</code> y <code>{SECOND_READING_TXT}</code>.</li>
+          <li><code>{ACCLAMATION_REF}</code> y <code>{ACCLAMATION_TXT}</code>.</li>
+          <li><code>{GOSPEL_REF}</code> y <code>{GOSPEL_TXT}</code>.</li>
+        </ul>
+      </article>
+
+      <article class="doc-card">
+        <h2>Cómo crear una plantilla</h2>
+        <ul class="feature-list">
+          <li>Diseña cada diapositiva en PowerPoint con el estilo visual final.</li>
+          <li>Inserta los placeholders como texto editable, preferiblemente en una sola corrida de texto.</li>
+          <li>Reserva una diapositiva semilla para cada lectura que pueda crecer a varias diapositivas.</li>
+          <li>Prueba la plantilla con un día que tenga lecturas largas para validar el comportamiento real.</li>
+        </ul>
+      </article>
+
+      <article class="doc-card">
+        <h2>Lecturas largas y técnica de waterfall</h2>
+        <p>
+          Cuando una lectura no cabe cómodamente en una sola diapositiva, AutoLectio divide el
+          contenido en fragmentos balanceados. Luego toma una diapositiva semilla y la duplica
+          tantas veces como sea necesario, reemplazando solo el cuerpo del texto.
+        </p>
+        <p>
+          Esto permite mantener el mismo diseño sin reconstruir manualmente cada continuación.
+        </p>
+      </article>
+
+      <article class="doc-card">
+        <h2>Cantos y partes fijas</h2>
+        <p>
+          El modo avanzado también admite contenido para cantos y algunas partes fijas de la
+          Misa. Ese contenido se integra mediante placeholders dedicados y puede expandirse en
+          varias diapositivas si hace falta.
+        </p>
+      </article>
+    </div>
+  </section>
+{% endblock %}

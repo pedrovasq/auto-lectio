@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}AutoLectio{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}" />
+  </head>
+  <body class="site-body">
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="{{ url_for('index') }}">AutoLectio</a>
+        <nav class="site-nav" aria-label="Principal">
+          <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}is-active{% endif %}">Inicio</a>
+          <a href="{{ url_for('docs') }}" class="{% if request.endpoint == 'docs' %}is-active{% endif %}">Documentación</a>
+        </nav>
+      </header>
+    </div>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-shell footer-inner">
+        <p class="footer-brand">AutoLectio</p>
+        <p class="footer-copy">Una ayuda sencilla para preparar las lecturas y la presentación de la Misa.</p>
+        <div class="footer-links" aria-label="Enlaces del sitio">
+          <a href="{{ url_for('index') }}">Inicio</a>
+          <a href="{{ url_for('docs') }}">Documentación</a>
+          <a href="{{ url_for('guided') }}">Modo guiado</a>
+          <a href="{{ url_for('advanced') }}">Modo avanzado</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

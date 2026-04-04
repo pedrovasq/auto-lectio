@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}AutoLectio | Modo Guiado{% endblock %}
+
+{% block content %}
+  <section class="section guided-shell">
+    <div class="site-shell narrow">
+      <article class="content-card guided-card">
+        <p class="section-label">Modo guiado</p>
+        <h1 class="page-title">Esta experiencia se implementará próximamente.</h1>
+        <p class="lead">
+          Aquí habrá un flujo paso a paso para generar la presentación sin exponer todas las
+          opciones avanzadas al mismo tiempo.
+        </p>
+        <p>
+          Mientras tanto, puedes trabajar con la interfaz actual desde el modo avanzado.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="{{ url_for('advanced') }}">Ir al modo avanzado</a>
+          <a class="button ghost" href="{{ url_for('index') }}">Volver al inicio</a>
+        </div>
+      </article>
+    </div>
+  </section>
+{% endblock %}

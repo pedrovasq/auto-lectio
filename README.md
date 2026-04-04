@@ -11,7 +11,12 @@ Generate Mass slides automatically (USCCB → JSON → PPTX)
 - `chunking.py`: shared balanced reading chunker used by fetch and render.
 - `render.py`: PPTX renderer, placeholder replacer, waterfall slide duplicator, hymn/song merger.
 - `web/app.py`: Flask UI and JSON API for fetch/render/upload.
-- `web/templates/index.html`: basic browser UI.
+- `web/templates/home.html`: public landing page.
+- `web/templates/docs.html`: public documentation page.
+- `web/templates/guided.html`: placeholder guided-flow page.
+- `web/templates/advanced.html`: current advanced browser UI.
+- `web/templates/base.html`: shared shell for the public pages.
+- `web/static/site.css`: shared styles for the public pages.
 - `songs/parts/`: fixed JSON snippets for Kyrie, Sanctus, Agnus, and Mysterium.
 - `templates/README.md`: template authoring guide.
 - `docs/CODEBASE.md`: maintenance notes and current architecture for future agents.
@@ -49,14 +54,20 @@ Assumes a virtualenv `venv` with dependencies installed (python-pptx, feedparser
 
 The renderer prints the final output path (with timestamp when `--stamp` is used).
 
-## Minimal Web UI
+## Web UI
 
 Run a tiny Flask UI to fetch + render:
 
 - Local: `venv/bin/pip install flask && venv/bin/python web/app.py` then open http://127.0.0.1:5000
 - Docker: `docker compose up --build` then open http://127.0.0.1:8000
 
-The UI lives in `web/templates/index.html` and calls backend endpoints:
+Public pages:
+- `/`: landing page
+- `/docs`: documentation
+- `/guided`: guided-flow placeholder
+- `/advanced`: current advanced UI
+
+The advanced UI calls backend endpoints:
 
 - `POST /fetch` (build JSON)
 - `POST /render` (render PPTX)
