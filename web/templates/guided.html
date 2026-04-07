@@ -104,6 +104,10 @@
                 <textarea id="song-communion" placeholder="Escribe la letra o separa estrofas con una línea en blanco."></textarea>
               </div>
               <div class="guided-song-field">
+                <label for="song-meditation">Meditación</label>
+                <textarea id="song-meditation" placeholder="Escribe la letra o separa estrofas con una línea en blanco."></textarea>
+              </div>
+              <div class="guided-song-field">
                 <label for="song-recessional">Salida</label>
                 <textarea id="song-recessional" placeholder="Escribe la letra o separa estrofas con una línea en blanco."></textarea>
               </div>
@@ -206,6 +210,7 @@
           entrance: document.getElementById("song-entrance"),
           offertory: document.getElementById("song-offertory"),
           communion: document.getElementById("song-communion"),
+          meditation: document.getElementById("song-meditation"),
           recessional: document.getElementById("song-recessional"),
         },
       };
@@ -289,6 +294,7 @@
           entranceText: els.songs.entrance.value.trim(),
           offertoryText: els.songs.offertory.value.trim(),
           communionText: els.songs.communion.value.trim(),
+          meditationText: els.songs.meditation.value.trim(),
           recessionalText: els.songs.recessional.value.trim(),
         };
       }
