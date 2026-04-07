@@ -13,7 +13,7 @@ Generate Mass slides automatically (USCCB → JSON → PPTX)
 - `web/app.py`: Flask UI and JSON API for fetch/render/upload.
 - `web/templates/home.html`: public landing page.
 - `web/templates/docs.html`: public documentation page.
-- `web/templates/guided.html`: placeholder guided-flow page.
+- `web/templates/guided.html`: minimal guided workflow for common use.
 - `web/templates/advanced.html`: current advanced browser UI.
 - `web/templates/base.html`: shared shell for the public pages.
 - `web/static/site.css`: shared styles for the public pages.
@@ -64,8 +64,14 @@ Run a tiny Flask UI to fetch + render:
 Public pages:
 - `/`: landing page
 - `/docs`: documentation
-- `/guided`: guided-flow placeholder
+- `/guided`: guided workflow
 - `/advanced`: current advanced UI
+
+Guided mode notes:
+- Uses only dates currently available from the RSS feed.
+- Sends ordinary acclamation mode by default.
+- Assumes Kyrie, Gloria, Santo, and Cordero de Dios in Spanish.
+- Lets the user choose the `Misterio de la fe` option and optionally add a few hymn lyric fields.
 
 The advanced UI calls backend endpoints:
 

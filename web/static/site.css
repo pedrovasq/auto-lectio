@@ -334,8 +334,377 @@ ol {
   padding-top: 18px;
 }
 
-.guided-card {
-  text-align: left;
+.guided-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.guided-intro {
+  padding: 22px 24px;
+}
+
+.guided-title {
+  font-size: clamp(2.2rem, 6vw, 4rem);
+}
+
+.guided-step {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.guided-step.is-locked {
+  opacity: 0.55;
+}
+
+.guided-step.is-active {
+  border-color: var(--line-strong);
+}
+
+.guided-step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 22px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.guided-step-header h2 {
+  margin-bottom: 0;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.guided-step-number,
+.guided-step-summary,
+.guided-review-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.guided-step-summary {
+  max-width: 260px;
+  text-align: right;
+}
+
+.guided-step-body {
+  padding: 18px 22px 22px;
+}
+
+.guided-help {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.guided-upload-row,
+.guided-actions,
+.guided-result-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.guided-upload-row {
+  margin-top: 10px;
+}
+
+.guided-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.guided-file-trigger,
+.guided-file-name {
+  min-height: 48px;
+  padding: 11px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-tight);
+  background: rgba(255, 255, 255, 0.94);
+  line-height: 1.45;
+}
+
+.guided-file-trigger {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 700;
+  background: rgba(255, 249, 242, 0.92);
+}
+
+.guided-file-trigger:hover {
+  background: var(--surface-strong);
+}
+
+.guided-file-input:focus + .guided-file-trigger {
+  outline: 2px solid rgba(139, 63, 32, 0.14);
+  outline-offset: 1px;
+  border-color: rgba(139, 63, 32, 0.52);
+}
+
+.guided-file-name {
+  flex: 1 1 260px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.guided-choice-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.guided-fixed-parts {
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 252, 247, 0.72);
+}
+
+.guided-fixed-title {
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+
+.guided-step-body select,
+.guided-fixed-parts select {
+  width: 100%;
+  padding: 12px 44px 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-tight);
+  background:
+    linear-gradient(45deg, transparent 50%, rgba(139, 63, 32, 0.85) 50%),
+    linear-gradient(135deg, rgba(139, 63, 32, 0.85) 50%, transparent 50%),
+    rgba(255, 255, 255, 0.94);
+  background-position:
+    calc(100% - 18px) calc(50% - 2px),
+    calc(100% - 12px) calc(50% - 2px),
+    0 0;
+  background-size: 6px 6px, 6px 6px, 100% 100%;
+  background-repeat: no-repeat;
+  color: var(--text);
+  font: inherit;
+  line-height: 1.45;
+  appearance: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.guided-fixed-parts select {
+  margin-top: 8px;
+}
+
+.guided-step-body select {
+  margin-top: 6px;
+}
+
+.guided-step-body select option,
+.guided-fixed-parts select option {
+  white-space: normal;
+}
+
+.guided-step-body select:focus,
+.guided-fixed-parts select:focus {
+  outline: 2px solid rgba(139, 63, 32, 0.14);
+  outline-offset: 1px;
+  border-color: rgba(139, 63, 32, 0.52);
+}
+
+.guided-choice-group legend {
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.guided-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 252, 247, 0.72);
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.guided-choice:hover {
+  border-color: var(--line-strong);
+  background: rgba(255, 249, 242, 0.92);
+}
+
+.guided-choice input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.95);
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.guided-choice input[type="radio"]::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 999px;
+  background: var(--accent);
+  transform: scale(0);
+  transition: transform 120ms ease;
+}
+
+.guided-choice input[type="radio"]:checked::after {
+  transform: scale(1);
+}
+
+.guided-choice input[type="radio"]:checked {
+  border-color: rgba(139, 63, 32, 0.52);
+}
+
+.guided-choice:has(input[type="radio"]:checked) {
+  border-color: rgba(139, 63, 32, 0.42);
+  background: rgba(246, 230, 211, 0.62);
+}
+
+.guided-choice input[type="radio"]:focus {
+  outline: 2px solid rgba(139, 63, 32, 0.14);
+  outline-offset: 2px;
+}
+
+.guided-song-fields {
+  margin-top: 16px;
+}
+
+.guided-song-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.guided-song-field {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 252, 247, 0.72);
+}
+
+.guided-song-field label {
+  margin: 0;
+}
+
+.guided-song-field textarea {
+  min-height: 168px;
+  padding: 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-tight);
+  background: rgba(255, 255, 255, 0.94);
+  font: inherit;
+  line-height: 1.55;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.guided-song-field textarea::placeholder {
+  color: #8a796c;
+}
+
+.guided-song-field textarea:focus {
+  outline: 2px solid rgba(139, 63, 32, 0.14);
+  outline-offset: 1px;
+  border-color: rgba(139, 63, 32, 0.52);
+}
+
+.guided-review {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.guided-review-item {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 252, 247, 0.7);
+}
+
+.guided-review-item strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1rem;
+}
+
+.guided-status {
+  min-height: 22px;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.guided-status.is-error {
+  color: #8d2f21;
+}
+
+.guided-status.is-success {
+  color: #1c6d51;
+}
+
+.guided-result {
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.guided-result.is-hidden,
+.guided-song-fields.is-hidden,
+.guided-details.is-hidden {
+  display: none;
+}
+
+.guided-result-title {
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+
+.guided-result-copy {
+  margin: 0 0 12px;
+}
+
+.guided-details {
+  margin-top: 12px;
+}
+
+.guided-details summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.guided-details pre {
+  margin: 10px 0 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-tight);
+  background: rgba(255, 252, 247, 0.9);
+  white-space: pre-wrap;
+  font-size: 0.92rem;
 }
 
 code {
@@ -349,7 +718,9 @@ code {
   .hero-editorial,
   .section-grid.two-col,
   .mode-grid,
-  .steps-grid {
+  .steps-grid,
+  .guided-song-grid,
+  .guided-review {
     grid-template-columns: 1fr;
   }
 
@@ -374,6 +745,15 @@ code {
     flex-direction: column;
   }
 
+  .guided-step-header {
+    flex-direction: column;
+  }
+
+  .guided-step-summary {
+    max-width: none;
+    text-align: left;
+  }
+
   .hero-kicker-row,
   .hero-strip {
     grid-template-columns: 1fr;
@@ -391,7 +771,22 @@ code {
     padding: 18px;
   }
 
+  .guided-song-field {
+    padding: 12px;
+  }
+
+  .guided-song-field textarea {
+    min-height: 152px;
+  }
+
   .button {
     width: 100%;
+  }
+
+  .guided-upload-row,
+  .guided-actions,
+  .guided-result-links {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

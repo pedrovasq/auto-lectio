@@ -100,7 +100,7 @@ Primary responsibilities:
 Current page routes:
 - `/`: Spanish landing page (`web/templates/home.html`)
 - `/docs`: Spanish documentation page (`web/templates/docs.html`)
-- `/guided`: placeholder page for the future guided workflow (`web/templates/guided.html`)
+- `/guided`: minimal guided workflow for common use (`web/templates/guided.html`)
 - `/advanced`: current operator UI (`web/templates/advanced.html`)
 
 Architecture note:
@@ -111,6 +111,8 @@ Architecture note:
 Template/layout note:
 - `web/templates/base.html` provides the shared shell for the public pages.
 - `web/static/site.css` holds the shared styling for the public pages.
+- `web/templates/guided.html` is a client-side progressive form that uses `/feed/dates`, `/templates`, `/upload`, and `/run`.
+- Guided mode constrains the user to feed-available dates, defaults the acclamation to ordinary, assumes fixed sung parts in Spanish, and only exposes `Misterio de la fe` as a fixed-part choice.
 - The advanced page is still a standalone template with its own embedded styles and behavior.
 
 This means renderer changes must be tested through the CLI path, even when the UI is the user-facing entry point.

@@ -4,22 +4,567 @@
 
 {% block content %}
   <section class="section guided-shell">
-    <div class="site-shell narrow">
-      <article class="content-card guided-card">
+    <div class="site-shell narrow guided-stack">
+      <article class="content-card guided-intro">
         <p class="section-label">Modo guiado</p>
-        <h1 class="page-title">Esta experiencia se implementará próximamente.</h1>
+        <h1 class="guided-title">Vamos paso por paso.</h1>
         <p class="lead">
-          Aquí habrá un flujo paso a paso para generar la presentación sin exponer todas las
-          opciones avanzadas al mismo tiempo.
+          Aquí solo verás lo necesario para preparar una presentación. Si después necesitas más
+          control, puedes pasar al modo avanzado.
         </p>
-        <p>
-          Mientras tanto, puedes trabajar con la interfaz actual desde el modo avanzado.
-        </p>
-        <div class="hero-actions">
-          <a class="button primary" href="{{ url_for('advanced') }}">Ir al modo avanzado</a>
-          <a class="button ghost" href="{{ url_for('index') }}">Volver al inicio</a>
+      </article>
+
+      <article class="guided-step is-active" data-step="1">
+        <div class="guided-step-header">
+          <div>
+            <p class="guided-step-number">1. Elige la fecha</p>
+            <h2>Selecciona el día que vas a preparar.</h2>
+          </div>
+          <p class="guided-step-summary" data-summary="date">Falta elegir una fecha.</p>
+        </div>
+        <div class="guided-step-body">
+          <label for="guided-date">Fecha</label>
+          <select id="guided-date">
+            <option value="">Cargando fechas disponibles...</option>
+          </select>
+          <p class="guided-help" id="guided-date-meta">Leyendo el feed RSS...</p>
+        </div>
+      </article>
+
+      <article class="guided-step is-locked" data-step="2">
+        <div class="guided-step-header">
+          <div>
+            <p class="guided-step-number">2. Elige la plantilla</p>
+            <h2>Usa una plantilla disponible o sube una nueva.</h2>
+          </div>
+          <p class="guided-step-summary" data-summary="template">Falta elegir una plantilla.</p>
+        </div>
+        <div class="guided-step-body">
+          <label for="guided-template">Plantilla</label>
+          <select id="guided-template" disabled>
+            <option value="">Cargando plantillas...</option>
+          </select>
+          <div class="guided-upload-row">
+            <input id="guided-upload" class="guided-file-input" type="file" accept=".pptx" />
+            <label class="guided-file-trigger" for="guided-upload">Elegir archivo .pptx</label>
+            <span class="guided-file-name" id="guided-file-name">Ningún archivo seleccionado</span>
+            <button class="button secondary" id="guided-upload-btn" type="button">Subir otra plantilla</button>
+          </div>
+          <p class="guided-help">La lista muestra las plantillas aprobadas y las que ya se hayan subido.</p>
+        </div>
+      </article>
+
+      <article class="guided-step is-locked" data-step="3">
+        <div class="guided-step-header">
+          <div>
+            <p class="guided-step-number">3. Cantos</p>
+            <h2>Agrega solo lo que necesites.</h2>
+          </div>
+          <p class="guided-step-summary" data-summary="songs">Por ahora no se agregarán cantos.</p>
+        </div>
+        <div class="guided-step-body">
+          <div class="guided-fixed-parts">
+            <p class="guided-fixed-title">Partes fijas</p>
+            <p class="guided-help">
+              En este modo se asume que el Kyrie, el Gloria, el Santo y el Cordero de Dios van en español.
+              La aclamación antes del Evangelio se usará en modo ordinario.
+            </p>
+            <label for="guided-mysterium">Misterio de la fe</label>
+            <select id="guided-mysterium">
+              <option value="1">1. Anunciamos tu muerte, proclamamos tu resurrección. ¡Ven, Señor Jesús!</option>
+              <option value="2">2. Cada vez que comemos de este pan y bebemos de este cáliz, anunciamos tu muerte, Señor, hasta que vuelvas.</option>
+              <option value="3">3. Por tu cruz y resurrección nos has salvado, Señor.</option>
+            </select>
+          </div>
+
+          <fieldset class="guided-choice-group">
+            <legend>¿Quieres agregar cantos?</legend>
+            <label class="guided-choice">
+              <input type="radio" name="guided-songs-toggle" value="no" checked />
+              <span>No por ahora</span>
+            </label>
+            <label class="guided-choice">
+              <input type="radio" name="guided-songs-toggle" value="yes" />
+              <span>Sí, agregar cantos</span>
+            </label>
+          </fieldset>
+
+          <div class="guided-song-fields is-hidden" id="guided-song-fields">
+            <div class="guided-song-grid">
+              <div class="guided-song-field">
+                <label for="song-entrance">Entrada</label>
+                <textarea id="song-entrance" placeholder="Escribe la letra o separa estrofas con una línea en blanco."></textarea>
+              </div>
+              <div class="guided-song-field">
+                <label for="song-offertory">Ofertorio</label>
+                <textarea id="song-offertory" placeholder="Escribe la letra o separa estrofas con una línea en blanco."></textarea>
+              </div>
+              <div class="guided-song-field">
+                <label for="song-communion">Comunión</label>
+                <textarea id="song-communion" placeholder="Escribe la letra o separa estrofas con una línea en blanco."></textarea>
+              </div>
+              <div class="guided-song-field">
+                <label for="song-recessional">Salida</label>
+                <textarea id="song-recessional" placeholder="Escribe la letra o separa estrofas con una línea en blanco."></textarea>
+              </div>
+            </div>
+            <p class="guided-help">Si dejas un campo vacío, simplemente no se agregará ese canto.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="guided-step is-locked" data-step="4">
+        <div class="guided-step-header">
+          <div>
+            <p class="guided-step-number">4. Revisa y genera</p>
+            <h2>Confirma lo esencial antes de continuar.</h2>
+          </div>
+        </div>
+        <div class="guided-step-body">
+          <div class="guided-review">
+            <div class="guided-review-item">
+              <span class="guided-review-label">Fecha</span>
+              <strong id="review-date">No seleccionada</strong>
+            </div>
+            <div class="guided-review-item">
+              <span class="guided-review-label">Plantilla</span>
+              <strong id="review-template">No seleccionada</strong>
+            </div>
+            <div class="guided-review-item">
+              <span class="guided-review-label">Cantos</span>
+              <strong id="review-songs">No</strong>
+            </div>
+            <div class="guided-review-item">
+              <span class="guided-review-label">Misterio de la fe</span>
+              <strong id="review-mysterium">Opción 1</strong>
+            </div>
+          </div>
+          <div class="guided-actions">
+            <button class="button primary" id="guided-generate" type="button" disabled>Generar presentación</button>
+            <a class="button ghost" href="{{ url_for('advanced') }}">Ir al modo avanzado</a>
+          </div>
+          <div class="guided-status" id="guided-status" aria-live="polite"></div>
+          <div class="guided-result is-hidden" id="guided-result">
+            <p class="guided-result-title">Presentación generada</p>
+            <p class="guided-result-copy" id="guided-result-copy"></p>
+            <div class="guided-result-links" id="guided-result-links"></div>
+            <details class="guided-details" id="guided-details">
+              <summary>Ver detalles</summary>
+              <pre id="guided-details-pre"></pre>
+            </details>
+          </div>
         </div>
       </article>
     </div>
   </section>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    (() => {
+      const state = {
+        date: "",
+        template: "",
+        templates: [],
+        feedDates: [],
+        songsEnabled: false,
+        busy: false,
+      };
+
+      const els = {
+        date: document.getElementById("guided-date"),
+        dateMeta: document.getElementById("guided-date-meta"),
+        template: document.getElementById("guided-template"),
+        upload: document.getElementById("guided-upload"),
+        fileName: document.getElementById("guided-file-name"),
+        uploadBtn: document.getElementById("guided-upload-btn"),
+        songFields: document.getElementById("guided-song-fields"),
+        generate: document.getElementById("guided-generate"),
+        status: document.getElementById("guided-status"),
+        result: document.getElementById("guided-result"),
+        resultCopy: document.getElementById("guided-result-copy"),
+        resultLinks: document.getElementById("guided-result-links"),
+        details: document.getElementById("guided-details"),
+        detailsPre: document.getElementById("guided-details-pre"),
+        reviewDate: document.getElementById("review-date"),
+        reviewTemplate: document.getElementById("review-template"),
+        reviewSongs: document.getElementById("review-songs"),
+        reviewMysterium: document.getElementById("review-mysterium"),
+        mysterium: document.getElementById("guided-mysterium"),
+        summaries: {
+          date: document.querySelector('[data-summary="date"]'),
+          template: document.querySelector('[data-summary="template"]'),
+          songs: document.querySelector('[data-summary="songs"]'),
+        },
+        steps: {
+          1: document.querySelector('[data-step="1"]'),
+          2: document.querySelector('[data-step="2"]'),
+          3: document.querySelector('[data-step="3"]'),
+          4: document.querySelector('[data-step="4"]'),
+        },
+        songs: {
+          entrance: document.getElementById("song-entrance"),
+          offertory: document.getElementById("song-offertory"),
+          communion: document.getElementById("song-communion"),
+          recessional: document.getElementById("song-recessional"),
+        },
+      };
+
+      function setStatus(message, mode = "") {
+        els.status.textContent = message || "";
+        els.status.className = "guided-status" + (mode ? ` is-${mode}` : "");
+      }
+
+      function setBusy(flag) {
+        state.busy = !!flag;
+        els.generate.disabled = flag || !canGenerate();
+        els.uploadBtn.disabled = flag;
+        if (els.upload) els.upload.disabled = flag;
+      }
+
+      function unlockStep(stepNumber, active = false) {
+        const step = els.steps[stepNumber];
+        if (!step) return;
+        step.classList.remove("is-locked");
+        if (active) step.classList.add("is-active");
+      }
+
+      function lockStep(stepNumber) {
+        const step = els.steps[stepNumber];
+        if (!step) return;
+        step.classList.add("is-locked");
+        step.classList.remove("is-active");
+      }
+
+      function canGenerate() {
+        return !!state.date && !!state.template;
+      }
+
+      function selectedTemplateLabel() {
+        const option = els.template.selectedOptions[0];
+        return option && option.value ? option.textContent : "No seleccionada";
+      }
+
+      function shortenLabel(text, maxLength = 72) {
+        const value = String(text || "").trim();
+        if (value.length <= maxLength) return value;
+        return value.slice(0, Math.max(0, maxLength - 1)).trimEnd() + "…";
+      }
+
+      function buildGuidedDateLabel(item) {
+        const date = String(item.date || "").trim();
+        const title = String(item.title || "").trim();
+        if (!title) return date;
+        return shortenLabel(`${date} — ${title}`, 64);
+      }
+
+      function buildGuidedTemplateLabel(template) {
+        const name = String(template.name || "").trim();
+        const group = String(template.group_label || "").trim();
+        const label = group ? `${name} (${group})` : name;
+        return shortenLabel(label, 56);
+      }
+
+      function selectedSongsCount() {
+        return Object.values(els.songs).filter((field) => field.value.trim()).length;
+      }
+
+      function buildSongsPayload() {
+        const payload = {
+          kyrieLang: "es",
+          gloriaEnabled: true,
+          gloriaLang: "es",
+          sanctusLang: "es",
+          agnusLang: "es",
+          mysteriumLang: "es",
+          mysteriumVersion: els.mysterium.value || "1",
+        };
+
+        if (!state.songsEnabled) {
+          return payload;
+        }
+
+        return {
+          ...payload,
+          entranceText: els.songs.entrance.value.trim(),
+          offertoryText: els.songs.offertory.value.trim(),
+          communionText: els.songs.communion.value.trim(),
+          recessionalText: els.songs.recessional.value.trim(),
+        };
+      }
+
+      function updateStepStates() {
+        state.date = els.date.value;
+        state.template = els.template.value;
+
+        if (state.date) {
+          unlockStep(2, true);
+          els.template.disabled = false;
+          els.summaries.date.textContent = state.date;
+          els.reviewDate.textContent = state.date;
+        } else {
+          lockStep(2);
+          lockStep(3);
+          lockStep(4);
+          els.template.disabled = true;
+          els.summaries.date.textContent = "Falta elegir una fecha.";
+          els.reviewDate.textContent = "No seleccionada";
+        }
+
+        if (state.date && state.template) {
+          unlockStep(3, true);
+          unlockStep(4, true);
+          els.summaries.template.textContent = selectedTemplateLabel();
+          els.reviewTemplate.textContent = selectedTemplateLabel();
+        } else {
+          lockStep(3);
+          lockStep(4);
+          els.summaries.template.textContent = "Falta elegir una plantilla.";
+          els.reviewTemplate.textContent = "No seleccionada";
+        }
+
+        if (state.songsEnabled) {
+          const count = selectedSongsCount();
+          els.summaries.songs.textContent = count
+            ? `${count} campo${count === 1 ? "" : "s"} con texto.`
+            : "Agregarás cantos, pero todavía no hay texto escrito.";
+          els.reviewSongs.textContent = count
+            ? `Sí, ${count} campo${count === 1 ? "" : "s"} con texto`
+            : "Sí, sin texto todavía";
+        } else {
+          els.summaries.songs.textContent = "Sin cantos adicionales; se mantendrán las partes fijas en español.";
+          els.reviewSongs.textContent = "No";
+        }
+
+        els.reviewMysterium.textContent = `Opción ${els.mysterium.value || "1"}`;
+
+        els.generate.disabled = state.busy || !canGenerate();
+      }
+
+      function updateDateMeta() {
+        const selected = state.feedDates.find((item) => item.date === els.date.value);
+        if (!state.feedDates.length) {
+          els.dateMeta.textContent = "No se pudieron cargar fechas del feed RSS.";
+          return;
+        }
+        if (!selected) {
+          els.dateMeta.textContent = `${state.feedDates.length} fechas disponibles en el feed RSS.`;
+          return;
+        }
+        const parts = [`${state.feedDates.length} fechas en RSS`];
+        if (selected.title) parts.push(selected.title);
+        els.dateMeta.textContent = parts.join(" • ");
+      }
+
+      async function loadFeedDates(selectedDate = "") {
+        els.dateMeta.textContent = "Leyendo el feed RSS...";
+        try {
+          const response = await fetch("/feed/dates");
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "No se pudieron cargar las fechas del feed.");
+          }
+
+          state.feedDates = Array.isArray(data.options) ? data.options : [];
+          els.date.innerHTML = "";
+
+          if (!state.feedDates.length) {
+            els.date.innerHTML = '<option value="">No hay fechas disponibles</option>';
+            updateDateMeta();
+            updateStepStates();
+            return;
+          }
+
+          for (const item of state.feedDates) {
+            const option = document.createElement("option");
+            option.value = item.date;
+            option.textContent = buildGuidedDateLabel(item);
+            option.title = item.label || item.date;
+            els.date.appendChild(option);
+          }
+
+          const fallback = data.selected || state.feedDates[0].date;
+          els.date.value = state.feedDates.some((item) => item.date === selectedDate) ? selectedDate : fallback;
+          updateDateMeta();
+          updateStepStates();
+        } catch (error) {
+          state.feedDates = [];
+          els.date.innerHTML = '<option value="">No se pudo cargar</option>';
+          els.dateMeta.textContent = error.message || "No se pudieron cargar las fechas del feed.";
+          updateStepStates();
+        }
+      }
+
+      async function loadTemplates(selectedPath = "") {
+        setStatus("Cargando plantillas...");
+        try {
+          const response = await fetch("/templates");
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.error || "No se pudieron cargar las plantillas.");
+
+          state.templates = Array.isArray(data.templates) ? data.templates : [];
+          els.template.innerHTML = "";
+
+          if (!state.templates.length) {
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "No hay plantillas disponibles";
+            els.template.appendChild(option);
+            els.template.disabled = true;
+            setStatus("No se encontraron plantillas disponibles.", "error");
+            updateStepStates();
+            return;
+          }
+
+          const placeholder = document.createElement("option");
+          placeholder.value = "";
+          placeholder.textContent = "Selecciona una plantilla";
+          els.template.appendChild(placeholder);
+
+          for (const template of state.templates) {
+            const option = document.createElement("option");
+            option.value = template.path;
+            option.textContent = buildGuidedTemplateLabel(template);
+            option.title = `${template.name} (${template.group_label})`;
+            if (selectedPath && selectedPath === template.path) option.selected = true;
+            els.template.appendChild(option);
+          }
+
+          if (!selectedPath) {
+            const first = state.templates[0];
+            if (first) {
+              els.template.value = first.path;
+            }
+          }
+
+          setStatus("");
+          updateStepStates();
+        } catch (error) {
+          els.template.innerHTML = '<option value="">No se pudieron cargar las plantillas</option>';
+          els.template.disabled = true;
+          setStatus(error.message || "No se pudieron cargar las plantillas.", "error");
+          updateStepStates();
+        }
+      }
+
+      async function uploadTemplate() {
+        const file = els.upload.files && els.upload.files[0];
+        if (!file) {
+          setStatus("Selecciona un archivo .pptx antes de subirlo.", "error");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        setBusy(true);
+        setStatus("Subiendo plantilla...");
+
+        try {
+          const response = await fetch("/upload", { method: "POST", body: formData });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo subir la plantilla.");
+          els.upload.value = "";
+          els.fileName.textContent = "Ningún archivo seleccionado";
+          await loadTemplates(data.template_path || "");
+          setStatus("Plantilla subida y seleccionada.");
+        } catch (error) {
+          setStatus(error.message || "No se pudo subir la plantilla.", "error");
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      function resultLink(path, label, download = false) {
+        const baseName = path.split("/").pop();
+        const href = download ? `/build/${baseName}?download=1` : `/build/${baseName}`;
+        return `<a class="button ${download ? "secondary" : "ghost"}" href="${href}">${label}</a>`;
+      }
+
+      async function generate() {
+        if (!canGenerate()) return;
+
+        const payload = {
+          date: state.date,
+          template: state.template,
+          acclamation_mode: "ordinary",
+        };
+
+        payload.songs = buildSongsPayload();
+
+        setBusy(true);
+        setStatus("Generando presentación...");
+        els.result.classList.add("is-hidden");
+        els.details.open = false;
+        els.detailsPre.textContent = "";
+
+        try {
+          const response = await fetch("/run", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || data.stderr || "No se pudo generar la presentación.");
+          }
+
+          const outputPath = data.output_path || "";
+          els.resultCopy.textContent = outputPath
+            ? `La presentación quedó lista en ${outputPath}.`
+            : "La presentación se generó correctamente.";
+
+          els.resultLinks.innerHTML = outputPath
+            ? `${resultLink(outputPath, "Abrir archivo")}${resultLink(outputPath, "Descargar", true)}`
+            : "";
+
+          const details = [data.stdout, data.stderr].filter(Boolean).join("\n\n").trim();
+          if (details) {
+            els.detailsPre.textContent = details;
+            els.details.classList.remove("is-hidden");
+          } else {
+            els.details.classList.add("is-hidden");
+          }
+
+          els.result.classList.remove("is-hidden");
+          setStatus("Presentación generada correctamente.", "success");
+        } catch (error) {
+          els.result.classList.remove("is-hidden");
+          els.resultCopy.textContent = error.message || "No se pudo generar la presentación.";
+          els.resultLinks.innerHTML = "";
+          els.detailsPre.textContent = "";
+          els.details.classList.add("is-hidden");
+          setStatus(error.message || "No se pudo generar la presentación.", "error");
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      document.querySelectorAll('input[name="guided-songs-toggle"]').forEach((input) => {
+        input.addEventListener("change", () => {
+          state.songsEnabled = input.value === "yes" && input.checked;
+          els.songFields.classList.toggle("is-hidden", !state.songsEnabled);
+          updateStepStates();
+        });
+      });
+
+      Object.values(els.songs).forEach((field) => field.addEventListener("input", updateStepStates));
+      els.mysterium.addEventListener("change", updateStepStates);
+      els.upload.addEventListener("change", () => {
+        const file = els.upload.files && els.upload.files[0];
+        els.fileName.textContent = file ? file.name : "Ningún archivo seleccionado";
+      });
+      els.date.addEventListener("change", () => {
+        updateDateMeta();
+        updateStepStates();
+      });
+      els.template.addEventListener("change", updateStepStates);
+      els.uploadBtn.addEventListener("click", uploadTemplate);
+      els.generate.addEventListener("click", generate);
+
+      state.songsEnabled = false;
+      updateStepStates();
+      loadFeedDates();
+      loadTemplates();
+    })();
+  </script>
 {% endblock %}
