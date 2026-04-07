@@ -38,7 +38,7 @@ Important functions:
 
 Notable behavior:
 - First and second reading references are normalized into spoken Mass phrasing, not copied verbatim from the feed.
-- `{ACCLAMATION_TXT}` keeps the verse in `placeholders`; the fetcher also emits a 3-part chunk sequence for waterfall rendering: response, verse, response.
+- The acclamation is split into explicit placeholders: `{ACCLAMATION_RES}` and `{ACCLAMATION_VERSE}`.
 - `build_payload(...)` normalizes whitespace in both placeholders and chunks.
 
 ### `chunking.py`
@@ -81,8 +81,8 @@ Actual rendering order:
 6. Replace the seed token with chunk 1 and duplicate the seed for chunks 2..N.
 
 Waterfall tokens currently include:
-- Readings: `{FIRST_READING_TXT}`, `{PSALM_TXT}`, `{SECOND_READING_TXT}`, `{ACCLAMATION_TXT}`, `{GOSPEL_TXT}`
-- Hymns/fixed sung parts: `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{GLORIA_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`, `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{RECESSIONAL_TXT}`
+- Readings: `{FIRST_READING_TXT}`, `{PSALM_TXT}`, `{SECOND_READING_TXT}`, `{GOSPEL_TXT}`
+- Hymns/fixed sung parts: `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{GLORIA_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`, `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{MEDITATION_TXT}`, `{RECESSIONAL_TXT}`
 
 Notable behavior:
 - Psalm chunking is regenerated from the raw psalm text at render time, even if the JSON already contains psalm chunks.
@@ -124,13 +124,13 @@ Core placeholders:
 - `{FIRST_READING_REF}`, `{FIRST_READING_TXT}`
 - `{PSALM_REF}`, `{PSALM_TXT}`
 - `{SECOND_READING_REF}`, `{SECOND_READING_TXT}`
-- `{ACCLAMATION_REF}`, `{ACCLAMATION_TXT}`
+- `{ACCLAMATION_RES}`, `{ACCLAMATION_VERSE}`
 - `{GOSPEL_REF}`, `{GOSPEL_TXT}`
 
 Hymn/fixed-part placeholders:
 - `{ENTRANCE_TXT}`, `{KYRIE_TXT}`, `{GLORIA_TXT}`, `{OFFERTORY_TXT}`, `{SANCTUS_TXT}`
-- `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{COMMUNION2_TXT}`, `{RECESSIONAL_TXT}`
-- optional refs: `{ENTRANCE_REF}`, `{OFFERTORY_REF}`, `{COMMUNION_REF}`, `{COMMUNION2_REF}`, `{RECESSIONAL_REF}`
+- `{MYSTERIUM_TXT}`, `{AGNUS_TXT}`, `{COMMUNION_TXT}`, `{MEDITATION_TXT}`, `{RECESSIONAL_TXT}`
+- optional refs: `{ENTRANCE_REF}`, `{OFFERTORY_REF}`, `{COMMUNION_REF}`, `{MEDITATION_REF}`, `{RECESSIONAL_REF}`
 
 For custom templates, the safest assumption is still one seed slide per waterfall token.
 

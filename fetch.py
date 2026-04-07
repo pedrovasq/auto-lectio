@@ -332,11 +332,10 @@ def to_placeholders(
             ph["{SECOND_READING_REF}"] = second_reading_intro(header)
             ph["{SECOND_READING_TXT}"] = body
         elif kind == "ACCLAMATION":
-            # Trim Aleluya/R. lines; attempt to derive a reference
+            # Split the acclamation into explicit response and verse placeholders.
             verse_only = normalize_acclamation_text(body)
-            acc_ref = extract_bible_ref_from_text(body) or ""
-            ph["{ACCLAMATION_REF}"] = acc_ref
-            ph["{ACCLAMATION_TXT}"] = verse_only
+            ph["{ACCLAMATION_RES}"] = acclamation_response_for_mode(acclamation_mode)
+            ph["{ACCLAMATION_VERSE}"] = verse_only
         elif kind == "GOSPEL":
             ph["{GOSPEL_REF}"] = gospel_ref_name_only(header)
             ph["{GOSPEL_TXT}"] = body
@@ -413,20 +412,6 @@ def make_chunks(placeholders: Dict[str, str]) -> Dict[str, List[str]]:
     return out
 
 
-def add_acclamation_chunks(
-    placeholders: Dict[str, str],
-    chunks: Dict[str, List[str]],
-    acclamation_mode: str = "ordinary",
-) -> Dict[str, List[str]]:
-    verse = (placeholders.get("{ACCLAMATION_TXT}") or "").strip()
-    if not verse:
-        return chunks
-    response = acclamation_response_for_mode(acclamation_mode)
-    updated = dict(chunks)
-    updated["{ACCLAMATION_TXT}"] = [response, verse, response]
-    return updated
-
-
 def parse_date_arg(s: str) -> date:
     """Parse a date string. Supports:
     - YYYY-MM-DD (ISO)
@@ -451,7 +436,7 @@ def main() -> None:
         "--acclamation-mode",
         choices=sorted(ACCLAMATION_RESPONSES.keys()),
         default="ordinary",
-        help="Response used before and after the Gospel acclamation verse",
+        help="Response text used for the acclamation response placeholder",
     )
     args = ap.parse_args()
 
@@ -475,8 +460,6 @@ def main() -> None:
 
     # chunk only the long text fields
     chunks = make_chunks(placeholders)
-    chunks = add_acclamation_chunks(placeholders, chunks, acclamation_mode=args.acclamation_mode)
-
     payload = build_payload(
         d=target_date,
         language="es-US",

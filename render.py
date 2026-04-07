@@ -337,12 +337,10 @@ def main() -> None:
         "{MYSTERIUM_TXT}",
         "{AGNUS_TXT}",
         "{COMMUNION_TXT}",
-        "{COMMUNION2_TXT}",
+        "{MEDITATION_TXT}",
         "{RECESSIONAL_TXT}",
     ]
-    exact_chunk_tokens = {
-        "{ACCLAMATION_TXT}",
-    }
+    exact_chunk_tokens = set()
 
     songs_chunks: Dict[str, List[str]] = {}
     songs_placeholders: Dict[str, str] = {}
@@ -386,13 +384,13 @@ def main() -> None:
         "{FIRST_READING_REF}", "{FIRST_READING_TXT}",
         "{PSALM_REF}", "{PSALM_TXT}",
         "{SECOND_READING_REF}", "{SECOND_READING_TXT}",
-        "{ACCLAMATION_REF}", "{ACCLAMATION_TXT}",
+        "{ACCLAMATION_RES}", "{ACCLAMATION_VERSE}",
         "{GOSPEL_REF}", "{GOSPEL_TXT}",
         # Hymn lyrics (chunked)
         "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{GLORIA_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
-        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{COMMUNION2_TXT}", "{RECESSIONAL_TXT}",
+        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{MEDITATION_TXT}", "{RECESSIONAL_TXT}",
         # Hymn references (simple)
-        "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{COMMUNION2_REF}", "{RECESSIONAL_REF}",
+        "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{MEDITATION_REF}", "{RECESSIONAL_REF}",
     ]
     if args.verbose:
         print(f"Using template: {template_path}")
@@ -406,11 +404,10 @@ def main() -> None:
         "{FIRST_READING_TXT}",
         "{PSALM_TXT}",
         "{SECOND_READING_TXT}",
-        "{ACCLAMATION_TXT}",
         "{GOSPEL_TXT}",
         # Hymn lyrics use waterfall with pre-chunked lines, preserving newlines
         "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{GLORIA_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
-        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{COMMUNION2_TXT}", "{RECESSIONAL_TXT}",
+        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{MEDITATION_TXT}", "{RECESSIONAL_TXT}",
     ]
 
     # Known tokens for cleanup when missing
@@ -419,13 +416,13 @@ def main() -> None:
         "{FIRST_READING_REF}", "{FIRST_READING_TXT}",
         "{PSALM_REF}", "{PSALM_TXT}",
         "{SECOND_READING_REF}", "{SECOND_READING_TXT}",
-        "{ACCLAMATION_REF}", "{ACCLAMATION_TXT}",
+        "{ACCLAMATION_RES}", "{ACCLAMATION_VERSE}",
         "{GOSPEL_REF}", "{GOSPEL_TXT}",
         # Hymn lyrics tokens
         "{ENTRANCE_TXT}", "{KYRIE_TXT}", "{GLORIA_TXT}", "{OFFERTORY_TXT}", "{SANCTUS_TXT}",
-        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{COMMUNION2_TXT}", "{RECESSIONAL_TXT}",
+        "{MYSTERIUM_TXT}", "{AGNUS_TXT}", "{COMMUNION_TXT}", "{MEDITATION_TXT}", "{RECESSIONAL_TXT}",
         # Hymn references
-        "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{COMMUNION2_REF}", "{RECESSIONAL_REF}",
+        "{ENTRANCE_REF}", "{OFFERTORY_REF}", "{COMMUNION_REF}", "{MEDITATION_REF}", "{RECESSIONAL_REF}",
     }
 
     # Merge optional songs placeholders (e.g., hymn references) into base placeholders

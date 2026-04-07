@@ -91,7 +91,7 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
     """Given a UI 'songs' config dict, write a songs JSON file and return its path.
 
     cfg shape (expected keys):
-      - entranceText, offertoryText, communionText, communion2Text, recessionalText: multiline strings (blank line separates chunks)
+      - entranceText, offertoryText, communionText, meditationText, recessionalText: multiline strings (blank line separates chunks)
       - gloriaEnabled: boolean-like flag to include fixed Gloria text
       - kyrieLang, sanctusLang, agnusLang: 'es' or 'la'
       - mysteriumLang: 'es' or 'la'; mysteriumVersion: '1'|'2'|'3'
@@ -107,7 +107,7 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
         ("{ENTRANCE_TXT}", cfg.get("entranceText")),
         ("{OFFERTORY_TXT}", cfg.get("offertoryText")),
         ("{COMMUNION_TXT}", cfg.get("communionText")),
-        ("{COMMUNION2_TXT}", cfg.get("communion2Text")),
+        ("{MEDITATION_TXT}", cfg.get("meditationText")),
         ("{RECESSIONAL_TXT}", cfg.get("recessionalText")),
     ]
     for key, text in ft_map:
@@ -121,7 +121,7 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
         ("{ENTRANCE_REF}", cfg.get("entranceRef")),
         ("{OFFERTORY_REF}", cfg.get("offertoryRef")),
         ("{COMMUNION_REF}", cfg.get("communionRef")),
-        ("{COMMUNION2_REF}", cfg.get("communion2Ref")),
+        ("{MEDITATION_REF}", cfg.get("meditationRef")),
         ("{RECESSIONAL_REF}", cfg.get("recessionalRef")),
     ]
     for key, ref in ref_map:
@@ -305,7 +305,7 @@ def _build_fetch_preview(payload: Dict[str, Any]) -> Dict[str, Any]:
         ("first_reading", "{FIRST_READING_REF}", "{FIRST_READING_TXT}", "Primera lectura"),
         ("psalm", "{PSALM_REF}", "{PSALM_TXT}", "Salmo"),
         ("second_reading", "{SECOND_READING_REF}", "{SECOND_READING_TXT}", "Segunda lectura"),
-        ("acclamation", "{ACCLAMATION_REF}", "{ACCLAMATION_TXT}", "Aclamación"),
+        ("acclamation", "{ACCLAMATION_RES}", "{ACCLAMATION_VERSE}", "Aclamación"),
         ("gospel", "{GOSPEL_REF}", "{GOSPEL_TXT}", "Evangelio"),
     ]
 
@@ -418,8 +418,8 @@ PLACEHOLDER_HELP = [
     {"placeholder": "{PSALM_TXT}", "description": "Texto del salmo (alternando R. y versos; puede generar múltiples diapositivas)", "category": "text", "waterfall": True},
     {"placeholder": "{SECOND_READING_REF}", "description": "Referencia de la segunda lectura", "category": "ref", "waterfall": False},
     {"placeholder": "{SECOND_READING_TXT}", "description": "Texto de la segunda lectura (con posible expansión en cascada)", "category": "text", "waterfall": True},
-    {"placeholder": "{ACCLAMATION_REF}", "description": "Referencia breve de la aclamación antes del Evangelio", "category": "ref", "waterfall": False},
-    {"placeholder": "{ACCLAMATION_TXT}", "description": "Aclamación antes del Evangelio en cascada: respuesta, verso, respuesta", "category": "text", "waterfall": True},
+    {"placeholder": "{ACCLAMATION_RES}", "description": "Respuesta de la aclamación antes del Evangelio", "category": "text", "waterfall": False},
+    {"placeholder": "{ACCLAMATION_VERSE}", "description": "Verso de la aclamación antes del Evangelio", "category": "text", "waterfall": False},
     {"placeholder": "{GOSPEL_REF}", "description": "Referencia del Evangelio", "category": "ref", "waterfall": False},
     {"placeholder": "{GOSPEL_TXT}", "description": "Texto del Evangelio (con expansión en cascada si es largo)", "category": "text", "waterfall": True},
     # Himnos (rellenados vía UI; cada trozo genera una diapositiva)
@@ -427,12 +427,12 @@ PLACEHOLDER_HELP = [
     {"placeholder": "{GLORIA_TXT}", "description": "Gloria fijo (se incluye u omite desde la UI)", "category": "hymn", "waterfall": True},
     {"placeholder": "{OFFERTORY_TXT}", "description": "Ofertorio (estrofas)", "category": "hymn", "waterfall": True},
     {"placeholder": "{COMMUNION_TXT}", "description": "Comunión (estrofas)", "category": "hymn", "waterfall": True},
-    {"placeholder": "{COMMUNION2_TXT}", "description": "Segunda comunión (estrofas)", "category": "hymn", "waterfall": True},
+    {"placeholder": "{MEDITATION_TXT}", "description": "Meditación (estrofas)", "category": "hymn", "waterfall": True},
     {"placeholder": "{RECESSIONAL_TXT}", "description": "Salida (estrofas)", "category": "hymn", "waterfall": True},
     {"placeholder": "{ENTRANCE_REF}", "description": "Referencia/identificador del canto de entrada (opcional)", "category": "hymn", "waterfall": False},
     {"placeholder": "{OFFERTORY_REF}", "description": "Referencia del ofertorio (opcional)", "category": "hymn", "waterfall": False},
     {"placeholder": "{COMMUNION_REF}", "description": "Referencia de comunión (opcional)", "category": "hymn", "waterfall": False},
-    {"placeholder": "{COMMUNION2_REF}", "description": "Referencia de la segunda comunión (opcional)", "category": "hymn", "waterfall": False},
+    {"placeholder": "{MEDITATION_REF}", "description": "Referencia de la meditación (opcional)", "category": "hymn", "waterfall": False},
     {"placeholder": "{RECESSIONAL_REF}", "description": "Referencia de salida (opcional)", "category": "hymn", "waterfall": False},
     {"placeholder": "{KYRIE_TXT}", "description": "Kyrie (Español o Latín)", "category": "hymn", "waterfall": True},
     {"placeholder": "{SANCTUS_TXT}", "description": "Santo (Español o Latín)", "category": "hymn", "waterfall": True},
@@ -459,7 +459,7 @@ def placeholders_help():
                 "Inserte los tokens tal cual, p. ej. {FIRST_READING_TXT}.",
                 "Para lecturas largas, se usa 'waterfall' duplicando la diapositiva semilla.",
                 "El Salmo alterna R. y versos en diapositivas separadas.",
-                "La aclamación antes del Evangelio usa waterfall: respuesta, verso, respuesta.",
+                "La aclamación antes del Evangelio usa placeholders separados para la respuesta y el verso.",
                 "Los himnos y el Gloria se pueden configurar en la sección 'Cantos' de esta UI.",
             ],
         }
@@ -567,7 +567,6 @@ def do_fetch():
 
         placeholders = fetch_mod.to_placeholders(item.title, sections, acclamation_mode=acclamation_mode)
         chunks = fetch_mod.make_chunks(placeholders)
-        chunks = fetch_mod.add_acclamation_chunks(placeholders, chunks, acclamation_mode=acclamation_mode)
 
         payload = fetch_mod.build_payload(
             d=target_date,

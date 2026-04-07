@@ -362,7 +362,7 @@
                     <label><input type="radio" name="acclamationMode" value="ordinary" checked> Ordinaria</label>
                     <label><input type="radio" name="acclamationMode" value="lent"> Cuaresma</label>
                   </div>
-                  <div class="muted">La selección controla la secuencia waterfall de la aclamación: respuesta, verso, respuesta.</div>
+                  <div class="muted">La selección controla el texto de la respuesta de la aclamación.</div>
                 </div>
               </div>
             </div>
@@ -391,9 +391,9 @@
                   <input type="text" id="songs-communion-ref" placeholder="Referencia opcional" />
                 </div>
                 <div class="song-card">
-                  <h3 class="song-title">Comunión 2 <code>{COMMUNION2_TXT}</code></h3>
-                  <textarea id="songs-communion2" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
-                  <input type="text" id="songs-communion2-ref" placeholder="Referencia opcional" />
+                  <h3 class="song-title">Meditación <code>{MEDITATION_TXT}</code></h3>
+                  <textarea id="songs-meditation" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
+                  <input type="text" id="songs-meditation-ref" placeholder="Referencia opcional" />
                 </div>
                 <div class="song-card">
                   <h3 class="song-title">Salida <code>{RECESSIONAL_TXT}</code></h3>
@@ -647,7 +647,7 @@
           ['Entrada', songs.entranceText],
           ['Ofertorio', songs.offertoryText],
           ['Comunión', songs.communionText],
-          ['Comunión 2', songs.communion2Text],
+          ['Meditación', songs.meditationText],
           ['Salida', songs.recessionalText],
         ].filter(([, value]) => value);
 
@@ -901,8 +901,8 @@
         'songs-offertory-ref',
         'songs-communion',
         'songs-communion-ref',
-        'songs-communion2',
-        'songs-communion2-ref',
+        'songs-meditation',
+        'songs-meditation-ref',
         'songs-recessional',
         'songs-recessional-ref',
         'mysteriumVersion',
@@ -1160,8 +1160,8 @@
           offertoryRef: document.getElementById('songs-offertory-ref').value.trim(),
           communionText: document.getElementById('songs-communion').value.trim(),
           communionRef: document.getElementById('songs-communion-ref').value.trim(),
-          communion2Text: document.getElementById('songs-communion2').value.trim(),
-          communion2Ref: document.getElementById('songs-communion2-ref').value.trim(),
+          meditationText: document.getElementById('songs-meditation').value.trim(),
+          meditationRef: document.getElementById('songs-meditation-ref').value.trim(),
           recessionalText: document.getElementById('songs-recessional').value.trim(),
           recessionalRef: document.getElementById('songs-recessional-ref').value.trim(),
           kyrieLang: getRadio('kyrieLang'),

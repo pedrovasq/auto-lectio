@@ -24,8 +24,8 @@ Type these tokens exactly as written into text boxes where you want content to a
 - `{PSALM_TXT}`
 - `{SECOND_READING_REF}`
 - `{SECOND_READING_TXT}`
-- `{ACCLAMATION_REF}`
-- `{ACCLAMATION_TXT}`
+- `{ACCLAMATION_RES}`
+- `{ACCLAMATION_VERSE}`
 - `{GOSPEL_REF}`
 - `{GOSPEL_TXT}`
 
@@ -40,13 +40,13 @@ Additional hymn/fixed-part placeholders are supported by the current renderer:
   - `{MYSTERIUM_TXT}`
   - `{AGNUS_TXT}`
   - `{COMMUNION_TXT}`
-  - `{COMMUNION2_TXT}`
+  - `{MEDITATION_TXT}`
   - `{RECESSIONAL_TXT}`
 - Optional references:
   - `{ENTRANCE_REF}`
   - `{OFFERTORY_REF}`
   - `{COMMUNION_REF}`
-  - `{COMMUNION2_REF}`
+  - `{MEDITATION_REF}`
   - `{RECESSIONAL_REF}`
 
 These are filled from a songs JSON passed with `--songs`, or from the web UI which generates that JSON for you.
@@ -76,7 +76,7 @@ Tips for reliable placeholders:
 ## Text Handling
 
 - Reading/acclamation text is normalized so newlines become spaces and repeated whitespace is collapsed.
-- `{ACCLAMATION_TXT}` now renders as a waterfall sequence using three chunks: response, verse, response.
+- The acclamation now uses explicit placeholders for the response and verse instead of waterfall duplication.
 - Hymn chunks preserve explicit line breaks from the songs JSON.
 - Non-Psalm reading chunks are balanced with the shared `chunking.py` rules, which prefer fuller slides and avoid tiny remainder chunks when possible.
 
@@ -89,7 +89,7 @@ A simple, effective order in the template:
 - First Reading body seed: a slide with `{FIRST_READING_TXT}`
 - Psalm: `{PSALM_REF}` then `{PSALM_TXT}` seed
 - Second Reading: `{SECOND_READING_REF}` then `{SECOND_READING_TXT}` seed
-- Acclamation: `{ACCLAMATION_REF}` and an `{ACCLAMATION_TXT}` seed slide
+- Acclamation: one slide with `{ACCLAMATION_RES}`, one slide with `{ACCLAMATION_VERSE}`, and another response slide with `{ACCLAMATION_RES}`
 - Gospel: `{GOSPEL_REF}` then `{GOSPEL_TXT}` seed
 
 You may include interstitial slides (e.g., “Palabra de Dios”) as desired; the renderer won’t delete slides.

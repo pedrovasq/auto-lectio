@@ -23,7 +23,7 @@ We have two main scripts:
     - First Reading: “Lectura del profeta …” for prophets, “Lectura del libro de los Hechos…”, feminine articles (Sabiduría), etc.
     - Second Reading: “Lectura de la (primera/segunda) carta del apóstol san Pablo a los …”, “Lectura de la carta a los Hebreos”, “Lectura del libro del Apocalipsis”, “Lectura de la (primera/…) carta del apóstol san Juan/Pedro”, “Lectura de la carta del apóstol Santiago/Judas”, etc.
     - Gospel ref simplified to just the book name.
-    - Acclamation: keeps the verse as the placeholder text, attempts a short reference when possible, and emits waterfall chunks for response / verse / response.
+    - Acclamation: emits explicit placeholders for the response and the verse.
   - produces a JSON payload with:
     - `meta`
     - `placeholders` (strings)
@@ -47,14 +47,14 @@ Template placeholders (exact tokens in text boxes):
 - {PSALM_TXT}
 - {SECOND_READING_REF}
 - {SECOND_READING_TXT}
-- {ACCLAMATION_REF}
-- {ACCLAMATION_TXT}
+- {ACCLAMATION_RES}
+- {ACCLAMATION_VERSE}
 - {GOSPEL_REF}
 - {GOSPEL_TXT}
 - Hymn lyrics (lyrics only; titles not displayed):
-  - {ENTRANCE_TXT}, {KYRIE_TXT}, {GLORIA_TXT}, {OFFERTORY_TXT}, {SANCTUS_TXT}, {MYSTERIUM_TXT}, {AGNUS_TXT}, {COMMUNION_TXT}, {COMMUNION2_TXT}, {RECESSIONAL_TXT}
+  - {ENTRANCE_TXT}, {KYRIE_TXT}, {GLORIA_TXT}, {OFFERTORY_TXT}, {SANCTUS_TXT}, {MYSTERIUM_TXT}, {AGNUS_TXT}, {COMMUNION_TXT}, {MEDITATION_TXT}, {RECESSIONAL_TXT}
   - Optional hymn references to display source/identifier:
-    - {ENTRANCE_REF}, {OFFERTORY_REF}, {COMMUNION_REF}, {COMMUNION2_REF}, {RECESSIONAL_REF}
+    - {ENTRANCE_REF}, {OFFERTORY_REF}, {COMMUNION_REF}, {MEDITATION_REF}, {RECESSIONAL_REF}
 
 Hymn lyrics are provided via a separate songs JSON file; fetcher does not supply them.
 
@@ -77,14 +77,14 @@ Example shape:
     "{PSALM_TXT}": "...",
     "{SECOND_READING_REF}": "...",
     "{SECOND_READING_TXT}": "...",
-    "{ACCLAMATION_REF}": "...",
-    "{ACCLAMATION_TXT}": "...",
+    "{ACCLAMATION_RES}": "...",
+    "{ACCLAMATION_VERSE}": "...",
     "{GOSPEL_REF}": "...",
     "{GOSPEL_TXT}": "...",
     "{ENTRANCE_REF}": "Flor y Canto #123",
     "{OFFERTORY_REF}": "",
     "{COMMUNION_REF}": "",
-    "{COMMUNION2_REF}": "",
+    "{MEDITATION_REF}": "",
     "{RECESSIONAL_REF}": ""
   },
   "chunks": {
@@ -165,7 +165,7 @@ Also ensure other placeholders on that slide (like `{FIRST_READING_REF}`) remain
 ### 5) Rendering order
 Recommended order:
 1) Replace all *simple* placeholders across all slides:
-   - {LITURGICAL_DAY}, all *_REF (including hymn refs), {ACCLAMATION_TXT} if not waterfall, etc.
+   - {LITURGICAL_DAY}, all simple placeholders (including hymn refs and acclamation response/verse), etc.
 2) Apply waterfall expansion for:
    - {FIRST_READING_TXT}
    - {PSALM_TXT}
