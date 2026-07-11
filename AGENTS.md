@@ -30,13 +30,16 @@ We have two main scripts:
     - `chunks` (dict of placeholder_key -> list of strings)
 
 - `render.py` — PPTX renderer that:
+  - uses OfficeCLI for PPTX mutation; local rendering requires `officecli` on PATH
+  - copies the template to the requested output path before editing, so source templates are not mutated
   - fills placeholders across the deck
   - expands long bodies with a “waterfall” by duplicating the seed slide and changing only the body text
   - handles Psalm specially (alternating R. and verse slides)
   - sanitizes text (newlines → spaces; collapse whitespace)
   - rebalances non-Psalm reading chunks with a shared scoring-based chunker to avoid tiny orphan slides
   - supports verbose logging and timestamped output filenames
-  - avoids slide deletion (to prevent repair prompts); blanks placeholders when a reading is absent
+  - prunes empty optional sections by default, deleting missing second-reading or hymn/fixed-part slide sequences from the output copy
+  - supports `--keep-empty-sections` to preserve the older blank-in-place behavior
 
 ## Placeholders in PPTX template
 Template placeholders (exact tokens in text boxes):
@@ -57,6 +60,11 @@ Template placeholders (exact tokens in text boxes):
     - {ENTRANCE_REF}, {OFFERTORY_REF}, {COMMUNION_REF}, {MEDITATION_REF}, {RECESSIONAL_REF}
 
 Hymn lyrics are provided via a separate songs JSON file; fetcher does not supply them.
+
+Optional OfficeCLI-native shape names for future templates:
+- Simple placeholders may use text shape names like `AL_TOKEN_LITURGICAL_DAY`.
+- Waterfall seed body placeholders may use names like `AL_SEED_FIRST_READING_TXT`.
+- Existing literal `{TOKEN}` placeholders remain supported and are the compatibility path for current templates.
 
 ## JSON Contract (expected)
 Example shape:
@@ -120,36 +128,22 @@ Fixed parts library:
 - Long readings are expanded into multiple slides using waterfall duplication
  - Hymn lyric placeholders are filled from songs JSON; each chunk produces a duplicate slide, preserving line breaks
 
-## Key Implementation Notes (python-pptx)
+## Key Implementation Notes (OfficeCLI)
 ### 1) Finding placeholders reliably
-Placeholders might appear:
-- in a single run
-- or split across multiple runs (PowerPoint can fragment runs)
+The renderer uses read-only PPTX ZIP inspection to find seed slides containing literal `{TOKEN}` text or matching `AL_SEED_*` shape names. OfficeCLI performs the actual replacement and can handle normal PowerPoint run fragmentation better than the previous renderer.
 
-Minimum viable approach (good enough if placeholders are typed as a single run):
-- iterate slides -> shapes -> text_frame -> paragraphs -> runs
-- if a run contains `{FIRST_READING_TXT}`, replace
-
-More robust approach (recommended):
-- operate at paragraph level:
-  - `full = "".join(run.text for run in paragraph.runs)`
-  - if placeholder token is in `full`, then:
-    - clear all runs
-    - set paragraph.text to replaced text
-This avoids issues with split runs.
-
-### 2) Replacing text in a shape
-Prefer setting `text_frame.text` only if you’re okay losing per-run styling.
-If you need to preserve formatting, change only the paragraph that contains the placeholder.
-
-For our first pass, it’s acceptable to lose styling inside the reading body textbox as long as the template is designed accordingly.
+### 2) Replacing text
+Use OfficeCLI scoped find/replace:
+- whole deck for simple placeholders: `officecli set deck.pptx / --find TOKEN --replace VALUE`
+- specific slide for waterfall body chunks: `officecli set deck.pptx '/slide[N]' --find TOKEN --replace VALUE`
 
 ### 3) “Waterfall” slide duplication
-We duplicate the seed slide (same layout + copied shapes) and insert it immediately after the seed. Only the target body token text is changed per duplicate; all other placeholders on that slide remain as previously filled.
+We clone the seed/tail slide with OfficeCLI and insert each clone immediately after the current tail. Only the target body token text is changed per duplicate; all other placeholders on that slide remain as previously filled.
 
 Implementation notes:
-- Create a new slide with the same layout and move it to sit right after the seed by targeting the slide’s specific relationship id (not “last slide”).
-- Copy shapes from the seed slide into the new slide to preserve formatting. To avoid repair prompts, we avoid deleting slides from the deck and keep per-slide relationships intact.
+- Always edit the output copy, never the source template.
+- Use `officecli open` before a render batch and `officecli close` before returning control to non-OfficeCLI readers.
+- Clone with `officecli add deck.pptx / --from '/slide[N]' --after '/slide[N]'`.
 
 ### 4) Waterfall algorithm (per placeholder key)
 For each long-text placeholder that supports chunking:
@@ -164,14 +158,18 @@ Also ensure other placeholders on that slide (like `{FIRST_READING_REF}`) remain
 
 ### 5) Rendering order
 Recommended order:
-1) Replace all *simple* placeholders across all slides:
+1) Copy the template to the output path.
+2) Prune empty optional sections unless `--keep-empty-sections` is used:
+   - Missing `{SECOND_READING_TXT}` removes its ref slide, body seed, matching “Palabra de Dios / Te alabamos” response slide, and immediate blank spacer slides.
+   - Missing hymn/fixed-part lyric tokens remove their seed slide and immediate blank spacer slides.
+3) Replace all *simple* placeholders across all slides:
    - {LITURGICAL_DAY}, all simple placeholders (including hymn refs and acclamation response/verse), etc.
-2) Apply waterfall expansion for:
+4) Apply waterfall expansion for:
    - {FIRST_READING_TXT}
    - {PSALM_TXT}
    - {SECOND_READING_TXT}
    - {GOSPEL_TXT}
-In step (2), do it in slide index order, because inserting slides shifts indices. Work from start to end:
+In step (4), do it in slide index order, because inserting slides shifts indices. Work from start to end:
 - Find seed slide indices first (by scanning once),
 - Then process from lowest index to highest.
 
@@ -194,10 +192,10 @@ In step (2), do it in slide index order, because inserting slides shifts indices
 - Hymn placeholders + Mystery of Faith can remain untouched for now.
 
 ## Common Pitfalls
-- Slide indices shift after insertions: either process in increasing index and update indices carefully, or precompute seed locations and insert relative to current position.
-- Placeholder tokens split across runs: use paragraph-level string rebuild to find/replace.
-- Duplicating slides in python-pptx needs private APIs; isolate in `duplicate_slide(prs, slide_index, insert_after_index)` and keep it tested.
-- Styling loss when setting `text_frame.text`: acceptable for now if the template is designed with a single textbox style.
+- Slide indices shift after deletions and insertions: record seed locations before pruning, adjust them by the removed-slide set, then process seeds from highest slide number to lowest.
+- Missing OfficeCLI: fail with a clear install/PATH message before copying or mutating output.
+- Placeholder seed discovery still expects literal `{TOKEN}` text in the slide XML.
+- Do not edit user template PPTX files directly; duplicate them for experiments.
 
 ## Quick CLI
 - Fetch (today): `venv/bin/python fetch.py`
@@ -206,6 +204,7 @@ In step (2), do it in slide index order, because inserting slides shifts indices
   - Override templates dir: `--template-root /templates`
   - Force specific template: `--template /templates/sunday-ord` or `--template /templates/daily-ord.pptx`
   - Provide hymn lyrics: `--songs songs/sample.es-US.json`
+  - Preserve empty optional-section slides: `--keep-empty-sections`
 - Render (verbose + timestamp): `venv/bin/python render.py --verbose --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx --stamp`
 
 ## Testing Checklist

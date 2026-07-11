@@ -10,6 +10,8 @@ Generate Mass slides automatically (USCCB → JSON → PPTX)
 - `fetch.py`: RSS fetcher, HTML parser, liturgical reference formatter, chunk generator, JSON writer.
 - `chunking.py`: shared balanced reading chunker used by fetch and render.
 - `render.py`: PPTX renderer, placeholder replacer, waterfall slide duplicator, hymn/song merger.
+- `scripts/lint_template.py`: read-only PPTX template linter for placeholder coverage, duplicate seeds, and unsupported tokens.
+- `scripts/inspect_pptx.py`: read-only PPTX inspector for rendered decks, remaining placeholders, and optional validation.
 - `web/app.py`: Flask UI and JSON API for fetch/render/upload.
 - `web/templates/home.html`: public landing page.
 - `web/templates/docs.html`: public documentation page.
@@ -31,11 +33,12 @@ Generate Mass slides automatically (USCCB → JSON → PPTX)
 - Psalm handling: alternates R. (refrain) and verse blocks as separate slides.
 - Text normalization: removes manual newlines, collapses whitespace so PowerPoint wraps naturally.
 - Chunk sizing: uses a balanced sentence/clause chunker for non-Psalm readings, with a wider soft target to reduce tiny orphan slides.
-- No slide deletions (avoids repair prompts); blanks placeholders if a reading is absent.
+- Empty optional-section pruning: missing second reading and hymn/fixed-part content removes the related placeholder slides and immediate spacer slides by default.
 - Verbose logging and timestamped outputs for traceability.
 
 ## Quick start
-Assumes a virtualenv `venv` with dependencies installed (python-pptx, feedparser, beautifulsoup4).
+Assumes a virtualenv `venv` with Python dependencies installed and the `officecli` binary on `PATH`.
+Docker builds install OfficeCLI automatically.
 
 1) Fetch today:
    - `venv/bin/python fetch.py`
@@ -48,11 +51,22 @@ Assumes a virtualenv `venv` with dependencies installed (python-pptx, feedparser
    - Use a custom templates directory: `--template-root /templates`
    - Or point directly to a template file/dir: `--template /templates/sunday-ord` or `--template /templates/daily-ord.pptx`
    - Provide hymn lyrics (chunked) via: `--songs songs/sample.es-US.json`
+   - Keep empty optional-section slides instead of pruning them: `--keep-empty-sections`
 
 4) Render with logs + timestamped filename:
    - `venv/bin/python render.py --verbose --json out/YYYY-MM-DD.es-US.json --out build/YYYY-MM-DD.es-US.pptx --stamp`
 
 The renderer prints the final output path (with timestamp when `--stamp` is used).
+
+5) Lint a template before rendering:
+   - `venv/bin/python scripts/lint_template.py templates/custom/domingo-jgv.pptx`
+   - JSON output: `venv/bin/python scripts/lint_template.py templates/custom/domingo-jgv.pptx --json`
+   - Strict + OfficeCLI validation: `venv/bin/python scripts/lint_template.py templates/custom/domingo-jgv.pptx --strict --validate`
+
+6) Inspect a rendered deck:
+   - `venv/bin/python scripts/inspect_pptx.py build/YYYY-MM-DD.es-US.pptx`
+   - Show token locations: `venv/bin/python scripts/inspect_pptx.py build/YYYY-MM-DD.es-US.pptx --tokens`
+   - Fail if supported placeholders remain: `venv/bin/python scripts/inspect_pptx.py build/YYYY-MM-DD.es-US.pptx --fail-on-remaining`
 
 ## Web UI
 
@@ -107,6 +121,7 @@ Then visit `https://your-domain/lectio/`.
 
 ## Placeholders
 See `AGENTS.md` for the full list and behavior.
+Existing `{TOKEN}` text placeholders remain supported. Future OfficeCLI-oriented templates can use shape names like `AL_TOKEN_LITURGICAL_DAY` and `AL_SEED_GOSPEL_TXT`; see `templates/README.md`.
 
 ### Hymn Lyrics (Songs JSON)
 - New hymn lyric placeholders (lyrics only, no titles):
@@ -127,16 +142,19 @@ Pre-baked fixed parts
  - `daily-ord(.pptx)` for weekdays
   You can override with `--template` (file or directory) or `--template-root`.
   - Provide hymn lyrics with `--songs songs/sample.es-US.json`.
-- We avoid deleting slides to keep the PPTX package consistent. If a reading is missing, placeholders are blanked and slides can be left in place or hidden later.
+- Missing optional sections are pruned by default. If the second reading or a hymn/fixed-part lyric has no text/chunks, the renderer removes its placeholder slide(s) plus immediate spacer slides from the output copy. Use `--keep-empty-sections` to retain the older blank-in-place behavior.
 
 ## Maintenance
-- The renderer currently replaces placeholders at the run level, not by rebuilding a whole paragraph. If PowerPoint splits a token across runs, replacement can fail.
-- Slide duplication in `render.py` uses private `python-pptx` internals and XML deep copies. That is the highest-risk area in the codebase.
-- `templates/README.md` documents the supported placeholder contract for template authors; keep it in sync with `web/app.py`'s `PLACEHOLDER_HELP` and `render.py`'s `waterfall_keys`.
+- The renderer mutates only an output copy of the template; source templates are not modified.
+- PPTX editing is delegated to OfficeCLI. Placeholder discovery for diagnostics is read-only ZIP inspection.
+- `templates/README.md` documents the supported placeholder contract for template authors; keep it in sync with `web/app.py`'s `PLACEHOLDER_HELP` and `render.py`'s `WATERFALL_KEYS`.
 
 ## Troubleshooting
 - Verbose logs: run with `--verbose` to print the chosen template path, initial placeholder slide positions (1-based), waterfall seed/sequence indices, and short text previews. This helps correlate PowerPoint slide numbers with renderer operations.
-- No repair prompt: avoid deleting slides. The renderer blanks missing-reading placeholders instead of deleting slides to prevent duplicate slide-part names and “repair” warnings.
+- Missing OfficeCLI: install OfficeCLI and confirm `officecli --version` works before rendering locally.
+- Template linting: run `scripts/lint_template.py` on a custom template before rendering. Missing core placeholders and duplicate waterfall seeds fail; missing second reading and hymn placeholders are warnings by default.
+- Render inspection: run `scripts/inspect_pptx.py build/<output>.pptx --fail-on-remaining` after rendering to catch any supported placeholder tokens left in the deck.
+- Empty-section pruning: run with `--verbose` to see which optional sections were removed. Use `--keep-empty-sections` if a custom template needs the old blanking behavior.
 - Slide order shifts: seeds are processed in descending index to minimize index shifting. Logs report final sequence indices so you can confirm where duplicates land.
 - Psalm splitting: renderer ignores global chunking for Psalms and alternates refrain/verse slides. If verses look too short, ask to enable verse-only min/merge rules.
 - Short slides: non-Psalm readings now use a shared balancing pass in `chunking.py` that prefers fuller slides and avoids tiny remainders when possible.

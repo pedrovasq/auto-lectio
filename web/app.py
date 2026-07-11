@@ -448,7 +448,7 @@ def placeholders_help():
     Notes for template authors:
     - Coloque exactamente estos tokens (con llaves) en cuadros de texto.
     - Los placeholders de texto marcados como waterfall pueden generar varias diapositivas.
-    - PowerPoint puede dividir texto en múltiples runs; el renderizador funciona mejor cuando cada token está en un solo run.
+    - El renderizador usa OfficeCLI para reemplazar texto y conserva el contrato de tokens literal.
     - Los saltos de línea se normalizan a espacios y el espacio en blanco se colapsa.
     """
     return jsonify(
@@ -461,6 +461,7 @@ def placeholders_help():
                 "El Salmo alterna R. y versos en diapositivas separadas.",
                 "La aclamación antes del Evangelio usa placeholders separados para la respuesta y el verso.",
                 "Los himnos y el Gloria se pueden configurar en la sección 'Cantos' de esta UI.",
+                "El archivo de plantilla original no se modifica; se edita una copia de salida.",
             ],
         }
     )

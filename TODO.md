@@ -32,16 +32,10 @@
 
 ## Debugging Tools
 
-- Add a template lint script, e.g. `scripts/lint_template.py`, that reports:
-  - missing required tokens
-  - duplicate waterfall seeds
-  - unsupported tokens
-  - placeholder tokens split across PowerPoint runs
-
-- Add a rendered-deck inspection script, e.g. `scripts/inspect_pptx.py`, that:
-  - prints slide count
-  - prints supported placeholder occurrences by slide
-  - fails if any supported placeholder remains after render
+- Done: added `scripts/lint_template.py`, `scripts/inspect_pptx.py`, and the shared read-only scanner `scripts/pptx_scan.py`.
+  - Template linting reports missing required tokens, duplicate waterfall seeds, unsupported tokens, and optional-placeholder warnings.
+  - Rendered-deck inspection prints slide count, supported placeholder occurrences by slide, named placeholders, and can fail if supported placeholders remain.
+  - Future enhancement: explicitly diagnose placeholders split across PowerPoint runs when the literal `{TOKEN}` no longer appears contiguously in slide XML.
 
 ## Fixtures
 

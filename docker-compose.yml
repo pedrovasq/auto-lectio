@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   auto-lectio:
     build: .
@@ -11,4 +10,3 @@ services:
     environment:
       - PORT=8000
     restart: unless-stopped
-

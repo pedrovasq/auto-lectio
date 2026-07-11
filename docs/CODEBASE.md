@@ -11,9 +11,11 @@ This file is for future maintainers and agents. It describes the code as impleme
    - `placeholders`: simple text replacements for the PPTX template
    - `chunks`: pre-split reading bodies for waterfall slides
 5. `render.py` loads the JSON payload and an input template.
-6. It replaces simple tokens across the deck.
-7. It expands waterfall tokens by duplicating a seed slide and replacing only the body token per duplicate.
-8. The output PPTX is written to `build/`.
+6. It copies the template to the requested output path, then opens that output copy with OfficeCLI.
+7. It prunes empty optional sections from the output copy unless `--keep-empty-sections` is set.
+8. It replaces simple tokens across the deck.
+9. It expands waterfall tokens by cloning a seed slide and replacing only the body token per duplicate.
+10. The output PPTX is written to `build/`.
 
 The web UI in `web/app.py` is a thin wrapper around that process, now split between public informational pages and the existing operator workflow.
 
@@ -63,22 +65,28 @@ Primary responsibilities:
 - template selection
 - placeholder replacement
 - songs JSON merge
+- empty optional-section pruning
 - waterfall slide duplication
 - PPTX output writing
 
 Important functions:
 - `resolve_template_path(args, payload)`: picks `sunday-ord` vs `daily-ord`
-- `replace_tokens_in_slide(...)`: run-level replacement inside text frames and table cells
+- `render_with_officecli(...)`: copies the template and applies all PPTX edits through OfficeCLI
+- `OfficeCli`: small subprocess adapter around the `officecli` binary
 - `chunk_psalm_text(text)`: splits the psalm into refrain/verse alternation
-- `duplicate_slide_filtered(...)`: duplicates a seed slide by copying selected XML shapes
+- `build_prune_plans(...)`: decides which optional-section slides should be removed before replacement
+- `find_seed_slide_numbers(...)`: read-only ZIP inspection for placeholder seed discovery
 
 Actual rendering order:
 1. Load payload and optional songs JSON.
 2. Merge song references into `placeholders` if the main payload does not already define them.
-3. Replace all non-waterfall tokens on every slide.
-4. Find seed slides for each waterfall token.
-5. Process seeds in descending slide index.
-6. Replace the seed token with chunk 1 and duplicate the seed for chunks 2..N.
+3. Copy the selected template to the requested output path.
+4. Plan empty optional-section pruning and record original seed slide locations.
+5. Remove planned empty-section slides with OfficeCLI unless `--keep-empty-sections` was passed, then adjust recorded seed slide numbers for the removed slides.
+6. Open the output copy with OfficeCLI.
+7. Replace all non-waterfall tokens with OfficeCLI find/replace.
+8. Process seeds in descending slide number.
+9. Clone seed/tail slides with OfficeCLI and replace each body token in slide scope.
 
 Waterfall tokens currently include:
 - Readings: `{FIRST_READING_TXT}`, `{PSALM_TXT}`, `{SECOND_READING_TXT}`, `{GOSPEL_TXT}`
@@ -88,7 +96,63 @@ Notable behavior:
 - Psalm chunking is regenerated from the raw psalm text at render time, even if the JSON already contains psalm chunks.
 - Hymn chunks preserve newlines; reading chunks are flattened to spaces.
 - Non-Psalm reading chunks are rebalanced with the shared chunker so older payloads also benefit.
-- Missing content is blanked out. The current code avoids deleting slides.
+- Missing optional sections are pruned by default. Missing second reading removes the ref slide, body seed slide, matching response slide, and immediate blank spacer slides. Missing hymn/fixed-part lyrics remove their seed slide and immediate blank spacer slides.
+- `--keep-empty-sections` restores the older behavior where empty placeholders are blanked and slides remain.
+- Source templates are never mutated; all edits happen on the output copy.
+
+### `scripts/pptx_scan.py`
+
+Primary responsibilities:
+- read PPTX files as ZIP archives without mutating them
+- enumerate `ppt/slides/slideN.xml` in slide-number order
+- detect supported literal `{TOKEN}` placeholders by slide
+- detect supported OfficeCLI shape names by slide, including `AL_TOKEN_*` and `AL_SEED_*`
+- detect unsupported placeholder-looking tokens such as `{FOO_BAR}`
+- provide optional `officecli validate` integration for diagnostic CLIs
+
+Notable behavior:
+- The scanner is deterministic and read-only. It does not call `officecli open`, `set`, `add`, `move`, or `close`.
+- Literal placeholder detection is XML substring-based, matching the renderer's compatibility path.
+- Shape-name detection reads `p:cNvPr name="..."` attributes and only reports names that belong to the supported Auto-Lectio contract.
+
+### `scripts/lint_template.py`
+
+Primary responsibilities:
+- validate a template before render
+- fail on missing required core placeholders
+- fail on duplicate waterfall seed slides
+- warn on missing optional second reading, hymn/fixed-part, and hymn reference placeholders
+- warn on unsupported placeholder-looking tokens
+- optionally run OfficeCLI validation with `--validate`
+
+CLI behavior:
+- `0`: no lint errors, or only warnings without `--strict`
+- `1`: lint errors, or warnings when `--strict` is used
+- `2`: runtime failure such as unreadable/invalid PPTX, or required OfficeCLI missing
+
+Useful commands:
+- `venv/bin/python scripts/lint_template.py templates/custom/domingo-jgv.pptx`
+- `venv/bin/python scripts/lint_template.py templates/custom/domingo-jgv.pptx --json`
+- `venv/bin/python scripts/lint_template.py templates/custom/domingo-jgv.pptx --strict --validate`
+
+### `scripts/inspect_pptx.py`
+
+Primary responsibilities:
+- inspect any PPTX deck, especially rendered output
+- report slide count, remaining supported literal placeholders, named placeholders, and unsupported tokens
+- optionally print token locations with `--tokens`
+- optionally run OfficeCLI validation with `--validate`
+- fail rendered-output checks with `--fail-on-remaining`
+
+CLI behavior:
+- `0`: inspection succeeded and no configured failure was found
+- `1`: `--fail-on-remaining` found supported literal placeholders
+- `2`: runtime failure such as unreadable/invalid PPTX
+
+Useful commands:
+- `venv/bin/python scripts/inspect_pptx.py build/YYYY-MM-DD.es-US.pptx`
+- `venv/bin/python scripts/inspect_pptx.py build/YYYY-MM-DD.es-US.pptx --tokens`
+- `venv/bin/python scripts/inspect_pptx.py build/YYYY-MM-DD.es-US.pptx --fail-on-remaining`
 
 ### `web/app.py`
 
@@ -134,24 +198,32 @@ Hymn/fixed-part placeholders:
 
 For custom templates, the safest assumption is still one seed slide per waterfall token.
 
+Optional OfficeCLI-native shape names are also supported for future templates:
+- `AL_TOKEN_<PLACEHOLDER_NAME>` for simple placeholders, e.g. `AL_TOKEN_LITURGICAL_DAY`
+- `AL_SEED_<PLACEHOLDER_NAME>` for waterfall seed body placeholders, e.g. `AL_SEED_GOSPEL_TXT`
+
+When a matching shape name exists, `render.py` sets that shape text directly. Otherwise it falls back to the literal `{TOKEN}` text contract used by existing templates.
+
 ## Fragile spots
 
-### Placeholder replacement
+### OfficeCLI dependency
 
-The code does run-level replacement, not paragraph-level reconstruction. If PowerPoint splits a token across multiple runs, replacement may fail. Template authors should keep each token as a single contiguous text run when possible.
+Rendering requires the `officecli` binary on `PATH`. Docker installs it during image build; local development should verify `officecli --version` before rendering.
+
+### Seed discovery
+
+The renderer discovers placeholder seed slides by reading slide XML inside the PPTX package. This is read-only and does not mutate templates. Existing templates are discovered through literal `{TOKEN}` text; future templates can use stable `AL_TOKEN_*` and `AL_SEED_*` shape names.
+
+When pruning is enabled, seed locations are discovered before OfficeCLI deletes slides. OfficeCLI paths use logical slide positions after deletion, while slide XML part numbers can remain sparse, so the renderer adjusts the original seed numbers by the removed-slide set instead of rescanning the mutated package for seed positions.
 
 ### Slide duplication
 
-`duplicate_slide_filtered(...)` uses private `python-pptx` internals and XML deep-copying. It intentionally skips:
-- shapes with image relationships
-- shapes containing other known placeholder tokens
-
-That filtering reduces package corruption and duplicate-token surprises, but it also means a duplicate slide may not be a byte-for-byte copy of the seed.
+OfficeCLI clone operations replace the old private `python-pptx` XML copying. If slide order behavior changes in OfficeCLI, verify the waterfall sequence with `--verbose` and `officecli view <deck> outline`.
 
 ### Documentation sync points
 
 When placeholder support changes, update these together:
-- `render.py`: `waterfall_keys`, `known_tokens`, songs handling
+- `render.py`: `WATERFALL_KEYS`, `KNOWN_TOKENS`, songs handling
 - `web/app.py`: `PLACEHOLDER_HELP`
 - `templates/README.md`
 - `AGENTS.md` if the JSON or placeholder contract changes
@@ -165,6 +237,7 @@ When placeholder support changes, update these together:
    - long readings duplicate correctly
    - psalm alternates refrain and verse
    - hymn chunks render in order
+   - `officecli validate build/YYYY-MM-DD.es-US.pptx` succeeds
    - PowerPoint opens the result without a repair prompt
 
 ## Known drift already corrected
