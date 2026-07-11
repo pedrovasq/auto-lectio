@@ -3,377 +3,1024 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AutoLectio — Modo avanzado</title>
+    <title>AutoLectio - Modo avanzado</title>
     <style>
       :root {
-        --bg: #f4efe6;
-        --surface: #fffdf8;
-        --surface-strong: #fffaf0;
-        --line: #ded4c4;
-        --line-soft: #ece3d4;
-        --text: #2d241d;
-        --muted: #6f6255;
-        --accent: #7c3421;
-        --accent-soft: #f3dfd7;
-        --ok: #1f7a57;
-        --err: #b2402e;
-        --shadow: 0 10px 30px rgba(88, 62, 37, 0.08);
+        --bg: #121826;
+        --panel: #182133;
+        --panel-soft: #1e2a40;
+        --panel-strong: #23314d;
+        --canvas: #f5f1e8;
+        --canvas-line: #d8cebc;
+        --canvas-soft: #fffdf7;
+        --text: #f3f6fb;
+        --muted: #9cabc4;
+        --ink: #27211b;
+        --ink-soft: #64584c;
+        --accent: #da7c43;
+        --accent-strong: #f0a15f;
+        --accent-soft: rgba(218, 124, 67, 0.16);
+        --ok: #8ad2aa;
+        --err: #ff9d8d;
+        --shadow: 0 18px 40px rgba(4, 10, 18, 0.28);
+        --radius: 0px;
       }
-      * { box-sizing: border-box; }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
-        font-family: Georgia, "Times New Roman", serif;
+        min-height: 100vh;
+        overflow: hidden;
+        font-family: "Segoe UI", "Inter", sans-serif;
         background:
-          radial-gradient(circle at top, rgba(255,255,255,0.9), transparent 36%),
-          linear-gradient(180deg, #efe4d2 0%, var(--bg) 55%, #f8f3eb 100%);
+          radial-gradient(circle at top left, rgba(240, 161, 95, 0.14), transparent 22%),
+          radial-gradient(circle at bottom right, rgba(88, 126, 217, 0.16), transparent 28%),
+          linear-gradient(180deg, #0f1521 0%, var(--bg) 100%);
         color: var(--text);
       }
-      .shell {
-        max-width: 1180px;
-        margin: 0 auto;
-        padding: 28px 18px 40px;
-      }
-      .hero {
+
+      .app-shell {
         display: grid;
-        gap: 10px;
-        margin-bottom: 18px;
-        padding: 22px;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: linear-gradient(135deg, rgba(255,253,248,0.96), rgba(252,244,230,0.92));
-        box-shadow: var(--shadow);
+        grid-template-columns: 344px minmax(0, 1fr) 344px;
+        gap: 18px;
+        height: 100vh;
+        padding: 18px;
       }
-      .eyebrow {
-        margin: 0;
-        font-size: 12px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--accent);
-      }
-      h1 {
-        margin: 0;
-        font-size: clamp(30px, 5vw, 48px);
-        line-height: 0.95;
-        font-weight: 600;
-      }
-      .hero-copy {
-        max-width: 720px;
-        color: var(--muted);
-        font-size: 16px;
-        line-height: 1.5;
-      }
-      .hero-stats {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-      .stat-chip {
-        padding: 8px 12px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: rgba(255,255,255,0.72);
-        font-size: 13px;
-      }
+
+      .sidebar,
+      .inspector,
       .workspace {
         display: grid;
-        grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
         gap: 14px;
-        align-items: start;
+        align-content: start;
+        min-height: 0;
+        overflow-y: auto;
+        padding-right: 4px;
+        scrollbar-gutter: stable;
       }
-      .stack {
-        display: grid;
-        gap: 14px;
-      }
-      .card {
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--surface);
+
+      .sidebar-card,
+      .inspector-card,
+      .workspace-card {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius);
         box-shadow: var(--shadow);
-        overflow: hidden;
       }
-      .card-header {
-        padding: 16px 18px 12px;
-        border-bottom: 1px solid var(--line-soft);
-        background: linear-gradient(180deg, rgba(255,250,240,0.95), rgba(255,253,248,0.85));
+
+      .sidebar-card,
+      .inspector-card {
+        background: linear-gradient(180deg, rgba(27, 38, 58, 0.98), rgba(21, 29, 44, 0.98));
       }
-      .card-title {
+
+      .workspace-topbar,
+      .workspace-card {
+        background: linear-gradient(180deg, rgba(247, 242, 232, 0.98), rgba(244, 238, 227, 0.98));
+        color: var(--ink);
+        border: 1px solid rgba(112, 88, 60, 0.18);
+      }
+
+      .workspace-topbar {
+        padding: 12px 18px;
+        border-radius: 0;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .topbar-copy {
+        min-width: 0;
+      }
+
+      .topbar-title {
         margin: 0;
-        font-size: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #91552f;
       }
-      .card-subtitle {
-        margin: 6px 0 0;
-        color: var(--muted);
+
+      .topbar-subtitle {
+        margin: 4px 0 0;
+        color: var(--ink-soft);
         font-size: 13px;
         line-height: 1.45;
       }
-      .card-body {
-        padding: 16px 18px 18px;
+
+      .topbar-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
       }
-      .section-grid {
+
+      .topbar-chip {
+        padding: 6px 10px;
+        border: 1px solid var(--canvas-line);
+        background: rgba(255, 252, 245, 0.88);
+        font-size: 12px;
+      }
+
+      .sidebar-card {
+        padding: 18px 16px;
+      }
+
+      .brand {
         display: grid;
-        gap: 14px;
+        gap: 8px;
       }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 0;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(180deg, var(--accent) 0%, #b45c2d 100%);
+        color: #fff;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 22px;
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: 22px;
+      }
+
+      .brand p,
+      .nav-note,
+      .support-copy,
+      .card-subtitle,
+      .muted {
+        color: var(--muted);
+      }
+
+      .brand p,
+      .support-copy {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .nav-stack {
+        display: grid;
+        gap: 8px;
+      }
+
+      .nav-button {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 0;
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+        transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+      }
+
+      .nav-button:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.16);
+      }
+
+      .nav-button.is-active {
+        background: linear-gradient(180deg, rgba(218, 124, 67, 0.18), rgba(218, 124, 67, 0.08));
+        border-color: rgba(240, 161, 95, 0.48);
+        transform: translateX(2px);
+      }
+
+      .nav-title {
+        display: block;
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .nav-description {
+        display: block;
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+
+      .nav-note {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .support-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 10px;
+      }
+
+      .support-item {
+        padding: 11px 12px;
+        border-radius: 0;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .support-item strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+
+      .view {
+        display: none;
+        gap: 16px;
+      }
+
+      .view.is-active {
+        display: grid;
+      }
+
+      .workspace-card {
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .card-header {
+        padding: 22px 24px 14px;
+        border-bottom: 1px solid rgba(112, 88, 60, 0.16);
+        background: linear-gradient(180deg, rgba(255, 253, 248, 0.96), rgba(245, 239, 228, 0.92));
+      }
+
+      .card-title {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 28px;
+      }
+
+      .card-subtitle {
+        margin: 8px 0 0;
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--ink-soft);
+      }
+
+      .card-body {
+        padding: 22px 24px 24px;
+      }
+
+      .workspace-grid {
+        display: grid;
+        gap: 16px;
+      }
+
       .two-up {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 14px;
       }
-      .setup-grid {
+
+      .three-up {
         display: grid;
-        grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 14px;
       }
+
+      .overview-tile,
+      .info-panel,
+      .song-card,
+      .fixed-card,
+      .inspect-box,
+      .result-pre,
+      #log {
+        border-radius: 0;
+      }
+
+      .overview-tile,
+      .info-panel,
+      .song-card,
+      .fixed-card,
+      .inspect-box {
+        padding: 16px;
+        border: 1px solid var(--canvas-line);
+        background: rgba(255, 252, 246, 0.92);
+      }
+
+      .overview-tile strong,
+      .info-panel strong {
+        display: block;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #8a5a37;
+      }
+
+      .overview-tile span,
+      .info-panel span {
+        display: block;
+        margin-top: 8px;
+        font-size: 16px;
+        line-height: 1.45;
+      }
+
+      .info-panel h3,
+      .inspect-box h3,
+      .song-title {
+        margin: 0 0 10px;
+        font-size: 17px;
+      }
+
       .song-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        gap: 14px;
       }
+
       .song-card {
-        border: 1px solid var(--line-soft);
-        border-radius: 6px;
-        padding: 12px;
-        background: var(--surface-strong);
+        display: grid;
+        gap: 10px;
       }
-      .song-title {
-        margin: 0 0 8px;
-        font-size: 15px;
+
+      .song-card.full {
+        grid-column: 1 / -1;
       }
+
       .fixed-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
+        gap: 12px;
       }
-      .fixed-card {
-        border: 1px solid var(--line-soft);
-        border-radius: 6px;
-        padding: 12px;
-        background: #fff;
-      }
+
       .fixed-card strong {
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
       }
-      label { display: block; margin: 6px 0 4px; font-weight: 600; font-size: 13px; }
-      input[type="text"], input[type="date"], select {
-        width: 100%;
-        max-width: none;
-        padding: 10px 12px;
-        border: 1px solid var(--line);
-        border-radius: 4px;
-        background: #fff;
-        color: var(--text);
+
+      .control-stack {
+        display: grid;
+        gap: 12px;
       }
+
+      .control-group {
+        display: grid;
+        gap: 8px;
+      }
+
+      label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      input[type="text"],
+      input[type="file"],
+      select,
       textarea {
         width: 100%;
-        max-width: none;
-        min-height: 92px;
-        padding: 10px 12px;
-        border: 1px solid var(--line);
-        border-radius: 4px;
-        background: #fff;
-        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 0;
+        padding: 11px 12px;
+        font: inherit;
+        color: inherit;
+        background: rgba(7, 11, 18, 0.18);
+      }
+
+      select {
+        -webkit-appearance: none;
+        appearance: none;
+        background-image: none;
+      }
+
+      select::-ms-expand {
+        display: none;
+      }
+
+      .workspace-card input[type="text"],
+      .workspace-card input[type="file"],
+      .workspace-card select,
+      .workspace-card textarea {
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.82);
+        border-color: var(--canvas-line);
+      }
+
+      textarea {
+        min-height: 120px;
         resize: vertical;
       }
-      .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-      .control {
-        display: grid;
-        gap: 6px;
-      }
-      .check-row {
-        display: flex;
-        gap: 16px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-      .check-row label,
-      .radio-row label {
-        margin: 0;
-        font-weight: 500;
-      }
-      .inline-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-      .inline-actions.grow > *:first-child { flex: 1 1 240px; }
-      .setup-meta { min-height: 16px; }
-      .radio-row {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
+
       button {
-        padding: 9px 13px;
-        border-radius: 4px;
-        border: 1px solid var(--line);
-        background: #fff;
-        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 0;
+        background: rgba(255, 255, 255, 0.06);
+        color: inherit;
+        padding: 10px 12px;
+        font: inherit;
+        font-weight: 700;
         cursor: pointer;
-        font-weight: 600;
       }
+
       button.primary {
-        background: var(--accent);
-        border-color: var(--accent);
-        color: #fffaf7;
+        background: linear-gradient(180deg, var(--accent) 0%, #be642f 100%);
+        border-color: rgba(240, 161, 95, 0.55);
+        color: #fffaf4;
       }
+
       button.secondary {
-        background: var(--surface-strong);
+        background: rgba(255, 255, 255, 0.03);
       }
-      #log {
+
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      .inline-actions,
+      .radio-row,
+      .check-row,
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .inline-actions.grow > *:first-child {
+        flex: 1 1 180px;
+      }
+
+      .radio-row label,
+      .check-row label {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: normal;
+        text-transform: none;
+      }
+
+      .workspace-card .radio-row label,
+      .workspace-card .check-row label {
+        color: var(--ink);
+      }
+
+      .inspector-card {
+        padding: 18px 16px;
+      }
+
+      .inspector-title {
+        margin: 0 0 4px;
+        font-size: 16px;
+      }
+
+      .state-lines {
+        display: grid;
+        gap: 8px;
+      }
+
+      .state-line {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .state-line strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #fff;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .status-pill.ok {
+        color: var(--ok);
+        border-color: rgba(138, 210, 170, 0.25);
+      }
+
+      .status-pill.err {
+        color: var(--err);
+        border-color: rgba(255, 157, 141, 0.25);
+      }
+
+      #log,
+      .result-pre {
         white-space: pre-wrap;
-        background: #fff;
-        border: 1px solid var(--line-soft);
-        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(7, 11, 18, 0.26);
         padding: 14px;
-        min-height: 120px;
+        min-height: 180px;
+        color: #edf3fb;
       }
-      .muted { color: var(--muted); font-size: 12px; }
-      .ok { color: var(--ok); }
-      .err { color: var(--err); }
-      a { color: var(--accent); text-decoration: none; }
-      .panel { border: 1px solid var(--line); padding: 12px; margin-top: 16px; border-radius: 6px; background: var(--surface); }
-      .ph-list { list-style: none; padding-left: 0; margin: 10px 0 0; }
-      .ph-item { padding: 8px 0; border-bottom: 1px dotted var(--line-soft); break-inside: avoid; }
-      .ph-item:last-child { border-bottom: 0; }
-      code { background: #f7efe4; padding: 1px 5px; border-radius: 3px; }
-      .badge { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 4px; background: #efe4d8; color: #5b4233; margin-left: 6px; vertical-align: middle; }
-      .badge.waterfall { background: #dff2e9; color: var(--ok); }
-      .status-grid { display: grid; gap: 4px; }
-      .result-block { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line-soft); }
-      .result-block:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
-      .result-label { font-weight: 600; }
-      .result-pre { white-space: pre-wrap; background: #fff; border: 1px solid var(--line-soft); border-radius: 4px; padding: 8px; margin: 6px 0 0; }
-      .preview-grid { display: grid; gap: 8px; }
-      .preview-card { border: 1px solid var(--line-soft); padding: 12px; background: #fcfcfc; border-radius: 6px; }
-      .preview-title { font-weight: 600; margin-bottom: 4px; }
-      .preview-list { list-style: none; padding-left: 0; margin: 8px 0 0; }
-      .preview-list li { padding: 6px 0; border-bottom: 1px dotted var(--line-soft); }
-      .preview-list li:last-child { border-bottom: 0; }
-      button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+      .status-grid,
+      .preview-grid,
       .inspect-grid {
         display: grid;
-        gap: 10px;
+        gap: 12px;
       }
-      .inspect-box {
-        border: 1px solid var(--line-soft);
-        border-radius: 6px;
-        padding: 12px;
-        background: #fff;
+
+      .preview-card {
+        border: 1px solid var(--canvas-line);
+        border-radius: 0;
+        padding: 16px;
+        background: rgba(255, 252, 246, 0.94);
       }
-      .inspect-box h3 {
-        margin: 0 0 8px;
-        font-size: 15px;
+
+      .preview-title {
+        margin-bottom: 8px;
+        font-weight: 700;
+        font-size: 16px;
       }
+
+      .preview-list,
+      .ph-list,
+      .seed-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .preview-list li,
+      .ph-item,
+      .seed-list li {
+        padding: 8px 0;
+        border-bottom: 1px dotted rgba(112, 88, 60, 0.18);
+      }
+
+      .preview-list li:last-child,
+      .ph-item:last-child,
+      .seed-list li:last-child {
+        border-bottom: 0;
+      }
+
       .placeholder-grid {
-        column-count: 2;
-        column-gap: 22px;
+        columns: 2;
+        column-gap: 20px;
       }
-      @media (max-width: 940px) {
+
+      .ph-item {
+        break-inside: avoid;
+      }
+
+      .badge {
+        display: inline-block;
+        margin-left: 6px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        background: rgba(218, 124, 67, 0.12);
+        color: #91552f;
+      }
+
+      .badge.waterfall {
+        background: rgba(78, 156, 106, 0.12);
+        color: #2f6d45;
+      }
+
+      .result-block {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .result-block:first-child {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: 0;
+      }
+
+      .result-label {
+        font-weight: 700;
+      }
+
+      .ok {
+        color: var(--ok);
+      }
+
+      .err {
+        color: var(--err);
+      }
+
+      code {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        background: rgba(255, 255, 255, 0.07);
+        padding: 2px 6px;
+        border-radius: 0;
+      }
+
+      .sidebar::-webkit-scrollbar,
+      .workspace::-webkit-scrollbar,
+      .inspector::-webkit-scrollbar {
+        width: 14px;
+      }
+
+      .sidebar::-webkit-scrollbar-button,
+      .workspace::-webkit-scrollbar-button,
+      .inspector::-webkit-scrollbar-button {
+        -webkit-appearance: none;
+        appearance: none;
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        max-width: 0 !important;
+        max-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+      }
+
+      .sidebar::-webkit-scrollbar-button:single-button,
+      .workspace::-webkit-scrollbar-button:single-button,
+      .inspector::-webkit-scrollbar-button:single-button,
+      .sidebar::-webkit-scrollbar-button:double-button,
+      .workspace::-webkit-scrollbar-button:double-button,
+      .inspector::-webkit-scrollbar-button:double-button,
+      .sidebar::-webkit-scrollbar-button:start,
+      .workspace::-webkit-scrollbar-button:start,
+      .inspector::-webkit-scrollbar-button:start,
+      .sidebar::-webkit-scrollbar-button:end,
+      .workspace::-webkit-scrollbar-button:end,
+      .inspector::-webkit-scrollbar-button:end,
+      .sidebar::-webkit-scrollbar-button:vertical:start:decrement,
+      .workspace::-webkit-scrollbar-button:vertical:start:decrement,
+      .inspector::-webkit-scrollbar-button:vertical:start:decrement,
+      .sidebar::-webkit-scrollbar-button:vertical:end:increment,
+      .workspace::-webkit-scrollbar-button:vertical:end:increment,
+      .inspector::-webkit-scrollbar-button:vertical:end:increment,
+      .sidebar::-webkit-scrollbar-button:vertical:start:increment,
+      .workspace::-webkit-scrollbar-button:vertical:start:increment,
+      .inspector::-webkit-scrollbar-button:vertical:start:increment,
+      .sidebar::-webkit-scrollbar-button:vertical:end:decrement,
+      .workspace::-webkit-scrollbar-button:vertical:end:decrement,
+      .inspector::-webkit-scrollbar-button:vertical:end:decrement,
+      .sidebar::-webkit-scrollbar-button:horizontal:start:decrement,
+      .workspace::-webkit-scrollbar-button:horizontal:start:decrement,
+      .inspector::-webkit-scrollbar-button:horizontal:start:decrement,
+      .sidebar::-webkit-scrollbar-button:horizontal:end:increment,
+      .workspace::-webkit-scrollbar-button:horizontal:end:increment,
+      .inspector::-webkit-scrollbar-button:horizontal:end:increment,
+      .sidebar::-webkit-scrollbar-button:horizontal:start:increment,
+      .workspace::-webkit-scrollbar-button:horizontal:start:increment,
+      .inspector::-webkit-scrollbar-button:horizontal:start:increment,
+      .sidebar::-webkit-scrollbar-button:horizontal:end:decrement,
+      .workspace::-webkit-scrollbar-button:horizontal:end:decrement,
+      .inspector::-webkit-scrollbar-button:horizontal:end:decrement {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        max-width: 0 !important;
+        max-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+      }
+
+      .sidebar::-webkit-scrollbar-thumb,
+      .workspace::-webkit-scrollbar-thumb,
+      .inspector::-webkit-scrollbar-thumb {
+        border: 2px solid transparent;
+        border-radius: 0;
+        background-clip: padding-box;
+      }
+
+      .sidebar::-webkit-scrollbar-track,
+      .workspace::-webkit-scrollbar-track,
+      .inspector::-webkit-scrollbar-track {
+        border-radius: 0;
+      }
+
+      .sidebar,
+      .inspector {
+        scrollbar-width: auto;
+        scrollbar-color: rgba(240, 161, 95, 0.72) rgba(255, 255, 255, 0.06);
+      }
+
+      .workspace {
+        scrollbar-width: auto;
+        scrollbar-color: rgba(145, 85, 47, 0.78) rgba(122, 97, 65, 0.14);
+      }
+
+      .sidebar::-webkit-scrollbar-thumb,
+      .inspector::-webkit-scrollbar-thumb {
+        background-color: rgba(240, 161, 95, 0.78);
+      }
+
+      .workspace::-webkit-scrollbar-thumb {
+        background-color: rgba(145, 85, 47, 0.78);
+      }
+
+      .sidebar::-webkit-scrollbar-thumb:hover,
+      .inspector::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 187, 120, 0.92);
+      }
+
+      .workspace::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(170, 101, 57, 0.94);
+      }
+
+      .sidebar::-webkit-scrollbar-track,
+      .inspector::-webkit-scrollbar-track {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      }
+
+      .workspace::-webkit-scrollbar-track {
+        background: linear-gradient(180deg, rgba(132, 101, 68, 0.16), rgba(132, 101, 68, 0.07));
+      }
+
+      .sidebar::-webkit-scrollbar-corner,
+      .workspace::-webkit-scrollbar-corner,
+      .inspector::-webkit-scrollbar-corner {
+        background: transparent;
+      }
+
+      .workspace-card code {
+        background: rgba(138, 108, 72, 0.12);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .workspace-card a {
+        color: #91552f;
+      }
+
+      @media (max-width: 1320px) {
+        .app-shell {
+          grid-template-columns: 310px minmax(0, 1fr) 310px;
+        }
+      }
+
+      @media (max-width: 1080px) {
+        body {
+          overflow: auto;
+        }
+
+        .app-shell {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+
+        .sidebar,
         .workspace,
-        .setup-grid,
+        .inspector {
+          order: initial;
+          overflow: visible;
+          min-height: auto;
+          padding-right: 0;
+        }
+
+        .nav-stack {
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        .nav-button {
+          min-height: 100%;
+        }
+
+        .placeholder-grid {
+          columns: 1;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .nav-stack,
         .two-up,
+        .three-up,
         .song-grid,
         .fixed-grid {
           grid-template-columns: 1fr;
         }
-        .placeholder-grid {
-          column-count: 1;
+
+        .app-shell {
+          padding: 12px;
+        }
+
+        .workspace-topbar,
+        .card-header,
+        .card-body,
+        .sidebar-card,
+        .inspector-card {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .workspace-topbar {
+          display: grid;
+          justify-content: stretch;
         }
       }
     </style>
   </head>
   <body>
-    <div class="shell">
-      <section class="hero">
-        <p class="eyebrow">USCCB → JSON → PPTX</p>
-        <h1>AutoLectio</h1>
-        <div class="hero-copy">
-          Preparar la presentación de la Misa debería sentirse como un flujo claro: elegir la fecha, escoger la plantilla, revisar el payload y generar el PPTX sin adivinar rutas internas.
-        </div>
-        <div class="hero-stats">
-          <div class="stat-chip">1. Elegir fecha</div>
-          <div class="stat-chip">2. Elegir plantilla</div>
-          <div class="stat-chip">3. Revisar preview</div>
-          <div class="stat-chip">4. Generar PPTX</div>
-        </div>
-      </section>
-
-      <div class="workspace">
-        <div class="stack">
-          <section class="card">
-            <div class="card-header">
-              <h2 class="card-title">Configuración</h2>
-              <p class="card-subtitle">Defina la fecha litúrgica, elija la plantilla y controle cómo se escribe la salida.</p>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <section class="sidebar-card">
+          <div class="brand">
+            <div class="brand-mark">A</div>
+            <div>
+              <h1>AutoLectio</h1>
+              <p>Modo avanzado para operar el flujo completo de lecturas, plantillas y build sin perder el estado de la sesión.</p>
             </div>
-            <div class="card-body section-grid">
-              <div class="setup-grid">
-                <div class="control">
-                  <label for="date">Fecha disponible</label>
-                  <div class="inline-actions grow">
-                    <select id="date">
-                      <option value="">Cargando fechas...</option>
-                    </select>
-                    <button id="btn-refresh-dates" class="secondary" type="button">Actualizar fechas</button>
-                  </div>
-                  <div id="date-meta" class="muted setup-meta">Leyendo el feed RSS…</div>
+          </div>
+        </section>
+
+        <section class="sidebar-card">
+          <p class="eyebrow">Workspace</p>
+          <div class="nav-stack">
+            <button class="nav-button is-active" type="button" data-view-target="session">
+              <span class="nav-title">Session</span>
+              <span class="nav-description">Estado general, fecha, payload y ritmo del flujo.</span>
+            </button>
+            <button class="nav-button" type="button" data-view-target="readings">
+              <span class="nav-title">Readings</span>
+              <span class="nav-description">Preview del payload cargado y estructura litúrgica.</span>
+            </button>
+            <button class="nav-button" type="button" data-view-target="template">
+              <span class="nav-title">Template</span>
+              <span class="nav-description">Plantilla activa, upload, inspección y placeholders.</span>
+            </button>
+            <button class="nav-button" type="button" data-view-target="songs">
+              <span class="nav-title">Songs</span>
+              <span class="nav-description">Himnos libres y partes fijas para el render.</span>
+            </button>
+            <button class="nav-button" type="button" data-view-target="build">
+              <span class="nav-title">Build</span>
+              <span class="nav-description">Acciones, salida, errores y enlaces al PPTX final.</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="sidebar-card">
+          <p class="eyebrow">Notas</p>
+          <p class="nav-note">El flujo recomendado sigue siendo: cargar fecha, revisar payload, validar plantilla, añadir cantos y ejecutar `Fetch + Render`.</p>
+        </section>
+
+        <section class="sidebar-card">
+          <p class="eyebrow">Guardrails</p>
+          <ul class="support-list">
+            <li class="support-item">
+              <strong>Payload explícito</strong>
+              <span class="support-copy">`Solo Render` se mantiene bloqueado hasta cargar o generar un JSON real.</span>
+            </li>
+            <li class="support-item">
+              <strong>Template inspection</strong>
+              <span class="support-copy">Los seeds waterfall siguen visibles para detectar problemas antes del build.</span>
+            </li>
+            <li class="support-item">
+              <strong>Same backend contract</strong>
+              <span class="support-copy">La UI nueva usa las mismas rutas `/fetch`, `/render`, `/run`, `/upload` y `/templates/inspect`.</span>
+            </li>
+          </ul>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <section class="workspace-topbar">
+          <div class="topbar-copy">
+            <p class="topbar-title">Modo avanzado</p>
+            <p class="topbar-subtitle">Centro con vista activa, rieles persistentes para navegación y operación.</p>
+          </div>
+          <div class="topbar-status">
+            <div class="topbar-chip">USCCB -> JSON -> PPTX</div>
+            <div class="topbar-chip">3-column workspace</div>
+          </div>
+        </section>
+
+        <section id="view-session" class="view is-active" data-view="session">
+          <article class="workspace-card">
+            <div class="card-header">
+              <h2 class="card-title">Session Overview</h2>
+              <p class="card-subtitle">Este panel resume el estado actual de la fecha, el payload, la plantilla y el render. Sirve como punto de entrada para decidir en qué parte del flujo necesita trabajar.</p>
+            </div>
+            <div class="card-body workspace-grid">
+              <div class="three-up">
+                <div class="overview-tile">
+                  <strong>Fecha activa</strong>
+                  <span id="session-date-summary">Sin seleccionar</span>
                 </div>
-                <div class="control">
-                  <label for="templateSelect">Plantilla PPTX</label>
-                  <div class="inline-actions grow">
-                    <select id="templateSelect">
-                      <option value="">Cargando plantillas...</option>
-                    </select>
-                    <button id="btn-refresh-templates" class="secondary" type="button">Actualizar lista</button>
-                  </div>
-                  <div id="template-meta" class="muted setup-meta">Cargando opciones de plantilla...</div>
+                <div class="overview-tile">
+                  <strong>Payload actual</strong>
+                  <span id="session-payload-summary">No hay JSON cargado</span>
+                </div>
+                <div class="overview-tile">
+                  <strong>Plantilla activa</strong>
+                  <span id="session-template-summary">No hay plantilla seleccionada</span>
                 </div>
               </div>
-
               <div class="two-up">
-                <div class="control">
-                  <label for="payloadSelect">Payload JSON</label>
-                  <div class="inline-actions grow">
-                    <select id="payloadSelect">
-                      <option value="">Cargando payloads...</option>
-                    </select>
-                    <button id="btn-refresh-payloads" class="secondary" type="button">Actualizar lista</button>
-                    <button id="btn-load-payload" class="secondary" type="button">Cargar payload</button>
+                <div class="info-panel">
+                  <h3>Mapa del flujo</h3>
+                  <div class="preview-list">
+                    <div>1. Seleccione fecha y aclamación desde la columna derecha.</div>
+                    <div>2. En `Readings`, confirme que el payload tiene las secciones esperadas.</div>
+                    <div>3. En `Template`, valide placeholders y seeds waterfall.</div>
+                    <div>4. En `Songs`, pegue estrofas y elija partes fijas.</div>
+                    <div>5. Lance `Fetch + Render` o ejecute fetch/render por separado.</div>
                   </div>
-                  <div id="payload-meta" class="muted setup-meta">Leyendo payloads locales…</div>
                 </div>
-                <div class="control">
-                  <label for="templateFile">Subir nueva plantilla</label>
-                  <div class="inline-actions">
+                <div class="info-panel">
+                  <h3>Estado del build</h3>
+                  <div class="preview-list">
+                    <div id="session-build-summary">Sin resultados recientes.</div>
+                    <div id="session-output-summary">Salida PPTX: ninguna.</div>
+                    <div id="session-song-summary">Cantos libres: ninguno.</div>
+                    <div id="session-mode-summary">Aclamación: Ordinaria.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section id="view-readings" class="view" data-view="readings">
+          <article class="workspace-card">
+            <div class="card-header">
+              <h2 class="card-title">Readings Payload</h2>
+              <p class="card-subtitle">Revise el payload cargado, su origen y la estructura de las lecturas antes de disparar el render.</p>
+            </div>
+            <div class="card-body">
+              <div id="payload-preview" class="muted">Todavía no hay payload cargado.</div>
+            </div>
+          </article>
+        </section>
+
+        <section id="view-template" class="view" data-view="template">
+          <article class="workspace-card">
+            <div class="card-header">
+              <h2 class="card-title">Template Workspace</h2>
+              <p class="card-subtitle">La plantilla activa se controla desde la derecha. Aquí puede subir una nueva, inspeccionar sus placeholders y revisar el contrato soportado.</p>
+            </div>
+            <div class="card-body workspace-grid">
+              <div class="two-up">
+                <div class="info-panel">
+                  <h3>Subir nueva plantilla</h3>
+                  <div class="control-stack">
                     <input type="file" id="templateFile" accept=".pptx" />
                     <button id="btn-upload" class="secondary" type="button">Subir .pptx</button>
+                    <div class="muted">Las plantillas subidas permanecen disponibles en `templates/uploads/` y vuelven a aparecer en el selector.</div>
                   </div>
-                  <div class="muted">Las plantillas subidas permanecen disponibles para reutilizarlas en sesiones futuras.</div>
                 </div>
-                <div class="control" style="grid-column: 1 / -1;">
-                  <label>Opciones de salida</label>
-                  <div class="check-row">
-                    <label><input type="checkbox" id="stamp" checked /> Añadir timestamp</label>
-                    <label><input type="checkbox" id="verbose" /> Verbose</label>
-                  </div>
-                  <div class="muted">Los archivos se escriben en <code>out/</code> (JSON) y <code>build/</code> (PPTX).</div>
-                  <div id="json-state" class="muted">JSON actual: ninguno.</div>
-                  <div id="payload-source-state" class="muted">Origen del payload: ninguno.</div>
-                </div>
-                <div class="control" style="grid-column: 1 / -1;">
-                  <label>Aclamación antes del Evangelio</label>
-                  <div class="radio-row">
-                    <label><input type="radio" name="acclamationMode" value="ordinary" checked> Ordinaria</label>
-                    <label><input type="radio" name="acclamationMode" value="lent"> Cuaresma</label>
-                  </div>
-                  <div class="muted">La selección controla el texto de la respuesta de la aclamación.</div>
+                <div class="info-panel">
+                  <h3>Plantilla actual</h3>
+                  <div id="template-meta" class="muted">Cargando opciones de plantilla...</div>
+                  <div style="margin-top: 12px;" id="template-quick-status"></div>
                 </div>
               </div>
-            </div>
-          </section>
 
-          <section class="card">
-            <div class="card-header">
-              <h2 class="card-title">Cantos</h2>
-              <p class="card-subtitle">Pegue textos libres por estrofas y seleccione las partes fijas que deben entrar al deck.</p>
+              <div class="info-panel">
+                <h3>Inspección</h3>
+                <div id="template-inspection" class="muted">Seleccione una plantilla para ver su inspección.</div>
+              </div>
+
+              <div class="info-panel">
+                <h3>Placeholders soportados</h3>
+                <ul id="ph-list" class="ph-list placeholder-grid"><li class="ph-item muted">Cargando...</li></ul>
+                <div id="ph-notes" class="muted" style="margin-top: 10px;"></div>
+              </div>
             </div>
-            <div class="card-body section-grid">
+          </article>
+        </section>
+
+        <section id="view-songs" class="view" data-view="songs">
+          <article class="workspace-card">
+            <div class="card-header">
+              <h2 class="card-title">Songs and Fixed Parts</h2>
+              <p class="card-subtitle">Separe estrofas con una línea en blanco. Las partes fijas siguen resolviéndose desde `songs/parts/` para mantener el contrato de render intacto.</p>
+            </div>
+            <div class="card-body workspace-grid">
               <div class="song-grid">
                 <div class="song-card">
                   <h3 class="song-title">Entrada <code>{ENTRANCE_TXT}</code></h3>
@@ -386,16 +1033,16 @@
                   <input type="text" id="songs-offertory-ref" placeholder="Referencia opcional" />
                 </div>
                 <div class="song-card">
-                  <h3 class="song-title">Comunión <code>{COMMUNION_TXT}</code></h3>
+                  <h3 class="song-title">Comunion <code>{COMMUNION_TXT}</code></h3>
                   <textarea id="songs-communion" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
                   <input type="text" id="songs-communion-ref" placeholder="Referencia opcional" />
                 </div>
                 <div class="song-card">
-                  <h3 class="song-title">Meditación <code>{MEDITATION_TXT}</code></h3>
+                  <h3 class="song-title">Meditacion <code>{MEDITATION_TXT}</code></h3>
                   <textarea id="songs-meditation" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
                   <input type="text" id="songs-meditation-ref" placeholder="Referencia opcional" />
                 </div>
-                <div class="song-card">
+                <div class="song-card full">
                   <h3 class="song-title">Salida <code>{RECESSIONAL_TXT}</code></h3>
                   <textarea id="songs-recessional" placeholder="Estrofa 1...\n\nEstrofa 2..."></textarea>
                   <input type="text" id="songs-recessional-ref" placeholder="Referencia opcional" />
@@ -406,8 +1053,8 @@
                 <div class="fixed-card">
                   <strong>Kyrie <code>{KYRIE_TXT}</code></strong>
                   <div class="radio-row">
-                    <label><input type="radio" name="kyrieLang" value="es" checked> Español</label>
-                    <label><input type="radio" name="kyrieLang" value="la"> Latín</label>
+                    <label><input type="radio" name="kyrieLang" value="es" checked /> Espanol</label>
+                    <label><input type="radio" name="kyrieLang" value="la" /> Latin</label>
                   </div>
                 </div>
                 <div class="fixed-card">
@@ -420,93 +1067,165 @@
                 <div class="fixed-card">
                   <strong>Santo <code>{SANCTUS_TXT}</code></strong>
                   <div class="radio-row">
-                    <label><input type="radio" name="sanctusLang" value="es" checked> Español</label>
-                    <label><input type="radio" name="sanctusLang" value="la"> Latín</label>
+                    <label><input type="radio" name="sanctusLang" value="es" checked /> Espanol</label>
+                    <label><input type="radio" name="sanctusLang" value="la" /> Latin</label>
                   </div>
                 </div>
                 <div class="fixed-card">
                   <strong>Cordero <code>{AGNUS_TXT}</code></strong>
                   <div class="radio-row">
-                    <label><input type="radio" name="agnusLang" value="es" checked> Español</label>
-                    <label><input type="radio" name="agnusLang" value="la"> Latín</label>
+                    <label><input type="radio" name="agnusLang" value="es" checked /> Espanol</label>
+                    <label><input type="radio" name="agnusLang" value="la" /> Latin</label>
                   </div>
                 </div>
                 <div class="fixed-card">
                   <strong>Misterio de la Fe <code>{MYSTERIUM_TXT}</code></strong>
-                  <div class="radio-row" style="margin-bottom:8px;">
-                    <label><input type="radio" name="mysteriumLang" value="es" checked> Español</label>
-                    <label><input type="radio" name="mysteriumLang" value="la"> Latín</label>
+                  <div class="radio-row" style="margin-bottom: 10px;">
+                    <label><input type="radio" name="mysteriumLang" value="es" checked /> Espanol</label>
+                    <label><input type="radio" name="mysteriumLang" value="la" /> Latin</label>
                   </div>
-                  <label for="mysteriumVersion">Opción</label>
+                  <label for="mysteriumVersion">Opcion</label>
                   <select id="mysteriumVersion">
-                    <option value="1">1) Anunciamos tu muerte</option>
-                    <option value="2">2) Cada vez que comemos</option>
-                    <option value="3">3) Por tu cruz y resurrección</option>
+                    <option value="1">1. Anunciamos tu muerte</option>
+                    <option value="2">2. Cada vez que comemos</option>
+                    <option value="3">3. Por tu cruz y resurreccion</option>
                   </select>
                 </div>
               </div>
             </div>
-          </section>
+          </article>
+        </section>
 
-          <section class="card">
+        <section id="view-build" class="view" data-view="build">
+          <article class="workspace-card">
             <div class="card-header">
-              <h2 class="card-title">Acciones</h2>
-              <p class="card-subtitle">Use fetch para cargar el payload, render para generar desde un payload ya cargado, o ejecute el flujo completo de una vez.</p>
+              <h2 class="card-title">Build Notes</h2>
+              <p class="card-subtitle">Las acciones siguen estando disponibles desde la derecha para no perderlas de vista. Esta vista resume cómo se interpretará la sesión actual cuando haga fetch, render o ambas cosas.</p>
             </div>
-            <div class="card-body">
-              <div class="row">
-                <button id="btn-fetch" class="secondary">Solo Fetch</button>
-                <button id="btn-render">Solo Render</button>
-                <button id="btn-run" class="primary">Fetch + Render</button>
+            <div class="card-body workspace-grid">
+              <div class="two-up">
+                <div class="info-panel">
+                  <h3>Antes de ejecutar</h3>
+                  <div class="preview-list">
+                    <div>Confirme que la fecha elegida exista en el feed RSS.</div>
+                    <div>Si va a usar `Solo Render`, asegúrese de tener un payload cargado.</div>
+                    <div>Valide seeds waterfall en la plantilla si cambió el PPTX.</div>
+                    <div>Revise cantos y referencias opcionales si el deck los necesita.</div>
+                  </div>
+                </div>
+                <div class="info-panel">
+                  <h3>Estado interpretado</h3>
+                  <div class="preview-list">
+                    <div id="build-interpretation-date">Fecha: sin seleccionar.</div>
+                    <div id="build-interpretation-payload">Payload: ninguno.</div>
+                    <div id="build-interpretation-template">Plantilla: ninguna.</div>
+                    <div id="build-interpretation-flags">Flags: stamp ON, verbose OFF.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="info-panel">
+                <h3>Resultado reciente</h3>
+                <div id="build-output-summary" class="muted">Todavia no hay una salida generada.</div>
               </div>
             </div>
-          </section>
-        </div>
+          </article>
+        </section>
+      </main>
 
-        <div class="stack">
-          <section class="card">
-            <div class="card-header">
-              <h2 class="card-title">Preview</h2>
-              <p class="card-subtitle">Revise el payload cargado y el estado actual de los cantos antes de generar la presentación.</p>
+      <aside class="inspector">
+        <section class="inspector-card">
+          <p class="eyebrow">Controls</p>
+          <div class="control-stack">
+            <div class="control-group">
+              <label for="date">Fecha disponible</label>
+              <div class="inline-actions grow">
+                <select id="date">
+                  <option value="">Cargando fechas...</option>
+                </select>
+                <button id="btn-refresh-dates" class="secondary" type="button">Actualizar</button>
+              </div>
+              <div id="date-meta" class="muted">Leyendo el feed RSS...</div>
             </div>
-            <div class="card-body">
-              <div id="payload-preview" class="muted">Todavía no hay payload cargado.</div>
-            </div>
-          </section>
 
-          <section class="card">
-            <div class="card-header">
-              <h2 class="card-title">Resultado</h2>
-              <p class="card-subtitle">Aquí aparecen los mensajes de fetch, render, errores del backend y enlaces de descarga.</p>
+            <div class="control-group">
+              <label for="payloadSelect">Payload JSON</label>
+              <div class="inline-actions grow">
+                <select id="payloadSelect">
+                  <option value="">Cargando payloads...</option>
+                </select>
+              </div>
+              <div class="inline-actions">
+                <button id="btn-refresh-payloads" class="secondary" type="button">Actualizar</button>
+                <button id="btn-load-payload" class="secondary" type="button">Cargar</button>
+              </div>
+              <div id="payload-meta" class="muted">Leyendo payloads locales...</div>
             </div>
-            <div class="card-body">
-              <div id="log">Listo.</div>
-            </div>
-          </section>
 
-          <section class="card">
-            <div class="card-header">
-              <h2 class="card-title">Inspección de Plantilla</h2>
-              <p class="card-subtitle">Revise qué placeholders soportados existen en la plantilla seleccionada y si los seeds waterfall están bien formados.</p>
+            <div class="control-group">
+              <label for="templateSelect">Plantilla PPTX</label>
+              <div class="inline-actions grow">
+                <select id="templateSelect">
+                  <option value="">Cargando plantillas...</option>
+                </select>
+                <button id="btn-refresh-templates" class="secondary" type="button">Actualizar</button>
+              </div>
             </div>
-            <div class="card-body">
-              <div id="template-inspection" class="muted">Seleccione una plantilla para ver su inspección.</div>
+
+            <div class="control-group">
+              <label>Aclamacion antes del Evangelio</label>
+              <div class="radio-row">
+                <label><input type="radio" name="acclamationMode" value="ordinary" checked /> Ordinaria</label>
+                <label><input type="radio" name="acclamationMode" value="lent" /> Cuaresma</label>
+              </div>
             </div>
-          </section>
 
-        </div>
-      </div>
+            <div class="control-group">
+              <label>Opciones de salida</label>
+              <div class="check-row">
+                <label><input type="checkbox" id="stamp" checked /> Timestamp</label>
+                <label><input type="checkbox" id="verbose" /> Verbose</label>
+              </div>
+              <div class="muted">Los archivos se escriben en <code>out/</code> y <code>build/</code>.</div>
+            </div>
+          </div>
+        </section>
 
-      <section class="card" style="margin-top:18px;">
-        <div class="card-header">
-          <h2 class="card-title">Placeholders de la Plantilla</h2>
-          <p class="card-subtitle">Inserte estos tokens exactamente como aparecen en cuadros de texto del PPTX.</p>
-        </div>
-        <div class="card-body">
-          <ul id="ph-list" class="ph-list placeholder-grid"><li class="ph-item muted">Cargando…</li></ul>
-          <div id="ph-notes" class="muted" style="margin-top:8px;"></div>
-        </div>
-      </section>
+        <section class="inspector-card">
+          <p class="eyebrow">Session State</p>
+          <div class="state-lines">
+            <div class="state-line">
+              <strong>JSON actual</strong>
+              <div id="json-state">JSON actual: ninguno.</div>
+            </div>
+            <div class="state-line">
+              <strong>Origen del payload</strong>
+              <div id="payload-source-state">Origen del payload: ninguno.</div>
+            </div>
+            <div class="state-line">
+              <strong>Estado de la plantilla</strong>
+              <div id="template-state-copy">Plantilla: ninguna.</div>
+            </div>
+            <div class="state-line">
+              <strong>Build status</strong>
+              <div id="build-status-pill"><span class="status-pill">Sin ejecutar</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="inspector-card">
+          <p class="eyebrow">Actions</p>
+          <div class="row">
+            <button id="btn-fetch" class="secondary" type="button">Solo Fetch</button>
+            <button id="btn-render" type="button">Solo Render</button>
+            <button id="btn-run" class="primary" type="button">Fetch + Render</button>
+          </div>
+        </section>
+
+        <section class="inspector-card">
+          <h3 class="inspector-title">Resultado</h3>
+          <div id="log">Listo.</div>
+        </section>
+      </aside>
     </div>
 
     <script>
@@ -518,9 +1237,12 @@
       let currentPreview = null;
       let currentInspection = null;
       let currentPayloadSource = '';
+      let currentOutputPath = '';
+      let activeView = 'session';
 
       const logEl = document.getElementById('log');
-      function log(msg, cls, isHTML=false) {
+
+      function log(msg, cls, isHTML = false) {
         logEl.className = cls || '';
         if (isHTML) {
           logEl.innerHTML = msg;
@@ -538,24 +1260,37 @@
           .replaceAll("'", '&#39;');
       }
 
-      function setCurrentJsonPath(path, source = '') {
-        currentJsonPath = path || '';
-        currentPayloadSource = source || '';
-        document.getElementById('json-state').textContent = currentJsonPath
-          ? `JSON actual: ${currentJsonPath}`
-          : 'JSON actual: ninguno.';
-        document.getElementById('payload-source-state').textContent = currentPayloadSource
-          ? `Origen del payload: ${currentPayloadSource}.`
-          : 'Origen del payload: ninguno.';
-        updateActionState();
+      function setActiveView(viewName) {
+        activeView = viewName;
+        document.querySelectorAll('[data-view]').forEach((el) => {
+          el.classList.toggle('is-active', el.dataset.view === viewName);
+        });
+        document.querySelectorAll('[data-view-target]').forEach((btn) => {
+          btn.classList.toggle('is-active', btn.dataset.viewTarget === viewName);
+        });
       }
 
-      function syncPayloadSelect(path) {
-        const select = document.getElementById('payloadSelect');
-        if (!select) return;
-        if (payloadList.some(item => item.path === path)) {
-          select.value = path;
-        }
+      function shorten(value, max = 72) {
+        const text = String(value || '').trim();
+        if (!text) return '';
+        if (text.length <= max) return text;
+        return text.slice(0, Math.max(0, max - 1)).trimEnd() + '...';
+      }
+
+      function formatDateTime(ts) {
+        if (!ts) return '';
+        const d = new Date(ts * 1000);
+        if (Number.isNaN(d.getTime())) return '';
+        return d.toLocaleString();
+      }
+
+      function getSelectedTemplate() {
+        return document.getElementById('templateSelect').value;
+      }
+
+      function getRadio(name) {
+        const el = document.querySelector(`input[name="${name}"]:checked`);
+        return el ? el.value : '';
       }
 
       function getAcclamationMode() {
@@ -567,78 +1302,26 @@
         return mode === 'lent' ? 'Cuaresma' : (mode === 'ordinary' ? 'Ordinaria' : 'Sin elegir');
       }
 
-      function updateActionState() {
-        const hasPayload = Boolean(currentJsonPath);
-        const hasDate = Boolean(dateEl.value);
-        const acclamationMode = getAcclamationMode();
-        const hasAcclamationMode = Boolean(acclamationMode);
-        const renderBtn = document.getElementById('btn-render');
-        const fetchBtn = document.getElementById('btn-fetch');
-        const runBtn = document.getElementById('btn-run');
-        renderBtn.disabled = !hasPayload;
-        renderBtn.title = hasPayload ? '' : 'Primero cargue un payload con Solo Fetch o Fetch + Render.';
-        fetchBtn.disabled = !hasDate || !hasAcclamationMode;
-        fetchBtn.title = !hasDate
-          ? 'No hay una fecha válida disponible en el feed RSS.'
-          : (hasAcclamationMode ? '' : 'Seleccione la aclamación ordinaria o de Cuaresma.');
-        runBtn.disabled = !hasDate || !hasAcclamationMode;
-        runBtn.title = !hasDate
-          ? 'No hay una fecha válida disponible en el feed RSS.'
-          : (hasAcclamationMode ? '' : 'Seleccione la aclamación ordinaria o de Cuaresma.');
-      }
-
-      function renderTemplateInspection() {
-        const el = document.getElementById('template-inspection');
-        if (!currentInspection) {
-          el.innerHTML = '<div class="muted">Seleccione una plantilla para ver su inspección.</div>';
-          return;
-        }
-
-        const inspection = currentInspection;
-        const present = Array.isArray(inspection.present) ? inspection.present : [];
-        const missing = Array.isArray(inspection.missing) ? inspection.missing : [];
-        const seeds = Array.isArray(inspection.waterfall_seeds) ? inspection.waterfall_seeds : [];
-
-        const seedItems = seeds.map(item => {
-          const label = item.slide_count === 1 ? 'OK' : (item.slide_count === 0 ? 'Falta seed' : 'Múltiples seeds');
-          return `<li>
-            <div><code>${escapeHTML(item.placeholder)}</code></div>
-            <div class="muted">slides: ${escapeHTML(String(item.slide_count))} • ${escapeHTML(label)}</div>
-          </li>`;
-        }).join('');
-
-        const presentItems = present.length
-          ? present.map(item => `<li><code>${escapeHTML(item.placeholder)}</code> <span class="muted">• slides: ${escapeHTML(String(item.slide_count))}</span></li>`).join('')
-          : '<li class="muted">No se detectaron placeholders soportados.</li>';
-
-        const missingItems = missing.length
-          ? missing.slice(0, 10).map(item => `<li><code>${escapeHTML(item.placeholder)}</code></li>`).join('')
-          : '<li class="muted">No faltan placeholders del set soportado.</li>';
-        const missingExtra = missing.length > 10 ? `<div class="muted">y ${escapeHTML(String(missing.length - 10))} más...</div>` : '';
-
-        el.innerHTML = `
-          <div class="inspect-grid">
-            <div class="inspect-box">
-              <h3>Resumen</h3>
-              <div><span class="result-label">Plantilla:</span> ${escapeHTML((inspection.template || {}).path || '')}</div>
-              <div><span class="result-label">Slides:</span> ${escapeHTML(String(inspection.slide_count || 0))}</div>
-              <div><span class="result-label">Placeholders presentes:</span> ${escapeHTML(String(present.length))}</div>
-              <div><span class="result-label">Placeholders ausentes:</span> ${escapeHTML(String(missing.length))}</div>
-            </div>
-            <div class="inspect-box">
-              <h3>Waterfall Seeds</h3>
-              <ul class="preview-list">${seedItems}</ul>
-            </div>
-            <div class="inspect-box">
-              <h3>Presentes</h3>
-              <ul class="preview-list">${presentItems}</ul>
-            </div>
-            <div class="inspect-box">
-              <h3>Ausentes</h3>
-              <ul class="preview-list">${missingItems}</ul>
-              ${missingExtra}
-            </div>
-          </div>`;
+      function buildSongsPayload() {
+        return {
+          entranceText: document.getElementById('songs-entrance').value.trim(),
+          entranceRef: document.getElementById('songs-entrance-ref').value.trim(),
+          gloriaEnabled: document.getElementById('gloriaEnabled').checked,
+          gloriaLang: 'es',
+          offertoryText: document.getElementById('songs-offertory').value.trim(),
+          offertoryRef: document.getElementById('songs-offertory-ref').value.trim(),
+          communionText: document.getElementById('songs-communion').value.trim(),
+          communionRef: document.getElementById('songs-communion-ref').value.trim(),
+          meditationText: document.getElementById('songs-meditation').value.trim(),
+          meditationRef: document.getElementById('songs-meditation-ref').value.trim(),
+          recessionalText: document.getElementById('songs-recessional').value.trim(),
+          recessionalRef: document.getElementById('songs-recessional-ref').value.trim(),
+          kyrieLang: getRadio('kyrieLang'),
+          sanctusLang: getRadio('sanctusLang'),
+          agnusLang: getRadio('agnusLang'),
+          mysteriumLang: getRadio('mysteriumLang'),
+          mysteriumVersion: document.getElementById('mysteriumVersion').value,
+        };
       }
 
       function summarizeSongState() {
@@ -666,21 +1349,152 @@
         };
       }
 
+      function updateBuildStatus(mode, label) {
+        const classes = mode ? `status-pill ${mode}` : 'status-pill';
+        document.getElementById('build-status-pill').innerHTML = `<span class="${classes}">${escapeHTML(label)}</span>`;
+      }
+
+      function updateWorkspaceState() {
+        const selectedDate = feedDateList.find((item) => item.date === dateEl.value);
+        const selectedTemplate = templateList.find((item) => item.path === getSelectedTemplate());
+        const songState = summarizeSongState();
+        const freeSongCount = songState.freeText.length;
+        const inspectionSeeds = Array.isArray((currentInspection || {}).waterfall_seeds) ? currentInspection.waterfall_seeds : [];
+        const seedIssues = inspectionSeeds.filter((item) => item.slide_count !== 1).length;
+
+        document.getElementById('session-date-summary').textContent = selectedDate ? (selectedDate.label || selectedDate.date) : 'Sin seleccionar';
+        document.getElementById('session-payload-summary').textContent = currentJsonPath ? shorten(currentJsonPath, 48) : 'No hay JSON cargado';
+        document.getElementById('session-template-summary').textContent = selectedTemplate ? `${selectedTemplate.group_label}: ${selectedTemplate.label}` : 'No hay plantilla seleccionada';
+        document.getElementById('session-song-summary').textContent = freeSongCount ? `Cantos libres configurados: ${freeSongCount}.` : 'Cantos libres: ninguno.';
+        document.getElementById('session-mode-summary').textContent = `Aclamación: ${acclamationModeLabel(getAcclamationMode())}.`;
+        document.getElementById('session-output-summary').textContent = currentOutputPath ? `Salida PPTX: ${currentOutputPath}` : 'Salida PPTX: ninguna.';
+        document.getElementById('build-interpretation-date').textContent = `Fecha: ${selectedDate ? selectedDate.date : 'sin seleccionar'}.`;
+        document.getElementById('build-interpretation-payload').textContent = `Payload: ${currentJsonPath || 'ninguno'}.`;
+        document.getElementById('build-interpretation-template').textContent = `Plantilla: ${getSelectedTemplate() || 'ninguna'}.`;
+        document.getElementById('build-interpretation-flags').textContent = `Flags: stamp ${document.getElementById('stamp').checked ? 'ON' : 'OFF'}, verbose ${document.getElementById('verbose').checked ? 'ON' : 'OFF'}.`;
+        document.getElementById('build-output-summary').textContent = currentOutputPath ? `Último output detectado: ${currentOutputPath}` : 'Todavia no hay una salida generada.';
+        document.getElementById('template-state-copy').textContent = getSelectedTemplate() ? getSelectedTemplate() : 'Plantilla: ninguna.';
+        document.getElementById('template-quick-status').innerHTML = inspectionSeeds.length
+          ? `<span class="status-pill ${seedIssues ? 'err' : 'ok'}">${seedIssues ? `${seedIssues} problemas de seed` : 'Seeds waterfall OK'}</span>`
+          : '<span class="status-pill">Inspección pendiente</span>';
+      }
+
+      function setCurrentJsonPath(path, source = '') {
+        currentJsonPath = path || '';
+        currentPayloadSource = source || '';
+        document.getElementById('json-state').textContent = currentJsonPath
+          ? `JSON actual: ${currentJsonPath}`
+          : 'JSON actual: ninguno.';
+        document.getElementById('payload-source-state').textContent = currentPayloadSource
+          ? `Origen del payload: ${currentPayloadSource}.`
+          : 'Origen del payload: ninguno.';
+        updateActionState();
+        updateWorkspaceState();
+      }
+
+      function syncPayloadSelect(path) {
+        const select = document.getElementById('payloadSelect');
+        if (!select) return;
+        if (payloadList.some((item) => item.path === path)) {
+          select.value = path;
+          updatePayloadMeta();
+        }
+      }
+
+      function updateActionState() {
+        const hasPayload = Boolean(currentJsonPath);
+        const hasDate = Boolean(dateEl.value);
+        const hasAcclamationMode = Boolean(getAcclamationMode());
+        const renderBtn = document.getElementById('btn-render');
+        const fetchBtn = document.getElementById('btn-fetch');
+        const runBtn = document.getElementById('btn-run');
+
+        renderBtn.disabled = !hasPayload;
+        renderBtn.title = hasPayload ? '' : 'Primero cargue un payload con Solo Fetch o Fetch + Render.';
+        fetchBtn.disabled = !hasDate || !hasAcclamationMode;
+        fetchBtn.title = !hasDate
+          ? 'No hay una fecha valida disponible en el feed RSS.'
+          : (hasAcclamationMode ? '' : 'Seleccione la aclamacion ordinaria o de Cuaresma.');
+        runBtn.disabled = !hasDate || !hasAcclamationMode;
+        runBtn.title = fetchBtn.title;
+      }
+
+      function renderTemplateInspection() {
+        const el = document.getElementById('template-inspection');
+        if (!currentInspection) {
+          el.innerHTML = '<div class="muted">Seleccione una plantilla para ver su inspección.</div>';
+          updateWorkspaceState();
+          return;
+        }
+
+        const inspection = currentInspection;
+        const present = Array.isArray(inspection.present) ? inspection.present : [];
+        const missing = Array.isArray(inspection.missing) ? inspection.missing : [];
+        const seeds = Array.isArray(inspection.waterfall_seeds) ? inspection.waterfall_seeds : [];
+
+        const seedItems = seeds.length
+          ? seeds.map((item) => {
+              const label = item.slide_count === 1 ? 'OK' : (item.slide_count === 0 ? 'Falta seed' : 'Multiples seeds');
+              return `<li>
+                <div><code>${escapeHTML(item.placeholder)}</code></div>
+                <div class="muted">slides: ${escapeHTML(String(item.slide_count))} • ${escapeHTML(label)}</div>
+              </li>`;
+            }).join('')
+          : '<li class="muted">Sin datos de waterfall.</li>';
+
+        const presentItems = present.length
+          ? present.map((item) => `<li><code>${escapeHTML(item.placeholder)}</code> <span class="muted">• slides: ${escapeHTML(String(item.slide_count))}</span></li>`).join('')
+          : '<li class="muted">No se detectaron placeholders soportados.</li>';
+
+        const missingItems = missing.length
+          ? missing.slice(0, 12).map((item) => `<li><code>${escapeHTML(item.placeholder)}</code></li>`).join('')
+          : '<li class="muted">No faltan placeholders del set soportado.</li>';
+
+        const missingExtra = missing.length > 12 ? `<div class="muted">y ${escapeHTML(String(missing.length - 12))} más...</div>` : '';
+
+        el.innerHTML = `
+          <div class="inspect-grid">
+            <div class="inspect-box">
+              <h3>Resumen</h3>
+              <div><span class="result-label">Plantilla:</span> ${escapeHTML((inspection.template || {}).path || '')}</div>
+              <div><span class="result-label">Slides:</span> ${escapeHTML(String(inspection.slide_count || 0))}</div>
+              <div><span class="result-label">Presentes:</span> ${escapeHTML(String(present.length))}</div>
+              <div><span class="result-label">Ausentes:</span> ${escapeHTML(String(missing.length))}</div>
+            </div>
+            <div class="inspect-box">
+              <h3>Waterfall Seeds</h3>
+              <ul class="seed-list">${seedItems}</ul>
+            </div>
+            <div class="inspect-box">
+              <h3>Presentes</h3>
+              <ul class="preview-list">${presentItems}</ul>
+            </div>
+            <div class="inspect-box">
+              <h3>Ausentes</h3>
+              <ul class="preview-list">${missingItems}</ul>
+              ${missingExtra}
+            </div>
+          </div>`;
+
+        updateWorkspaceState();
+      }
+
       function renderPreview() {
         const el = document.getElementById('payload-preview');
         const preview = currentPreview;
         const songState = summarizeSongState();
 
         if (!preview) {
-          const fixedSongs = songState.fixed.map(item => `<li>${escapeHTML(item)}</li>`).join('');
+          const fixedSongs = songState.fixed.map((item) => `<li>${escapeHTML(item)}</li>`).join('');
           const freeSongs = songState.freeText.length
             ? songState.freeText.map(([label]) => `<li>${escapeHTML(label)}</li>`).join('')
             : '<li class="muted">Ninguno</li>';
+
           el.innerHTML = `
             <div class="preview-grid">
               <div class="preview-card">
                 <div class="preview-title">Payload</div>
-                <div class="muted">Todavía no hay payload cargado.</div>
+                <div class="muted">Todavia no hay payload cargado.</div>
               </div>
               <div class="preview-card">
                 <div class="preview-title">Cantos</div>
@@ -690,13 +1504,14 @@
                 <ul class="preview-list">${fixedSongs}</ul>
               </div>
             </div>`;
+          updateWorkspaceState();
           return;
         }
 
         const meta = preview.meta || {};
         const sections = Array.isArray(preview.sections) ? preview.sections : [];
-        const sectionItems = sections.map(section => {
-          const presence = section.has_body ? 'Sí' : 'No';
+        const sectionItems = sections.map((section) => {
+          const presence = section.has_body ? 'Si' : 'No';
           const chunks = section.chunk_count || 0;
           const ref = section.ref || 'Sin referencia';
           return `<li>
@@ -712,13 +1527,13 @@
               return `<li>${escapeHTML(label)} <span class="muted">• estrofas: ${escapeHTML(String(stanzaCount))}</span></li>`;
             }).join('')
           : '<li class="muted">Ninguno</li>';
-        const fixedSongs = songState.fixed.map(item => `<li>${escapeHTML(item)}</li>`).join('');
+        const fixedSongs = songState.fixed.map((item) => `<li>${escapeHTML(item)}</li>`).join('');
         const payloadOrigin = currentPayloadSource ? `<div><span class="result-label">Carga:</span> ${escapeHTML(currentPayloadSource)}</div>` : '';
 
         el.innerHTML = `
           <div class="preview-grid">
             <div class="preview-card">
-              <div class="preview-title">${escapeHTML(meta.title || 'Sin título')}</div>
+              <div class="preview-title">${escapeHTML(meta.title || 'Sin titulo')}</div>
               ${payloadOrigin}
               <div><span class="result-label">Fecha:</span> ${escapeHTML(meta.date || '')}</div>
               <div><span class="result-label">Origen:</span> ${escapeHTML(meta.source || '')}</div>
@@ -727,13 +1542,15 @@
             </div>
             <div class="preview-card">
               <div class="preview-title">Cantos</div>
-              <div class="muted">El render usará el payload actual junto con los cantos visibles en esta UI.</div>
+              <div class="muted">El render usara el payload actual junto con los cantos visibles en esta UI.</div>
               <div class="muted">Textos libres</div>
               <ul class="preview-list">${freeSongs}</ul>
               <div class="muted">Partes fijas</div>
               <ul class="preview-list">${fixedSongs}</ul>
             </div>
           </div>`;
+
+        updateWorkspaceState();
       }
 
       function buildLinksHTML(path) {
@@ -743,16 +1560,19 @@
         return `<a href="${escapeHTML(dlUrl)}">Descargar PPTX</a> · <a href="${escapeHTML(viewUrl)}" target="_blank">Ver</a>`;
       }
 
-      function renderSuccess(title, items, linksHTML='') {
+      function renderSuccess(title, items, linksHTML = '') {
         const blocks = items
-          .filter(item => item && item.value)
-          .map(item => `<div><span class="result-label">${escapeHTML(item.label)}:</span> ${escapeHTML(item.value)}</div>`)
+          .filter((item) => item && item.value)
+          .map((item) => `<div><span class="result-label">${escapeHTML(item.label)}:</span> ${escapeHTML(item.value)}</div>`)
           .join('');
         const linksBlock = linksHTML ? `<div class="result-block">${linksHTML}</div>` : '';
         log(`<div class="status-grid"><div><strong>${escapeHTML(title)}</strong></div><div class="result-block">${blocks}</div>${linksBlock}</div>`, 'ok', true);
+        document.getElementById('session-build-summary').textContent = title;
+        updateBuildStatus('ok', title);
+        updateWorkspaceState();
       }
 
-      function renderError(title, err, details={}) {
+      function renderError(title, err, details = {}) {
         const message = escapeHTML(err && err.message ? err.message : err || 'Error desconocido');
         const parts = [`<div><strong>${escapeHTML(title)}</strong></div>`, `<div class="result-block">${message}</div>`];
         if (details.stderr) {
@@ -762,10 +1582,17 @@
           parts.push(`<div class="result-block"><div class="result-label">stdout</div><div class="result-pre">${escapeHTML(details.stdout)}</div></div>`);
         }
         log(`<div class="status-grid">${parts.join('')}</div>`, 'err', true);
+        document.getElementById('session-build-summary').textContent = `${title}: ${err && err.message ? err.message : 'falló'}`;
+        updateBuildStatus('err', title);
+        updateWorkspaceState();
       }
 
       async function postJSON(url, body) {
-        const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
         const data = await res.json();
         if (!res.ok || data.ok === false) {
           const error = new Error(data.error || JSON.stringify(data));
@@ -776,7 +1603,8 @@
       }
 
       async function doFetch() {
-        log('Fetching…');
+        log('Fetching...');
+        updateBuildStatus('', 'Procesando fetch');
         const date = document.getElementById('date').value;
         const acclamationMode = getAcclamationMode();
         const data = await postJSON('/fetch', { date, acclamation_mode: acclamationMode });
@@ -784,12 +1612,14 @@
         setCurrentJsonPath(data.json_path || '', 'fetch RSS');
         syncPayloadSelect(data.json_path || '');
         currentPreview = data.preview || null;
+        currentOutputPath = '';
         renderPreview();
         renderSuccess('Fetch OK', [
-          { label: 'Título', value: meta.title || '' },
+          { label: 'Titulo', value: meta.title || '' },
           { label: 'JSON', value: data.json_path || '' },
         ]);
         loadPayloads(data.json_path || '').catch(() => {});
+        setActiveView('readings');
         return data;
       }
 
@@ -801,26 +1631,32 @@
         const template = getSelectedTemplate();
         const stamp = document.getElementById('stamp').checked;
         const verbose = document.getElementById('verbose').checked;
-        log('Rendering…');
+        log('Rendering...');
+        updateBuildStatus('', 'Procesando render');
         const songs = buildSongsPayload();
         const data = await postJSON('/render', { json_path: jsonPath, template, stamp, verbose, songs });
         const path = data.output_path || '';
+        currentOutputPath = path;
         renderSuccess('Render OK', [
           { label: 'JSON', value: jsonPath },
           { label: 'Plantilla', value: template },
           { label: 'Salida', value: path },
           { label: 'Songs', value: data.songs_path || '' },
         ], buildLinksHTML(path));
+        setActiveView('build');
         return data;
       }
 
       async function uploadTemplate() {
         const fileInput = document.getElementById('templateFile');
         const f = fileInput.files && fileInput.files[0];
-        if (!f) { log('Seleccione un archivo .pptx', 'err'); return; }
+        if (!f) {
+          log('Seleccione un archivo .pptx', 'err');
+          return;
+        }
         const fd = new FormData();
         fd.append('file', f);
-        log('Subiendo plantilla…');
+        log('Subiendo plantilla...');
         const res = await fetch('/upload', { method: 'POST', body: fd });
         const data = await res.json();
         if (!res.ok || data.ok === false) throw new Error(data.error || 'Upload failed');
@@ -828,6 +1664,7 @@
         renderSuccess('Plantilla subida', [
           { label: 'Plantilla', value: data.template_path || '' },
         ]);
+        setActiveView('template');
       }
 
       async function loadSelectedPayload() {
@@ -835,7 +1672,7 @@
         if (!payloadPath) {
           throw new Error('Seleccione un payload JSON.');
         }
-        log('Cargando payload…');
+        log('Cargando payload...');
         const res = await fetch(`/payloads/load?path=${encodeURIComponent(payloadPath)}`);
         const data = await res.json();
         if (!res.ok || data.ok === false) {
@@ -844,15 +1681,16 @@
         setCurrentJsonPath(data.json_path || '', 'archivo JSON local');
         currentPreview = data.preview || null;
         const payloadDate = ((data.meta || {}).date || '').trim();
-        if (payloadDate && feedDateList.some(item => item.date === payloadDate)) {
+        if (payloadDate && feedDateList.some((item) => item.date === payloadDate)) {
           dateEl.value = payloadDate;
           updateDateMeta();
         }
         renderPreview();
         renderSuccess('Payload cargado', [
           { label: 'JSON', value: data.json_path || '' },
-          { label: 'Título', value: (data.meta || {}).title || '' },
+          { label: 'Titulo', value: (data.meta || {}).title || '' },
         ]);
+        setActiveView('readings');
         return data;
       }
 
@@ -862,10 +1700,12 @@
         const acclamationMode = getAcclamationMode();
         const stamp = document.getElementById('stamp').checked;
         const verbose = document.getElementById('verbose').checked;
-        log('Fetch + Render…');
+        log('Fetch + Render...');
+        updateBuildStatus('', 'Procesando build completo');
         const songs = buildSongsPayload();
         const data = await postJSON('/run', { date, template, acclamation_mode: acclamationMode, stamp, verbose, songs });
         setCurrentJsonPath(data.json_path || '', 'fetch RSS');
+        currentOutputPath = data.output_path || '';
         if (!currentPreview || (currentPreview.meta || {}).date !== date) {
           currentPreview = {
             meta: {
@@ -877,48 +1717,16 @@
           };
         }
         renderPreview();
-        const path = data.output_path || '';
         renderSuccess('Hecho', [
           { label: 'JSON', value: data.json_path || '' },
           { label: 'Plantilla', value: template },
-          { label: 'PPTX', value: path },
+          { label: 'PPTX', value: currentOutputPath },
           { label: 'Songs', value: data.songs_path || '' },
-        ], buildLinksHTML(path));
+        ], buildLinksHTML(currentOutputPath));
+        loadPayloads(data.json_path || '').catch(() => {});
+        setActiveView('build');
         return data;
       }
-
-      document.getElementById('btn-fetch').addEventListener('click', () => doFetch().catch(e => renderError('Fetch falló', e, e.data || {})));
-      document.getElementById('btn-render').addEventListener('click', () => doRender().catch(e => renderError('Render falló', e, e.data || {})));
-      document.getElementById('btn-run').addEventListener('click', () => doRun().catch(e => renderError('Ejecución falló', e, e.data || {})));
-      document.getElementById('btn-upload').addEventListener('click', () => uploadTemplate().catch(e => renderError('Subida falló', e, e.data || {})));
-      document.getElementById('btn-refresh-templates').addEventListener('click', () => loadTemplates(getSelectedTemplate()).catch(e => renderError('Carga de plantillas falló', e, e.data || {})));
-      document.getElementById('btn-load-payload').addEventListener('click', () => loadSelectedPayload().catch(e => renderError('Carga de payload falló', e, e.data || {})));
-      document.getElementById('btn-refresh-payloads').addEventListener('click', () => loadPayloads(document.getElementById('payloadSelect').value || currentJsonPath).catch(e => renderError('Carga de payloads falló', e, e.data || {})));
-      [
-        'songs-entrance',
-        'songs-entrance-ref',
-        'songs-offertory',
-        'songs-offertory-ref',
-        'songs-communion',
-        'songs-communion-ref',
-        'songs-meditation',
-        'songs-meditation-ref',
-        'songs-recessional',
-        'songs-recessional-ref',
-        'mysteriumVersion',
-      ].forEach(id => {
-        document.getElementById(id).addEventListener('input', renderPreview);
-      });
-      document.getElementById('gloriaEnabled').addEventListener('change', renderPreview);
-      ['kyrieLang', 'sanctusLang', 'agnusLang', 'mysteriumLang'].forEach(name => {
-        document.querySelectorAll(`input[name="${name}"]`).forEach(el => el.addEventListener('change', renderPreview));
-      });
-      document.querySelectorAll('input[name="acclamationMode"]').forEach(el => {
-        el.addEventListener('change', () => {
-          renderPreview();
-          updateActionState();
-        });
-      });
 
       async function loadPlaceholders() {
         try {
@@ -926,67 +1734,65 @@
           const data = await res.json();
           const list = Array.isArray(data.placeholders) ? data.placeholders : [];
           const ul = document.getElementById('ph-list');
-          if (!list.length) { ul.innerHTML = '<li class="ph-item muted">Sin datos</li>'; return; }
-          ul.innerHTML = list.map(p => {
+          if (!list.length) {
+            ul.innerHTML = '<li class="ph-item muted">Sin datos</li>';
+            return;
+          }
+          ul.innerHTML = list.map((p) => {
             const wf = p.waterfall ? '<span class="badge waterfall">waterfall</span>' : '';
             const cat = p.category ? `<span class="badge">${p.category}</span>` : '';
-            const desc = p.description ? ` — ${p.description}` : '';
+            const desc = p.description ? ` - ${p.description}` : '';
             return `<li class="ph-item"><code>${p.placeholder}</code> ${wf} ${cat}<span>${desc}</span></li>`;
           }).join('');
           const notes = Array.isArray(data.notes) ? data.notes : [];
-          document.getElementById('ph-notes').innerHTML = notes.length ? ('Notas: ' + notes.map(n => `• ${n}`).join(' &nbsp; ')) : '';
+          document.getElementById('ph-notes').innerHTML = notes.length ? ('Notas: ' + notes.map((n) => `• ${n}`).join(' &nbsp; ')) : '';
         } catch (e) {
-          document.getElementById('ph-list').innerHTML = `<li class="ph-item err">No se pudo cargar: ${e.message}</li>`;
+          document.getElementById('ph-list').innerHTML = `<li class="ph-item err">No se pudo cargar: ${escapeHTML(e.message)}</li>`;
         }
-      }
-
-      function getSelectedTemplate() {
-        return document.getElementById('templateSelect').value;
       }
 
       function updateDateMeta() {
         const meta = document.getElementById('date-meta');
-        const selected = feedDateList.find(item => item.date === dateEl.value);
+        const selected = feedDateList.find((item) => item.date === dateEl.value);
         if (!feedDateList.length) {
           meta.textContent = 'No se pudieron cargar fechas del feed RSS.';
+          updateWorkspaceState();
           return;
         }
         if (!selected) {
           meta.textContent = `${feedDateList.length} fechas disponibles en el feed RSS.`;
+          updateWorkspaceState();
           return;
         }
         const parts = [`${feedDateList.length} fechas en RSS`];
         if (selected.title) parts.push(selected.title);
         meta.textContent = parts.join(' • ');
+        updateWorkspaceState();
       }
 
       function updatePayloadMeta() {
         const select = document.getElementById('payloadSelect');
         const meta = document.getElementById('payload-meta');
-        const selected = payloadList.find(item => item.path === select.value);
+        const selected = payloadList.find((item) => item.path === select.value);
         if (!selected) {
           meta.textContent = payloadList.length ? 'Seleccione un payload JSON.' : 'No hay payloads JSON disponibles.';
+          updateWorkspaceState();
           return;
         }
         const parts = [selected.label, selected.path];
         const modified = formatDateTime(selected.modified_ts);
         if (modified) parts.push(`Actualizado: ${modified}`);
         meta.textContent = parts.join(' • ');
-      }
-
-      function formatDateTime(ts) {
-        if (!ts) return '';
-        const d = new Date(ts * 1000);
-        if (Number.isNaN(d.getTime())) return '';
-        return d.toLocaleString();
+        updateWorkspaceState();
       }
 
       function updateTemplateMeta() {
         const select = document.getElementById('templateSelect');
         const meta = document.getElementById('template-meta');
-        const selected = templateList.find(t => t.path === select.value);
+        const selected = templateList.find((t) => t.path === select.value);
         if (!selected) {
           meta.textContent = templateList.length ? 'Seleccione una plantilla.' : 'No hay plantillas disponibles.';
+          updateWorkspaceState();
           return;
         }
         const parts = [
@@ -996,6 +1802,7 @@
         const modified = formatDateTime(selected.modified_ts);
         if (modified) parts.push(`Actualizada: ${modified}`);
         meta.textContent = parts.join(' • ');
+        updateWorkspaceState();
       }
 
       async function loadTemplates(selectedPath = '', providedTemplates = null) {
@@ -1033,7 +1840,7 @@
         }
 
         const fallback = templates[0].path;
-        select.value = templates.some(t => t.path === selectedPath) ? selectedPath : fallback;
+        select.value = templates.some((t) => t.path === selectedPath) ? selectedPath : fallback;
         updateTemplateMeta();
         await loadTemplateInspection();
       }
@@ -1063,13 +1870,13 @@
         }
 
         const fallback = payloadList[0].path;
-        select.value = payloadList.some(item => item.path === selectedPath) ? selectedPath : fallback;
+        select.value = payloadList.some((item) => item.path === selectedPath) ? selectedPath : fallback;
         updatePayloadMeta();
       }
 
       async function loadFeedDates(selectedDate = '') {
         const meta = document.getElementById('date-meta');
-        meta.textContent = 'Leyendo el feed RSS…';
+        meta.textContent = 'Leyendo el feed RSS...';
         const res = await fetch('/feed/dates');
         const data = await res.json();
         if (!res.ok || data.ok === false) {
@@ -1094,7 +1901,7 @@
         }
 
         const fallback = data.selected || feedDateList[0].date;
-        dateEl.value = feedDateList.some(item => item.date === selectedDate) ? selectedDate : fallback;
+        dateEl.value = feedDateList.some((item) => item.date === selectedDate) ? selectedDate : fallback;
         updateDateMeta();
         updateActionState();
       }
@@ -1115,62 +1922,99 @@
         renderTemplateInspection();
       }
 
+      document.querySelectorAll('[data-view-target]').forEach((btn) => {
+        btn.addEventListener('click', () => setActiveView(btn.dataset.viewTarget));
+      });
+
+      document.getElementById('btn-fetch').addEventListener('click', () => doFetch().catch((e) => renderError('Fetch falló', e, e.data || {})));
+      document.getElementById('btn-render').addEventListener('click', () => doRender().catch((e) => renderError('Render falló', e, e.data || {})));
+      document.getElementById('btn-run').addEventListener('click', () => doRun().catch((e) => renderError('Ejecucion falló', e, e.data || {})));
+      document.getElementById('btn-upload').addEventListener('click', () => uploadTemplate().catch((e) => renderError('Subida falló', e, e.data || {})));
+      document.getElementById('btn-refresh-templates').addEventListener('click', () => loadTemplates(getSelectedTemplate()).catch((e) => renderError('Carga de plantillas falló', e, e.data || {})));
+      document.getElementById('btn-load-payload').addEventListener('click', () => loadSelectedPayload().catch((e) => renderError('Carga de payload falló', e, e.data || {})));
+      document.getElementById('btn-refresh-payloads').addEventListener('click', () => loadPayloads(document.getElementById('payloadSelect').value || currentJsonPath).catch((e) => renderError('Carga de payloads falló', e, e.data || {})));
+
+      [
+        'songs-entrance',
+        'songs-entrance-ref',
+        'songs-offertory',
+        'songs-offertory-ref',
+        'songs-communion',
+        'songs-communion-ref',
+        'songs-meditation',
+        'songs-meditation-ref',
+        'songs-recessional',
+        'songs-recessional-ref',
+        'mysteriumVersion',
+        'stamp',
+        'verbose',
+      ].forEach((id) => {
+        const node = document.getElementById(id);
+        if (!node) return;
+        node.addEventListener('input', () => {
+          renderPreview();
+          updateWorkspaceState();
+        });
+        node.addEventListener('change', () => {
+          renderPreview();
+          updateWorkspaceState();
+        });
+      });
+
+      document.getElementById('gloriaEnabled').addEventListener('change', () => {
+        renderPreview();
+        updateWorkspaceState();
+      });
+
+      ['kyrieLang', 'sanctusLang', 'agnusLang', 'mysteriumLang'].forEach((name) => {
+        document.querySelectorAll(`input[name="${name}"]`).forEach((el) => el.addEventListener('change', () => {
+          renderPreview();
+          updateWorkspaceState();
+        }));
+      });
+
+      document.querySelectorAll('input[name="acclamationMode"]').forEach((el) => {
+        el.addEventListener('change', () => {
+          renderPreview();
+          updateActionState();
+          updateWorkspaceState();
+        });
+      });
+
       document.getElementById('templateSelect').addEventListener('change', () => {
         updateTemplateMeta();
-        loadTemplateInspection().catch(e => renderError('Inspección de plantilla falló', e));
+        loadTemplateInspection().catch((e) => renderError('Inspección de plantilla falló', e));
       });
+
       document.getElementById('payloadSelect').addEventListener('change', updatePayloadMeta);
-      document.getElementById('btn-refresh-dates').addEventListener('click', () => loadFeedDates(dateEl.value).catch(e => renderError('Carga de fechas falló', e)));
+      document.getElementById('btn-refresh-dates').addEventListener('click', () => loadFeedDates(dateEl.value).catch((e) => renderError('Carga de fechas falló', e)));
+
       dateEl.addEventListener('change', () => {
         updateDateMeta();
         updateActionState();
       });
 
-      // Load placeholders panel and template options on startup
       loadPlaceholders();
-      loadFeedDates().catch(e => {
+      loadFeedDates().catch((e) => {
         feedDateList = [];
         dateEl.innerHTML = '<option value="">No se pudo cargar</option>';
         document.getElementById('date-meta').textContent = e.message;
         updateActionState();
       });
-      loadTemplates().catch(e => {
+      loadTemplates().catch((e) => {
         document.getElementById('templateSelect').innerHTML = '<option value="">No se pudo cargar</option>';
         document.getElementById('template-meta').textContent = e.message;
       });
-      loadPayloads().catch(e => {
+      loadPayloads().catch((e) => {
         document.getElementById('payloadSelect').innerHTML = '<option value="">No se pudo cargar</option>';
         document.getElementById('payload-meta').textContent = e.message;
       });
+
       setCurrentJsonPath('', '');
       renderPreview();
       renderTemplateInspection();
-
-      function getRadio(name) {
-        const el = document.querySelector(`input[name="${name}"]:checked`);
-        return el ? el.value : '';
-      }
-      function buildSongsPayload() {
-        return {
-          entranceText: document.getElementById('songs-entrance').value.trim(),
-          entranceRef: document.getElementById('songs-entrance-ref').value.trim(),
-          gloriaEnabled: document.getElementById('gloriaEnabled').checked,
-          gloriaLang: 'es',
-          offertoryText: document.getElementById('songs-offertory').value.trim(),
-          offertoryRef: document.getElementById('songs-offertory-ref').value.trim(),
-          communionText: document.getElementById('songs-communion').value.trim(),
-          communionRef: document.getElementById('songs-communion-ref').value.trim(),
-          meditationText: document.getElementById('songs-meditation').value.trim(),
-          meditationRef: document.getElementById('songs-meditation-ref').value.trim(),
-          recessionalText: document.getElementById('songs-recessional').value.trim(),
-          recessionalRef: document.getElementById('songs-recessional-ref').value.trim(),
-          kyrieLang: getRadio('kyrieLang'),
-          sanctusLang: getRadio('sanctusLang'),
-          agnusLang: getRadio('agnusLang'),
-          mysteriumLang: getRadio('mysteriumLang'),
-          mysteriumVersion: document.getElementById('mysteriumVersion').value,
-        };
-      }
+      updateBuildStatus('', 'Sin ejecutar');
+      updateWorkspaceState();
     </script>
   </body>
-  </html>
+</html>
