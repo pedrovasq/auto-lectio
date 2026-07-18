@@ -10,9 +10,14 @@
   <body class="site-body">
     <div class="site-shell">
       <header class="site-header">
-        <a class="brand" href="{{ url_for('index') }}">AutoLectio</a>
+        <a class="brand" href="{{ url_for('index') }}">
+          <span class="brand-mark">AL</span>
+          <span>AutoLectio</span>
+        </a>
         <nav class="site-nav" aria-label="Principal">
           <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}is-active{% endif %}">Inicio</a>
+          <a href="{{ url_for('guided') }}" class="{% if request.endpoint == 'guided' %}is-active{% endif %}">Guiado</a>
+          <a href="{{ url_for('advanced') }}" class="{% if request.endpoint == 'advanced' %}is-active{% endif %}">Avanzado</a>
           <a href="{{ url_for('docs') }}" class="{% if request.endpoint == 'docs' %}is-active{% endif %}">Documentación</a>
         </nav>
       </header>
@@ -25,12 +30,12 @@
     <footer class="site-footer">
       <div class="site-shell footer-inner">
         <p class="footer-brand">AutoLectio</p>
-        <p class="footer-copy">Una ayuda sencilla para preparar las lecturas y la presentación de la Misa.</p>
+        <p class="footer-copy">Herramienta interna para preparar presentaciones de la Misa.</p>
         <div class="footer-links" aria-label="Enlaces del sitio">
           <a href="{{ url_for('index') }}">Inicio</a>
-          <a href="{{ url_for('docs') }}">Documentación</a>
           <a href="{{ url_for('guided') }}">Modo guiado</a>
           <a href="{{ url_for('advanced') }}">Modo avanzado</a>
+          <a href="{{ url_for('docs') }}">Documentación</a>
         </div>
       </div>
     </footer>

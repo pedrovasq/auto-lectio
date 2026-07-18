@@ -235,6 +235,8 @@ def _list_feed_dates() -> dict[str, Any]:
         )
 
     options.sort(key=lambda item: item["date"], reverse=True)
+    if not options:
+        options = _list_local_payload_date_options()
 
     today_obj = date.today()
     selected = ""
@@ -252,6 +254,34 @@ def _list_feed_dates() -> dict[str, Any]:
         "selected": selected,
         "count": len(options),
     }
+
+
+def _list_local_payload_date_options() -> list[dict[str, str]]:
+    options: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for item in _list_payloads():
+        path = ROOT / item["path"]
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        meta = payload.get("meta") if isinstance(payload, dict) else {}
+        date_value = str((meta or {}).get("date") or "").strip()
+        if not date_value or date_value in seen:
+            continue
+        seen.add(date_value)
+        title = str((meta or {}).get("title") or item.get("name") or "").strip()
+        link = str((meta or {}).get("link") or "").strip()
+        options.append(
+            {
+                "date": date_value,
+                "label": f"{date_value} - {title}" if title else date_value,
+                "title": title,
+                "link": link,
+            }
+        )
+    options.sort(key=lambda item: item["date"], reverse=True)
+    return options
 
 
 def _list_payloads() -> list[dict[str, Any]]:
@@ -524,6 +554,14 @@ def _default_json_path(d: date) -> Path:
     return Path("out") / f"{d.isoformat()}.es-US.json"
 
 
+def _existing_default_json_path(d: date) -> str | None:
+    path = _default_json_path(d)
+    full_path = ROOT / path
+    if full_path.exists() and full_path.is_file():
+        return path.as_posix()
+    return None
+
+
 def _default_build_path(d: date) -> Path:
     return Path("build") / f"{d.isoformat()}.es-US.pptx"
 
@@ -682,17 +720,29 @@ def do_run():
 
         # 1) Fetch
         f_resp = do_fetch()
+        f_status = 200
         if isinstance(f_resp, tuple):
             f_json, status = f_resp
+            f_status = status
             if status != 200:
-                return f_resp
-            f_json = f_json.get_json()
+                f_json = f_json.get_json()
+            else:
+                f_json = f_json.get_json()
         else:
             f_json = f_resp.get_json()
-        if not f_json.get("ok"):
-            return jsonify(f_json), 500
 
-        json_path = f_json["json_path"]
+        if f_json.get("ok"):
+            json_path = f_json["json_path"]
+        else:
+            json_path = None
+            if date_str:
+                try:
+                    fallback_date = fetch_mod.parse_date_arg(date_str)
+                    json_path = _existing_default_json_path(fallback_date)
+                except Exception:
+                    json_path = None
+            if not json_path:
+                return jsonify(f_json), f_status if f_status != 200 else 500
 
         # 2) Render
         r_res = _run_render(json_path, None, template, verbose, stamp, songs_path)
