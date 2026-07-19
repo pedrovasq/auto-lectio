@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "date": "2026-08-14",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "Asunción de la Bienaventurada Virgen María: Misa Vespertina de la Vigilia",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 180,
+    "pdf_psalm_ref": "Salmo 131, 6–7. 9–10. 13–14",
+    "pdf_acclamation_ref": "Lucas 11, 28",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 131, 6–7. 9–10. 13–14",
+    "{PSALM_TXT}": "R. Levántate, Señor, ven a tu mansión; ven con el arca de tu poder.\nOímos que estaba en Efrata, la encontramos en el Soto de Jaar: entremos en su morada, postrémonos ante el estrado de sus pies.\nQue tus sacerdotes se vistan de gala, que tus fieles vitoreen. Por amor a tu siervo David, no niegues audiencia a tu Ungido.\nPorque el Señor ha elegido a Sión, ha deseado vivir en ella: “Ésta es mi mansión por siempre; aquí viviré porque lo deseo”.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Felices los que escuchan la palabra de Dios y la practican."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Levántate, Señor, ven a tu mansión; ven con el arca de tu poder.",
+      "Oímos que estaba en Efrata, la encontramos en el Soto de Jaar: entremos en su morada, postrémonos ante el estrado de sus pies.",
+      "R. Levántate, Señor, ven a tu mansión; ven con el arca de tu poder.",
+      "Que tus sacerdotes se vistan de gala, que tus fieles vitoreen. Por amor a tu siervo David, no niegues audiencia a tu Ungido.",
+      "R. Levántate, Señor, ven a tu mansión; ven con el arca de tu poder.",
+      "Porque el Señor ha elegido a Sión, ha deseado vivir en ella: “Ésta es mi mansión por siempre; aquí viviré porque lo deseo”.",
+      "R. Levántate, Señor, ven a tu mansión; ven con el arca de tu poder."
+    ]
+  }
+}

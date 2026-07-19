@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "date": "2026-11-15",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XXXIII Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 220,
+    "pdf_psalm_ref": "Salmo 127, 1–2. 3. 4–5",
+    "pdf_acclamation_ref": "Juan 15, 4. 5b",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 127, 1–2. 3. 4–5",
+    "{PSALM_TXT}": "R. Dichoso el que teme al Señor.\n¡Dichoso el que teme al Señor, y sigue sus caminos! Comerás del fruto de tu trabajo, serás dichoso, te irá bien.\nTu mujer, como parra fecunda, en medio de tu casa; tus hijos, como renuevos de olivo, alrededor de tu mesa.\nÉsta es la bendición del hombre que teme al Señor. Que el Señor te bendiga desde Sión, que veas la prosperidad de Jerusalén, todos los días de tu vida.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Permanezcan en mí y yo permaneceré en ustedes, dice el Señor; el que permanece en mí producirá mucho fruto."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Dichoso el que teme al Señor.",
+      "¡Dichoso el que teme al Señor, y sigue sus caminos! Comerás del fruto de tu trabajo, serás dichoso, te irá bien.",
+      "R. Dichoso el que teme al Señor.",
+      "Tu mujer, como parra fecunda, en medio de tu casa; tus hijos, como renuevos de olivo, alrededor de tu mesa.",
+      "R. Dichoso el que teme al Señor.",
+      "Ésta es la bendición del hombre que teme al Señor. Que el Señor te bendiga desde Sión, que veas la prosperidad de Jerusalén, todos los días de tu vida."
+    ]
+  }
+}

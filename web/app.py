@@ -164,6 +164,74 @@ def _write_songs_from_cfg(cfg: Dict[str, Any] | None) -> str | None:
     return str(out_path)
 
 
+def _load_songs_payload(path: Path) -> tuple[Dict[str, list[str]], Dict[str, str]]:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}, {}
+    if not isinstance(data, dict):
+        return {}, {}
+
+    chunks: Dict[str, list[str]] = {}
+    raw_chunks = data.get("chunks")
+    if isinstance(raw_chunks, dict):
+        for key, value in raw_chunks.items():
+            if isinstance(value, list):
+                chunks[key] = [item if isinstance(item, str) else str(item) for item in value]
+
+    placeholders: Dict[str, str] = {}
+    raw_placeholders = data.get("placeholders")
+    if isinstance(raw_placeholders, dict):
+        for key, value in raw_placeholders.items():
+            if isinstance(value, str):
+                placeholders[key] = value
+    return chunks, placeholders
+
+
+def _default_day_songs_path(json_path: str) -> Path | None:
+    try:
+        payload = _load_payload_file(json_path)["payload"]
+        date_value = str((payload.get("meta") or {}).get("date") or "").strip()
+    except Exception:
+        date_value = ""
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date_value):
+        return None
+
+    path = ROOT / "songs" / "days" / f"{date_value}.es-US.json"
+    if path.exists() and path.is_file():
+        return path
+    return None
+
+
+def _resolve_songs_path_for_render(json_path: str, ui_songs_path: str | None) -> str | None:
+    day_songs_path = _default_day_songs_path(json_path)
+    if day_songs_path is None:
+        return ui_songs_path
+    if not ui_songs_path:
+        return str(day_songs_path)
+
+    ui_chunks, ui_placeholders = _load_songs_payload(Path(ui_songs_path))
+    day_chunks, day_placeholders = _load_songs_payload(day_songs_path)
+    if not day_chunks and not day_placeholders:
+        return ui_songs_path
+
+    payload = {
+        "meta": {
+            "name": "UI songs + PDF day psalm/acclamation",
+            "sources": [ui_songs_path, str(day_songs_path)],
+        },
+        # Day chunks/placeholders win for psalm and acclamation tokens.
+        "chunks": {**ui_chunks, **day_chunks},
+        "placeholders": {**ui_placeholders, **day_placeholders},
+    }
+    songs_dir = ROOT / "songs"
+    songs_dir.mkdir(parents=True, exist_ok=True)
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    out_path = songs_dir / f"ui_combined_{ts}.json"
+    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return str(out_path)
+
+
 def _list_templates() -> list[dict[str, Any]]:
     entries: list[dict[str, Any]] = []
 
@@ -669,9 +737,10 @@ def do_render():
         out_path = data.get("out_path")
         # Optional: songs config from UI
         songs_cfg = data.get("songs") if isinstance(data, dict) else None
-        songs_path = _write_songs_from_cfg(songs_cfg) if isinstance(songs_cfg, dict) else None
         if not json_path:
             return jsonify({"ok": False, "error": "json_path is required"}), 400
+        ui_songs_path = _write_songs_from_cfg(songs_cfg) if isinstance(songs_cfg, dict) else None
+        songs_path = _resolve_songs_path_for_render(json_path, ui_songs_path)
         res = _run_render(json_path, out_path, template, verbose, stamp, songs_path)
         code = 200 if res["ok"] else 500
         return jsonify({**res, "songs_path": songs_path}), code
@@ -716,7 +785,7 @@ def do_run():
         stamp = str(data.get("stamp", "true")).lower() in ("1", "true", "yes", "on")
         verbose = str(data.get("verbose", "true")).lower() in ("1", "true", "yes", "on")
         songs_cfg = data.get("songs") if isinstance(data, dict) else None
-        songs_path = _write_songs_from_cfg(songs_cfg) if isinstance(songs_cfg, dict) else None
+        ui_songs_path = _write_songs_from_cfg(songs_cfg) if isinstance(songs_cfg, dict) else None
 
         # 1) Fetch
         f_resp = do_fetch()
@@ -745,6 +814,7 @@ def do_run():
                 return jsonify(f_json), f_status if f_status != 200 else 500
 
         # 2) Render
+        songs_path = _resolve_songs_path_for_render(json_path, ui_songs_path)
         r_res = _run_render(json_path, None, template, verbose, stamp, songs_path)
         code = 200 if r_res["ok"] else 500
         return jsonify({"ok": r_res["ok"], "json_path": json_path, "output_path": r_res.get("output_path"), "stdout": r_res.get("stdout"), "stderr": r_res.get("stderr"), "songs_path": songs_path, "acclamation_mode": acclamation_mode}), code

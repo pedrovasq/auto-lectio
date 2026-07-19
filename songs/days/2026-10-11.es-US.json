@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "date": "2026-10-11",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XXVIII Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 206,
+    "pdf_psalm_ref": "Salmo 22, 1–3a. 3b–4. 5. 6",
+    "pdf_acclamation_ref": "Cfr Efesios 1, 17–18",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 22, 1–3a. 3b–4. 5. 6",
+    "{PSALM_TXT}": "R. Habitaré en la casa del Señor, por años sin término.\nEl Señor es mi pastor, nada me falta: en verdes praderas me hace recostar; me conduce hacia fuentes tranquilas y repara mis fuerzas.\nMe guía por el sendero justo, por el honor de su nombre. Aunque camine por cañadas oscuras, nada temo, porque tú vas conmigo: tu vara y tu cayado me sosiegan.\nPreparas una mesa ante mí, enfrente de mis enemigos; me unges la cabeza con perfume, y mi copa rebosa.\nTu bondad y tu misericordia me acompañan todos los días de mi vida, y habitaré en la casa del Señor, por años sin término.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "El Padre de nuestro Señor Jesucristo ilumine los ojos de nuestro corazón, para que veamos la herencia gloriosa que Dios nos ha reservado."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Habitaré en la casa del Señor, por años sin término.",
+      "El Señor es mi pastor, nada me falta: en verdes praderas me hace recostar; me conduce hacia fuentes tranquilas y repara mis fuerzas.",
+      "R. Habitaré en la casa del Señor, por años sin término.",
+      "Me guía por el sendero justo, por el honor de su nombre. Aunque camine por cañadas oscuras, nada temo, porque tú vas conmigo: tu vara y tu cayado me sosiegan.",
+      "R. Habitaré en la casa del Señor, por años sin término.",
+      "Preparas una mesa ante mí, enfrente de mis enemigos; me unges la cabeza con perfume, y mi copa rebosa.",
+      "R. Habitaré en la casa del Señor, por años sin término.",
+      "Tu bondad y tu misericordia me acompañan todos los días de mi vida, y habitaré en la casa del Señor, por años sin término."
+    ]
+  }
+}

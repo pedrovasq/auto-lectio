@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "date": "2026-08-09",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XIX Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 176,
+    "pdf_psalm_ref": "Salmo 84, 9ab–10. 11–12. 13–14",
+    "pdf_acclamation_ref": "Salmo 129, 5",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 84, 9ab–10. 11–12. 13–14",
+    "{PSALM_TXT}": "R. Muéstranos, Señor, tu misericordia y danos tu salvación, y danos tu salvación.\nVoy a escuchar lo que dice el Señor: Dios anuncia la paz a su pueblo y a sus amigos. La salvación está ya cerca de sus fieles, y la gloria habitará en nuestra tierra.\nLa misericordia y la fidelidad se encuentran, la justicia y la paz se besan; la fidelidad brota de la tierra, y la justicia mira desde el cielo.\nEl Señor nos dará la lluvia, y nuestra tierra dará su fruto. La justicia marchará ante él, la salvación seguirá sus pasos.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Espero en el Señor, espero en su Palabra."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Muéstranos, Señor, tu misericordia y danos tu salvación, y danos tu salvación.",
+      "Voy a escuchar lo que dice el Señor: Dios anuncia la paz a su pueblo y a sus amigos. La salvación está ya cerca de sus fieles, y la gloria habitará en nuestra tierra.",
+      "R. Muéstranos, Señor, tu misericordia y danos tu salvación, y danos tu salvación.",
+      "La misericordia y la fidelidad se encuentran, la justicia y la paz se besan; la fidelidad brota de la tierra, y la justicia mira desde el cielo.",
+      "R. Muéstranos, Señor, tu misericordia y danos tu salvación, y danos tu salvación.",
+      "El Señor nos dará la lluvia, y nuestra tierra dará su fruto. La justicia marchará ante él, la salvación seguirá sus pasos.",
+      "R. Muéstranos, Señor, tu misericordia y danos tu salvación, y danos tu salvación."
+    ]
+  }
+}

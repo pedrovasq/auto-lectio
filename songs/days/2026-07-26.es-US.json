@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "date": "2026-07-26",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XVII Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 172,
+    "pdf_psalm_ref": "Salmo 118, 57 y 72. 76–77. 127–128. 129–130",
+    "pdf_acclamation_ref": "Cfr Mateo 11, 25",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 118, 57 y 72. 76–77. 127–128. 129–130",
+    "{PSALM_TXT}": "R. Cuánto amo tu voluntad, tu voluntad, Señor.\nMi porción es el Señor, he resuelto guardar tus palabras. Más estimo yo los preceptos de tu boca, que miles de monedas de oro y plata.\nQue tu voluntad me consuele, según la promesa hecha a tu siervo; cuando me alcance tu compasión, viviré, y mis delicias serán tu voluntad.\nYo amo tus mandatos, más que el oro purísimo; por eso aprecio tus decretos, y detesto el camino de la mentira.\nTus preceptos son admirables, por eso los guarda mi alma; la explicación de tus palabras ilumina, da inteligencia a los ignorantes.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Bendito seas, Padre, Señor del cielo y de la tierra, porque revelaste los secretos del Reino a la gente sencilla."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Cuánto amo tu voluntad, tu voluntad, Señor.",
+      "Mi porción es el Señor, he resuelto guardar tus palabras. Más estimo yo los preceptos de tu boca, que miles de monedas de oro y plata.",
+      "R. Cuánto amo tu voluntad, tu voluntad, Señor.",
+      "Que tu voluntad me consuele, según la promesa hecha a tu siervo; cuando me alcance tu compasión, viviré, y mis delicias serán tu voluntad.",
+      "R. Cuánto amo tu voluntad, tu voluntad, Señor.",
+      "Yo amo tus mandatos, más que el oro purísimo; por eso aprecio tus decretos, y detesto el camino de la mentira.",
+      "R. Cuánto amo tu voluntad, tu voluntad, Señor.",
+      "Tus preceptos son admirables, por eso los guarda mi alma; la explicación de tus palabras ilumina, da inteligencia a los ignorantes.",
+      "R. Cuánto amo tu voluntad, tu voluntad, Señor."
+    ]
+  }
+}

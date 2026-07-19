@@ -7,6 +7,7 @@ from zipfile import ZipFile
 from render import (
     OfficeCli,
     OfficeCliError,
+    _load_songs,
     _officecli_path_from_json,
     build_prune_plans,
     chunks_for_key,
@@ -137,6 +138,44 @@ class OfficeCliRenderTests(unittest.TestCase):
         )
 
         self.assertEqual(["Linea 1\nLinea 2", "Linea 3"], chunks)
+
+    def test_psalm_chunks_can_come_from_songs_json(self) -> None:
+        chunks = chunks_for_key(
+            "{PSALM_TXT}",
+            placeholders={"{PSALM_TXT}": "R. Original"},
+            chunks_map={"{PSALM_TXT}": ["R. Override", "Verse override"]},
+        )
+
+        self.assertEqual(["R. Override", "Verse override"], chunks)
+
+    def test_load_songs_accepts_day_psalm_and_acclamation_tokens(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "day.json"
+            path.write_text(
+                """
+{
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 85",
+    "{PSALM_TXT}": "R. Tu eres bueno",
+    "{ACCLAMATION_RES}": "Aleluya",
+    "{ACCLAMATION_VERSE}": "Bendito seas, Padre.",
+    "{UNKNOWN_TOKEN}": "ignored"
+  },
+  "chunks": {
+    "{PSALM_TXT}": ["R. Tu eres bueno", "Tu eres clemente."],
+    "{GOSPEL_TXT}": ["ignored"]
+  }
+}
+""".strip(),
+                encoding="utf-8",
+            )
+
+            chunks, placeholders = _load_songs(str(path))
+
+        self.assertEqual({"{PSALM_TXT}": ["R. Tu eres bueno", "Tu eres clemente."]}, chunks)
+        self.assertEqual("Salmo 85", placeholders["{PSALM_REF}"])
+        self.assertEqual("Aleluya", placeholders["{ACCLAMATION_RES}"])
+        self.assertNotIn("{UNKNOWN_TOKEN}", placeholders)
 
     def test_prune_plan_removes_empty_second_reading_group(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

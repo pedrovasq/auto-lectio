@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "date": "2026-09-13",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XXIV Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 192,
+    "pdf_psalm_ref": "Salmo 102, 1–2. 3–4. 9–10. 11–12",
+    "pdf_acclamation_ref": "Juan 13, 34",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 102, 1–2. 3–4. 9–10. 11–12",
+    "{PSALM_TXT}": "R. El Señor es compasivo y misericordioso, lento a la ira y rico en clemencia.\nBendice, alma mía al Señor, y todo mi ser a su santo nombre. Bendice, alma mía al Señor, y no olvides sus beneficios.\nÉl perdona todas tus culpas, y cura todas tus enfermedades; él rescata tu vida de la fosa y te colma de gracia y de ternura.\nNo está siempre acusando, ni guarda rencor perpetuo. No nos trata como merecen nuestros pecados, ni nos paga según nuestras culpas.\nComo se levanta el cielo sobre la tierra, se levanta su bondad sobre sus fieles; como dista el oriente del ocaso, así aleja de nosotros nuestros delitos.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Les doy este mandamiento nuevo, dice el Señor, que se amen unos a otros como yo los he amado."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. El Señor es compasivo y misericordioso, lento a la ira y rico en clemencia.",
+      "Bendice, alma mía al Señor, y todo mi ser a su santo nombre. Bendice, alma mía al Señor, y no olvides sus beneficios.",
+      "R. El Señor es compasivo y misericordioso, lento a la ira y rico en clemencia.",
+      "Él perdona todas tus culpas, y cura todas tus enfermedades; él rescata tu vida de la fosa y te colma de gracia y de ternura.",
+      "R. El Señor es compasivo y misericordioso, lento a la ira y rico en clemencia.",
+      "No está siempre acusando, ni guarda rencor perpetuo. No nos trata como merecen nuestros pecados, ni nos paga según nuestras culpas.",
+      "R. El Señor es compasivo y misericordioso, lento a la ira y rico en clemencia.",
+      "Como se levanta el cielo sobre la tierra, se levanta su bondad sobre sus fieles; como dista el oriente del ocaso, así aleja de nosotros nuestros delitos.",
+      "R. El Señor es compasivo y misericordioso, lento a la ira y rico en clemencia."
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "date": "2026-11-22",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "Nuestro Señor Jesucristo, Rey del Universo",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 222,
+    "pdf_psalm_ref": "Salmo 22, 1–2a. 2b–3. 5–6",
+    "pdf_acclamation_ref": "Marcos 11, 10",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 22, 1–2a. 2b–3. 5–6",
+    "{PSALM_TXT}": "R. El Señor es mi pastor, nada me falta.\nEl Señor es mi pastor, nada me falta: en verdes praderas me hace recostar.\nMe conduce hacia fuentes tranquilas, repara mis fuerzas; me guía por el sendero justo, por el honor de su nombre.\nPreparas una mesa ante mí enfrente de mis enemigos; me unges la cabeza con perfume, y mi copa rebosa.\nTu bondad y tu misericordia me acompañan todos los días de mi vida, y habitaré en la casa del Señor, por años sin término.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "¡Bendito el que viene en nombre del Señor! ¡Ahí viene el bendito reino de nuestro padre David!"
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. El Señor es mi pastor, nada me falta.",
+      "El Señor es mi pastor, nada me falta: en verdes praderas me hace recostar.",
+      "R. El Señor es mi pastor, nada me falta.",
+      "Me conduce hacia fuentes tranquilas, repara mis fuerzas; me guía por el sendero justo, por el honor de su nombre.",
+      "R. El Señor es mi pastor, nada me falta.",
+      "Preparas una mesa ante mí enfrente de mis enemigos; me unges la cabeza con perfume, y mi copa rebosa.",
+      "R. El Señor es mi pastor, nada me falta.",
+      "Tu bondad y tu misericordia me acompañan todos los días de mi vida, y habitaré en la casa del Señor, por años sin término."
+    ]
+  }
+}

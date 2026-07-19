@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "date": "2026-11-01",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "Todos los Santos",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 212,
+    "pdf_psalm_ref": "Salmo 23/Psalm 24, 1bc–2. 3–4ab. 5–6",
+    "pdf_acclamation_ref": "Mateo 11, 28",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 23/Psalm 24, 1bc–2. 3–4ab. 5–6",
+    "{PSALM_TXT}": "R. Ésta es la raza de los que buscan tu rostro, Señor.\nDel Señor es la tierra y cuanto la llena, el orbe y todos sus habitantes: él la fundó sobre los mares, él la afianzó sobre los ríos.\n¿Quién puede subir al monte del Señor? ¿Quién puede estar en el recinto sacro? El hombre de manos inocentes y puro corazón.\nÉse recibirá la bendición del Señor, le hará justicia el Dios de salvación. Ésta es la raza de los que lo buscan, que anhelan ver el rostro del Dios de Jacob.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Vengan a mí los que se sienten cargados y agobiados, porque yo los aliviaré, dice el Señor."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Ésta es la raza de los que buscan tu rostro, Señor.",
+      "Del Señor es la tierra y cuanto la llena, el orbe y todos sus habitantes: él la fundó sobre los mares, él la afianzó sobre los ríos.",
+      "R. Ésta es la raza de los que buscan tu rostro, Señor.",
+      "¿Quién puede subir al monte del Señor? ¿Quién puede estar en el recinto sacro? El hombre de manos inocentes y puro corazón.",
+      "R. Ésta es la raza de los que buscan tu rostro, Señor.",
+      "Ése recibirá la bendición del Señor, le hará justicia el Dios de salvación. Ésta es la raza de los que lo buscan, que anhelan ver el rostro del Dios de Jacob.",
+      "R. Ésta es la raza de los que buscan tu rostro, Señor."
+    ]
+  }
+}

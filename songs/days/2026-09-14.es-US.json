@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "date": "2026-09-14",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "Exaltación de la Santa Cruz",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 194,
+    "pdf_psalm_ref": "Salmo 77, 1–2. 34–35. 36–37. 38",
+    "pdf_acclamation_ref": "",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 77, 1–2. 34–35. 36–37. 38",
+    "{PSALM_TXT}": "R. No olviden las acciones del Señor.\nEscucha, pueblo mío, mi enseñanza; inclinen el oído a las palabras de mi boca: que voy a abrir mi boca a las sentencias, para que broten los enigmas del pasado.\nY cuando los hacía morir, lo buscaban, y madrugaban para volverse hacia Dios; se acordaban de que Dios era su roca, el Dios Altísimo, su redentor.\nLo adulaban con sus bocas, pero sus lenguas mentían; su corazón no era sincero con él ni eran fieles a su alianza.\nÉl, en cambio, sentía lástima, perdonaba la culpa y no los destruía: una y otra vez reprimió su cólera, y no despertaba todo su furor.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Te adoramos, Cristo, y te bendecimos, porque con tu cruz has redimido al mundo."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. No olviden las acciones del Señor.",
+      "Escucha, pueblo mío, mi enseñanza; inclinen el oído a las palabras de mi boca: que voy a abrir mi boca a las sentencias, para que broten los enigmas del pasado.",
+      "R. No olviden las acciones del Señor.",
+      "Y cuando los hacía morir, lo buscaban, y madrugaban para volverse hacia Dios; se acordaban de que Dios era su roca, el Dios Altísimo, su redentor.",
+      "R. No olviden las acciones del Señor.",
+      "Lo adulaban con sus bocas, pero sus lenguas mentían; su corazón no era sincero con él ni eran fieles a su alianza.",
+      "R. No olviden las acciones del Señor.",
+      "Él, en cambio, sentía lástima, perdonaba la culpa y no los destruía: una y otra vez reprimió su cólera, y no despertaba todo su furor.",
+      "R. No olviden las acciones del Señor."
+    ]
+  }
+}

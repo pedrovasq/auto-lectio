@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "date": "2026-08-15",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "Asunción de la Bienaventurada Virgen María: Misa del Día",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 182,
+    "pdf_psalm_ref": "Salmo 44, 10bc. 11–12ab. 16",
+    "pdf_acclamation_ref": "",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 44, 10bc. 11–12ab. 16",
+    "{PSALM_TXT}": "R. De pie a tu derecha está la reina, enjoyada con oro de Ofir.\nHijas de reyes salen a tu encuentro; de pie a tu derecha está la reina, enjoyada con oro de Ofir.\nEscucha, hija, mira: inclina el oído, olvida tu pueblo y la casa paterna.\nPrendado está el rey de tu belleza: póstrate ante él, que él es tu señor.\nLas traen entre alegría y algazara, van entrando en el palacio real.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Hoy es la Asunción de María: se alegra el ejército de los ángeles."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. De pie a tu derecha está la reina, enjoyada con oro de Ofir.",
+      "Hijas de reyes salen a tu encuentro; de pie a tu derecha está la reina, enjoyada con oro de Ofir.",
+      "R. De pie a tu derecha está la reina, enjoyada con oro de Ofir.",
+      "Escucha, hija, mira: inclina el oído, olvida tu pueblo y la casa paterna.",
+      "R. De pie a tu derecha está la reina, enjoyada con oro de Ofir.",
+      "Prendado está el rey de tu belleza: póstrate ante él, que él es tu señor.",
+      "R. De pie a tu derecha está la reina, enjoyada con oro de Ofir.",
+      "Las traen entre alegría y algazara, van entrando en el palacio real.",
+      "R. De pie a tu derecha está la reina, enjoyada con oro de Ofir."
+    ]
+  }
+}

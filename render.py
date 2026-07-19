@@ -29,6 +29,18 @@ HYMN_TOKENS = [
     "{RECESSIONAL_TXT}",
 ]
 
+SONGS_CHUNK_TOKENS = {
+    "{PSALM_TXT}",
+    *HYMN_TOKENS,
+}
+
+SONGS_PLACEHOLDER_OVERRIDE_TOKENS = {
+    "{PSALM_REF}",
+    "{PSALM_TXT}",
+    "{ACCLAMATION_RES}",
+    "{ACCLAMATION_VERSE}",
+}
+
 WATERFALL_KEYS = [
     "{FIRST_READING_TXT}",
     "{PSALM_TXT}",
@@ -327,13 +339,13 @@ def _load_songs(songs_path: str | None) -> tuple[Dict[str, List[str]], Dict[str,
     raw_chunks = songs_payload.get("chunks")
     if isinstance(raw_chunks, dict):
         for key, value in raw_chunks.items():
-            if key in HYMN_TOKENS and isinstance(value, list):
+            if key in SONGS_CHUNK_TOKENS and isinstance(value, list):
                 songs_chunks[key] = [item if isinstance(item, str) else str(item) for item in value]
 
     raw_placeholders = songs_payload.get("placeholders")
     if isinstance(raw_placeholders, dict):
         for key, value in raw_placeholders.items():
-            if isinstance(value, str):
+            if key in KNOWN_TOKENS and isinstance(value, str):
                 songs_placeholders[key] = value
 
     return songs_chunks, songs_placeholders
@@ -589,7 +601,9 @@ def chunks_for_key(
 ) -> List[str]:
     exact_chunk_tokens = exact_chunk_tokens or set()
     if key == "{PSALM_TXT}":
-        chunks = chunk_psalm_text(placeholders.get(key, "") or "")
+        chunks = chunks_map.get(key)
+        if not chunks:
+            chunks = chunk_psalm_text(placeholders.get(key, "") or "")
     elif key in HYMN_TOKENS:
         chunks = chunks_map.get(key)
         if not chunks:
@@ -786,7 +800,7 @@ def main() -> None:
                 print(f"Songs provided for tokens: {sorted(songs_chunks)}")
             chunks_map = {**chunks_map, **songs_chunks}
             for key, value in songs_placeholders.items():
-                if not placeholders.get(key):
+                if key in SONGS_PLACEHOLDER_OVERRIDE_TOKENS or not placeholders.get(key):
                     placeholders[key] = value
         except Exception as exc:
             if args.verbose:

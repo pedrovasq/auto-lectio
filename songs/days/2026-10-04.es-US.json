@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "date": "2026-10-04",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XXVII Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 204,
+    "pdf_psalm_ref": "Salmo 79, 9 y 12. 13–14. 15–16. 19–20",
+    "pdf_acclamation_ref": "Juan 15, 16",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 79, 9 y 12. 13–14. 15–16. 19–20",
+    "{PSALM_TXT}": "R. La viña del Señor es el pueblo de Israel.\nSacaste, Señor, una vid de Egipto, expulsaste a los gentiles, y la trasplantaste. Extendió sus sarmientos hasta el mar y sus brotes hasta el Gran Río.\nPor qué has derribado su cerca, para que la saqueen los viandantes, la pisoteen los jabalíes y se la coman las alimañas?\nDios de los Ejércitos, vuélvete: mira desde el cielo, fíjate, ven a visitar tu viña, la cepa que tu diestra plantó y que tú hiciste vigorosa.\nNo nos alejaremos de ti; danos vida, para que invoquemos tu nombre. Señor Dios de los Ejércitos, restáuranos, que brille tu rostro y nos salve.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Los escogí a ustedes y los he puesto para que produzcan fruto, y ese fruto permanezca, dice el Señor."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. La viña del Señor es el pueblo de Israel.",
+      "Sacaste, Señor, una vid de Egipto, expulsaste a los gentiles, y la trasplantaste. Extendió sus sarmientos hasta el mar y sus brotes hasta el Gran Río.",
+      "R. La viña del Señor es el pueblo de Israel.",
+      "Por qué has derribado su cerca, para que la saqueen los viandantes, la pisoteen los jabalíes y se la coman las alimañas?",
+      "R. La viña del Señor es el pueblo de Israel.",
+      "Dios de los Ejércitos, vuélvete: mira desde el cielo, fíjate, ven a visitar tu viña, la cepa que tu diestra plantó y que tú hiciste vigorosa.",
+      "R. La viña del Señor es el pueblo de Israel.",
+      "No nos alejaremos de ti; danos vida, para que invoquemos tu nombre. Señor Dios de los Ejércitos, restáuranos, que brille tu rostro y nos salve.",
+      "R. La viña del Señor es el pueblo de Israel."
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "date": "2026-09-27",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XXVI Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 202,
+    "pdf_psalm_ref": "Salmo 24, 4bc–5. 6–7. 8–9",
+    "pdf_acclamation_ref": "Juan 10, 27",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 24, 4bc–5. 6–7. 8–9",
+    "{PSALM_TXT}": "R. Recuerda, Señor, que tu misericordia es eterna.\nSeñor, enséñame tus caminos, instrúyeme en tus sendas, haz que camine con lealtad; enséñame, porque tú eres mi Dios y Salvador, y todo el día te estoy esperando.\nRecuerda, Señor, que tu ternura y tu misericordia son eternas; no te acuerdes de los pecados ni de las maldades de mi juventud; acuérdate de mí con misericordia, por tu bondad, Señor.\nEl Señor es bueno y es recto, y enseña el camino a los pecadores; hace caminar a los humildes con rectitud, enseña su camino a los humildes.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Mis ovejas conocen mi voz, dice el Señor; y yo las conozco a ellas, y ellas me siguen."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Recuerda, Señor, que tu misericordia es eterna.",
+      "Señor, enséñame tus caminos, instrúyeme en tus sendas, haz que camine con lealtad; enséñame, porque tú eres mi Dios y Salvador, y todo el día te estoy esperando.",
+      "R. Recuerda, Señor, que tu misericordia es eterna.",
+      "Recuerda, Señor, que tu ternura y tu misericordia son eternas; no te acuerdes de los pecados ni de las maldades de mi juventud; acuérdate de mí con misericordia, por tu bondad, Señor.",
+      "R. Recuerda, Señor, que tu misericordia es eterna.",
+      "El Señor es bueno y es recto, y enseña el camino a los pecadores; hace caminar a los humildes con rectitud, enseña su camino a los humildes.",
+      "R. Recuerda, Señor, que tu misericordia es eterna."
+    ]
+  }
+}

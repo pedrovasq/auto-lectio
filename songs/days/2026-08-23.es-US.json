@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "date": "2026-08-23",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XXI Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 186,
+    "pdf_psalm_ref": "Salmo 137, 1–2a. 2bc–3. 6 y 8bc",
+    "pdf_acclamation_ref": "Mateo 16, 18",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 137, 1–2a. 2bc–3. 6 y 8bc",
+    "{PSALM_TXT}": "R. Señor, tu misericordia es eterna, no abandones, no abandones la obra de tus manos.\nTe doy gracias, Señor, de todo corazón; delante de los ángeles tañeré para ti. Me postraré hacia tu santuario, daré gracias a tu nombre.\nPor tu misericordia y tu lealtad, porque tu promesa supera a tu fama. Cuando te invoqué, me escuchaste, acreciste el valor en mi alma.\nEl Señor es sublime, se fija en el humilde y de lejos conoce al soberbio. Señor, tu misericordia es eterna, no abandones la obra de tus manos.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Tú eres Pedro, y sobre esta piedra edificaré mi Iglesia que los poderes del infierno no podrán vencer."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Señor, tu misericordia es eterna, no abandones, no abandones la obra de tus manos.",
+      "Te doy gracias, Señor, de todo corazón; delante de los ángeles tañeré para ti. Me postraré hacia tu santuario, daré gracias a tu nombre.",
+      "R. Señor, tu misericordia es eterna, no abandones, no abandones la obra de tus manos.",
+      "Por tu misericordia y tu lealtad, porque tu promesa supera a tu fama. Cuando te invoqué, me escuchaste, acreciste el valor en mi alma.",
+      "R. Señor, tu misericordia es eterna, no abandones, no abandones la obra de tus manos.",
+      "El Señor es sublime, se fija en el humilde y de lejos conoce al soberbio. Señor, tu misericordia es eterna, no abandones la obra de tus manos.",
+      "R. Señor, tu misericordia es eterna, no abandones, no abandones la obra de tus manos."
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "date": "2026-09-06",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XXIII Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 190,
+    "pdf_psalm_ref": "Salmo 94, 1–2. 6–7. 8–9",
+    "pdf_acclamation_ref": "2 Corintios 5, 19",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 94, 1–2. 6–7. 8–9",
+    "{PSALM_TXT}": "R. Ojalá escuchen hoy su voz: “No endurezcan su corazón, no endurezcan su corazón”.\nVengan, aclamemos al Señor, entremos a su presencia dándole gracias, demos vítores a la Roca que nos salva; aclamándolo con cantos.\nEntren, postrémonos por tierra, bendiciendo al Señor, creador nuestro. Porque él es nuestro Dios y nosotros su pueblo, el rebaño que él guía.\nOjalá escuchen hoy su voz: “No endurezcan el corazón como en Meribá, como el día de Masá en el desierto: cuando sus padres me pusieron a prueba y me tentaron, aunque habían visto mis obras”.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "En Cristo, Dios reconciliaba al mundo con él, y nos entregaba el mensaje de la reconciliación."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Ojalá escuchen hoy su voz: “No endurezcan su corazón, no endurezcan su corazón”.",
+      "Vengan, aclamemos al Señor, entremos a su presencia dándole gracias, demos vítores a la Roca que nos salva; aclamándolo con cantos.",
+      "R. Ojalá escuchen hoy su voz: “No endurezcan su corazón, no endurezcan su corazón”.",
+      "Entren, postrémonos por tierra, bendiciendo al Señor, creador nuestro. Porque él es nuestro Dios y nosotros su pueblo, el rebaño que él guía.",
+      "R. Ojalá escuchen hoy su voz: “No endurezcan su corazón, no endurezcan su corazón”.",
+      "Ojalá escuchen hoy su voz: “No endurezcan el corazón como en Meribá, como el día de Masá en el desierto: cuando sus padres me pusieron a prueba y me tentaron, aunque habían visto mis obras”.",
+      "R. Ojalá escuchen hoy su voz: “No endurezcan su corazón, no endurezcan su corazón”."
+    ]
+  }
+}

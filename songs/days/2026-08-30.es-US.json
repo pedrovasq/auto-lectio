@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "date": "2026-08-30",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XXII Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 188,
+    "pdf_psalm_ref": "Salmo 62, 2. 3–4. 5–6. 8–9",
+    "pdf_acclamation_ref": "Cfr Efesios 1, 17–18",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 62, 2. 3–4. 5–6. 8–9",
+    "{PSALM_TXT}": "R. Mi alma está sedienta de ti, Señor, Dios mío.\nOh Dios, tú eres mi Dios, por ti madrugo, mi alma está sedienta de ti; mi carne tiene ansia de ti, como tierra reseca, agostada, sin agua.\n¡Cómo te contemplaba en el santuario viendo tu fuerza y tu gloria! Tu gracia vale más que la vida, te alabarán mis labios.\nToda mi vida te bendeciré y alzaré las manos invocándote. Me saciaré como de enjundia y de manteca y mis labios te alabarán jubilosos.\nPorque fuiste mi auxilio, y a la sombra de tus alas canto con júbilo, mi alma está unida a ti y tu diestra me sostiene.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "El Padre de nuestro Señor Jesucristo ilumine los ojos de nuestro corazón, para que veamos la herencia gloriosa que Dios nos ha reservado."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Mi alma está sedienta de ti, Señor, Dios mío.",
+      "Oh Dios, tú eres mi Dios, por ti madrugo, mi alma está sedienta de ti; mi carne tiene ansia de ti, como tierra reseca, agostada, sin agua.",
+      "R. Mi alma está sedienta de ti, Señor, Dios mío.",
+      "¡Cómo te contemplaba en el santuario viendo tu fuerza y tu gloria! Tu gracia vale más que la vida, te alabarán mis labios.",
+      "R. Mi alma está sedienta de ti, Señor, Dios mío.",
+      "Toda mi vida te bendeciré y alzaré las manos invocándote. Me saciaré como de enjundia y de manteca y mis labios te alabarán jubilosos.",
+      "R. Mi alma está sedienta de ti, Señor, Dios mío.",
+      "Porque fuiste mi auxilio, y a la sombra de tus alas canto con júbilo, mi alma está unida a ti y tu diestra me sostiene.",
+      "R. Mi alma está sedienta de ti, Señor, Dios mío."
+    ]
+  }
+}

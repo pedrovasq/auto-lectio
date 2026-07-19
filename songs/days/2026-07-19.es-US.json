@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "date": "2026-07-19",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XVI Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 170,
+    "pdf_psalm_ref": "Salmo 85, 5–6. 9–10. 15–16a",
+    "pdf_acclamation_ref": "Cfr Mateo 11, 25",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 85, 5–6. 9–10. 15–16a",
+    "{PSALM_TXT}": "R. Tú, Señor, eres bueno y clemente.\nTú, Señor, eres bueno y clemente, rico en misericordia con los que te invocan. Señor, escucha mi oración, atiende a la voz de mi súplica.\nTodos los pueblos vendrán a postrarse en tu presencia, Señor, bendecirán tu nombre: “Grande eres tú y haces maravillas; tú eres el único Dios”.\nPero tú, Señor, Dios clemente y misericordioso, lento a la cólera, rico en piedad y leal, mírame, ten compasión de mí.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Bendito seas, Padre, Señor del cielo y de la tierra, porque revelaste los secretos del Reino a la gente sencilla."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Tú, Señor, eres bueno y clemente.",
+      "Tú, Señor, eres bueno y clemente, rico en misericordia con los que te invocan. Señor, escucha mi oración, atiende a la voz de mi súplica.",
+      "R. Tú, Señor, eres bueno y clemente.",
+      "Todos los pueblos vendrán a postrarse en tu presencia, Señor, bendecirán tu nombre: “Grande eres tú y haces maravillas; tú eres el único Dios”.",
+      "R. Tú, Señor, eres bueno y clemente.",
+      "Pero tú, Señor, Dios clemente y misericordioso, lento a la cólera, rico en piedad y leal, mírame, ten compasión de mí.",
+      "R. Tú, Señor, eres bueno y clemente."
+    ]
+  }
+}

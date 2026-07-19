@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "date": "2026-10-25",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XXX Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 210,
+    "pdf_psalm_ref": "Salmo 17, 2–3a. 3bc–4. 47 y 51ab",
+    "pdf_acclamation_ref": "Juan 14, 23",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 17, 2–3a. 3bc–4. 47 y 51ab",
+    "{PSALM_TXT}": "R. Yo te a mo, Señor, tú eres mi for ta le za.\nYo te amo, Señor, tú eres mi forta leza, Señor, mi roca, mi alcázar, mi liberta dor.\nDios mío, peña mía, refugio mío, escudo mío, mi fuerza salvadora, mi ba luarte. Invoco al Señor de mi a la banza y quedo libre de mis ene migos. Invoco al Señor de mi a la banza y quedo libre de mis ene migos.\nViva el Señor, bendita sea mi Roca, sea ensalzado mi Dios y Salva dor. Con las Tú diste gran victoria a tu rey, tuviste misericordia de tu Un gido.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Si alguien me ama, guardará mis palabras, dice el Señor; y mi Padre lo amará y vendremos a él."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Yo te a mo, Señor, tú eres mi for ta le za.",
+      "Yo te amo, Señor, tú eres mi forta leza, Señor, mi roca, mi alcázar, mi liberta dor.",
+      "R. Yo te a mo, Señor, tú eres mi for ta le za.",
+      "Dios mío, peña mía, refugio mío, escudo mío, mi fuerza salvadora, mi ba luarte. Invoco al Señor de mi a la banza y quedo libre de mis ene migos. Invoco al Señor de mi a la banza y quedo libre de mis ene migos.",
+      "R. Yo te a mo, Señor, tú eres mi for ta le za.",
+      "Viva el Señor, bendita sea mi Roca, sea ensalzado mi Dios y Salva dor. Con las Tú diste gran victoria a tu rey, tuviste misericordia de tu Un gido."
+    ]
+  }
+}

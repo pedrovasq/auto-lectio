@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "date": "2026-09-20",
+    "language": "es-US",
+    "source": "ocp_pdf_manual",
+    "title": "XXV Domingo del Tiempo Ordinario",
+    "pdf": "Responde_Y_Aclama_2026_Libro_Electronico_Para_Imprimirse.pdf",
+    "pdf_page": 200,
+    "pdf_psalm_ref": "Salmo 144, 2–3. 8–9. 17–18",
+    "pdf_acclamation_ref": "Cfr Hechos de los Apóstoles 16, 14b",
+    "usccb_title": "",
+    "usccb_link": "",
+    "usccb_error": "",
+    "manual_reviewed": true
+  },
+  "placeholders": {
+    "{PSALM_REF}": "Salmo 144, 2–3. 8–9. 17–18",
+    "{PSALM_TXT}": "R. Cerca está el Señor de los que lo invocan.\nDía tras día te bendeciré, Dios mío, y alabaré tu nombre por siempre jamás. Grande es el Señor y merece toda alabanza, es incalculable su grandeza.\nEl Señor es clemente y misericordioso, lento a la cólera y rico en piedad; el Señor es bueno con todos, es cariñoso con todas sus criaturas.\nEl Señor es justo en todos sus caminos, es bondadoso en todas sus acciones; cerca está el Señor de los que lo invocan, de los que lo invocan sinceramente.",
+    "{ACCLAMATION_RES}": "Aleluya, Aleluya, Aleluya",
+    "{ACCLAMATION_VERSE}": "Abre, Señor, nuestro corazón, para que aceptemos las palabras de tu Hijo."
+  },
+  "chunks": {
+    "{PSALM_TXT}": [
+      "R. Cerca está el Señor de los que lo invocan.",
+      "Día tras día te bendeciré, Dios mío, y alabaré tu nombre por siempre jamás. Grande es el Señor y merece toda alabanza, es incalculable su grandeza.",
+      "R. Cerca está el Señor de los que lo invocan.",
+      "El Señor es clemente y misericordioso, lento a la cólera y rico en piedad; el Señor es bueno con todos, es cariñoso con todas sus criaturas.",
+      "R. Cerca está el Señor de los que lo invocan.",
+      "El Señor es justo en todos sus caminos, es bondadoso en todas sus acciones; cerca está el Señor de los que lo invocan, de los que lo invocan sinceramente.",
+      "R. Cerca está el Señor de los que lo invocan."
+    ]
+  }
+}
