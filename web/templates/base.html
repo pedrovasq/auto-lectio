@@ -4,6 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}AutoLectio{% endblock %}</title>
+    <script>
+      (() => {
+        try {
+          if (window.localStorage.getItem("autolectio-theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+          }
+        } catch (_) {}
+      })();
+    </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}" />
     {% block extra_head %}{% endblock %}
   </head>
@@ -20,6 +29,7 @@
           <a href="{{ url_for('advanced') }}" class="{% if request.endpoint == 'advanced' %}is-active{% endif %}">Avanzado</a>
           <a href="{{ url_for('docs') }}" class="{% if request.endpoint == 'docs' %}is-active{% endif %}">Documentación</a>
         </nav>
+        <button class="site-theme-button" type="button" aria-pressed="false">Modo oscuro</button>
       </header>
     </div>
 
@@ -39,6 +49,34 @@
         </div>
       </div>
     </footer>
+    <script>
+      (() => {
+        const storageKey = "autolectio-theme";
+        const button = document.querySelector(".site-theme-button");
+        if (!button) return;
+
+        function setTheme(theme) {
+          const isDark = theme === "dark";
+          if (isDark) {
+            document.documentElement.dataset.theme = "dark";
+          } else {
+            document.documentElement.removeAttribute("data-theme");
+          }
+          button.setAttribute("aria-pressed", String(isDark));
+          button.textContent = isDark ? "Modo claro" : "Modo oscuro";
+          try {
+            window.localStorage.setItem(storageKey, isDark ? "dark" : "light");
+          } catch (_) {}
+        }
+
+        const isDark = document.documentElement.dataset.theme === "dark";
+        setTheme(isDark ? "dark" : "light");
+        button.addEventListener("click", () => {
+          const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+          setTheme(nextTheme);
+        });
+      })();
+    </script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

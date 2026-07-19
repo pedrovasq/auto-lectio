@@ -8,7 +8,6 @@
       <div class="home-panel">
         <div class="home-toolbar">
           <span>Inicio</span>
-          <button class="home-theme-button" type="button" aria-pressed="false">Modo oscuro</button>
         </div>
         <div class="home-header">
           <p class="home-kicker">AutoLectio</p>
@@ -47,37 +46,4 @@
       </div>
     </div>
   </section>
-{% endblock %}
-
-{% block scripts %}
-  <script>
-    (() => {
-      const screen = document.querySelector(".home-screen");
-      const button = document.querySelector(".home-theme-button");
-      if (!screen || !button) return;
-
-      const storageKey = "autolectio-home-theme";
-
-      function setTheme(theme) {
-        const isDark = theme === "dark";
-        screen.classList.toggle("is-dark", isDark);
-        document.body.classList.toggle("home-theme-dark", isDark);
-        button.setAttribute("aria-pressed", String(isDark));
-        button.textContent = isDark ? "Modo claro" : "Modo oscuro";
-        try {
-          window.localStorage.setItem(storageKey, isDark ? "dark" : "light");
-        } catch (_) {}
-      }
-
-      let saved = "light";
-      try {
-        saved = window.localStorage.getItem(storageKey) || "light";
-      } catch (_) {}
-
-      setTheme(saved === "dark" ? "dark" : "light");
-      button.addEventListener("click", () => {
-        setTheme(screen.classList.contains("is-dark") ? "light" : "dark");
-      });
-    })();
-  </script>
 {% endblock %}
